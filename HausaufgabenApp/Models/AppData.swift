@@ -66,10 +66,6 @@ struct AppData: Codable {
         let tageMitAufgaben = Set(homework.map(\.dayKey))
         noHomeworkDays = noHomeworkDays.filter { !tageMitAufgaben.contains($0) }
 
-        notes = notes.filter(\.hasText).map { note in
-            var note = note
-            if let id = note.subjectID, !validIDs.contains(id) { note.subjectID = nil }
-            return note
-        }
+        notes = notes.filter(\.hasText)
     }
 }

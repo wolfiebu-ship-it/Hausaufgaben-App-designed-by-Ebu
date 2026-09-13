@@ -17,7 +17,6 @@ struct RootView: View {
 
             NotesView()
                 .tabItem { Label("Notizen", systemImage: "note.text") }
-                .badge(store.openNoteCount)
                 .tag(Tab.notes)
 
             TimetableView()

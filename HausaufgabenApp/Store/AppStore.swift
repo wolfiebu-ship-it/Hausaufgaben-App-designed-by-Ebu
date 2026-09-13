@@ -84,14 +84,11 @@ final class AppStore: ObservableObject {
     }
 
     /// Löscht ein Fach samt seiner Stundenplan-Einträge und Hausaufgaben.
-    /// Notizen bleiben erhalten und verlieren nur die Zuordnung.
+    /// Notizen sind davon unabhängig und bleiben unverändert.
     func deleteSubject(id: UUID) {
         subjects.removeAll { $0.id == id }
         lessons.removeAll { $0.subjectID == id }
         homework.removeAll { $0.subjectID == id }
-        for index in notes.indices where notes[index].subjectID == id {
-            notes[index].subjectID = nil
-        }
         scheduleSave()
     }
 
@@ -354,28 +351,9 @@ final class AppStore: ObservableObject {
         return notes.first { $0.id == id }
     }
 
-    /// Notizen mit einem noch bevorstehenden Termin – stehen oben in der Liste.
-    var upcomingNotes: [Note] {
-        notes.filter(\.isUpcoming)
-            .sorted { (a, b) in
-                let da = a.dueDate ?? .distantFuture
-                let db = b.dueDate ?? .distantFuture
-                if da != db { return da < db }
-                return a.updatedAt > b.updatedAt
-            }
-    }
-
-    /// Alle übrigen Notizen, zuletzt geändert zuerst – wie in Apples Notizen.
-    var otherNotes: [Note] {
-        notes.filter { !$0.isUpcoming }
-            .sorted { a, b in
-                if a.isDone != b.isDone { return !a.isDone }
-                return a.updatedAt > b.updatedAt
-            }
-    }
-
-    var openNoteCount: Int {
-        notes.filter { !$0.isDone }.count
+    /// Zuletzt geschriebene zuerst – wie in Apples Notizen.
+    var sortedNotes: [Note] {
+        notes.sorted { $0.updatedAt > $1.updatedAt }
     }
 
     /// Legt eine leere Notiz an und gibt ihre Kennung zurück,
@@ -387,29 +365,11 @@ final class AppStore: ObservableObject {
         return note.id
     }
 
-    /// Schreibt den Text während des Tippens. Leere Notizen bleiben
-    /// bestehen, solange sie offen sind – aufgeräumt wird beim Verlassen.
+    /// Schreibt den Text während des Tippens.
     func setNoteText(_ text: String, id: UUID) {
         guard let index = notes.firstIndex(where: { $0.id == id }),
               notes[index].text != text else { return }
         notes[index].text = text
-        notes[index].updatedAt = Date()
-        scheduleSave()
-    }
-
-    func setNoteSubject(_ subjectID: UUID?, id: UUID) {
-        guard let index = notes.firstIndex(where: { $0.id == id }),
-              notes[index].subjectID != subjectID else { return }
-        notes[index].subjectID = subjectID
-        notes[index].updatedAt = Date()
-        scheduleSave()
-    }
-
-    func setNoteDueDate(_ date: Date?, id: UUID) {
-        let key = date.map { SchoolCalendar.dayKey($0) }
-        guard let index = notes.firstIndex(where: { $0.id == id }),
-              notes[index].dueDayKey != key else { return }
-        notes[index].dueDayKey = key
         notes[index].updatedAt = Date()
         scheduleSave()
     }
@@ -426,20 +386,6 @@ final class AppStore: ObservableObject {
               !notes[index].hasText else { return }
         notes.remove(at: index)
         scheduleSave()
-    }
-
-    func setNoteDone(_ isDone: Bool, id: UUID) {
-        guard let index = notes.firstIndex(where: { $0.id == id }),
-              notes[index].isDone != isDone else { return }
-        notes[index].isDone = isDone
-        notes[index].updatedAt = Date()
-        scheduleSave()
-    }
-
-    func deleteDoneNotes() {
-        notes.removeAll(where: \.isDone)
-        dataRevision += 1
-        saveNow()
     }
 
     // MARK: - Daten ersetzen

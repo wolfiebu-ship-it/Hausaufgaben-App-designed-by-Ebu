@@ -43,15 +43,15 @@ Alles läuft auf dem Gerät – das Foto wird nicht hochgeladen und nirgends ges
 
 ### 4. Notizen
 
-Ein eigener Tab unten für alles, was keine Hausaufgabe ist – die nächste Klassenarbeit, ein Referat, Material zum Mitbringen. Bedient wird er wie Apples Notizen-App.
+Ein eigener Tab unten für alles, was man sich aufschreiben will – aufgebaut wie Apples Notizen-App.
 
-- **Einfach lostippen.** Oben rechts auf das Stift-Symbol, und das leere Blatt ist da – die Tastatur kommt von allein. Es gibt kein Titelfeld und keinen Sichern-Knopf: Die **erste Zeile wird automatisch zum Titel**, gespeichert wird während des Schreibens.
-- **Die Liste** zeigt je Notiz den Titel fett, darunter Uhrzeit bzw. Datum der letzten Änderung und den Anfang des Textes – wie man es von Notizen kennt. Sortiert nach zuletzt bearbeitet.
-- **Freiwillige Zusätze:** Über der Schreibfläche sitzen zwei Felder für **Fach** und **Termin**. Notizen mit Termin stehen unter „Termine“ ganz oben und zeigen, wie lange es noch ist („morgen“, „in 4 Tagen“); Bevorstehendes wird orange, Überfälliges rot.
-- Nach links wischen löscht, nach rechts hakt ab. Im „···“-Menü einer offenen Notiz lässt sie sich abhaken oder löschen.
-- Am Tab-Symbol steht die Zahl der offenen Notizen.
+- Oben steht **ein Feld: „Notiz schreiben …“**. Antippen, die Tastatur kommt, lostippen. Mehr braucht es nicht.
+- **Kein Titelfeld, kein Sichern-Knopf.** Die erste beschriebene Zeile wird automatisch zum Titel; gespeichert wird während des Schreibens.
+- Darunter stehen die eigenen Notizen: Titel fett, daneben Uhrzeit bzw. Datum der letzten Änderung und der Anfang des Textes. Zuletzt bearbeitet zuerst.
+- Antippen öffnet die Notiz wieder zum Weiterschreiben. Gelöscht wird über den Papierkorb in der geöffneten Notiz (mit Rückfrage) oder per langem Tippen in der Liste.
+- Die App bringt **keine vorgefertigten Notizen** mit – hier steht nur, was du selbst schreibst.
 
-> Anders als bei Apple wird die erste Zeile beim Schreiben nicht fett dargestellt – nur in der Liste. Für formatierten Text bräuchte es einen anderen Editor.
+> Anders als bei Apple wird die erste Zeile beim Schreiben nicht fett dargestellt, nur in der Liste. Für formatierten Text bräuchte es einen anderen Editor.
 
 ### 5. Fächer
 

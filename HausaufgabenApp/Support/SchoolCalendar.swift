@@ -104,11 +104,14 @@ enum SchoolCalendar {
     private static let dayMonthFormatter = formatter("d. MMMM")
     private static let shortDayFormatter = formatter("d.M.")
     private static let dayMonthYearFormatter = formatter("d. MMMM yyyy")
-    private static let weekdayDateFormatter = formatter("EE, d.M.")
+    private static let timeFormatter = formatter("HH:mm")
 
-    /// z. B. "Do, 24.9."
-    static func shortWeekdayDate(_ date: Date) -> String {
-        weekdayDateFormatter.string(from: date)
+    /// Wann eine Notiz zuletzt geschrieben wurde: heute die Uhrzeit,
+    /// sonst das Datum – wie in Apples Notizen.
+    static func noteTimestamp(_ date: Date) -> String {
+        if calendar.isDateInToday(date) { return timeFormatter.string(from: date) }
+        if calendar.isDateInYesterday(date) { return "Gestern" }
+        return shortDate(date)
     }
 
     /// z. B. "15. September"
