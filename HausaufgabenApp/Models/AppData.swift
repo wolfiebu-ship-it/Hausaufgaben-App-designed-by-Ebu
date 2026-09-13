@@ -6,6 +6,9 @@ struct AppData: Codable {
     var subjects: [Subject]
     var lessons: [Lesson]
     var homework: [HomeworkEntry]
+    /// Tage ("yyyy-MM-dd"), an denen ausdrücklich nichts aufgegeben wurde.
+    /// So bleibt unterscheidbar, ob es nichts gab oder nur nichts eingetragen wurde.
+    var noHomeworkDays: Set<String>
     var settings: AppSettings
 
     static let currentVersion = 1
@@ -14,11 +17,13 @@ struct AppData: Codable {
          subjects: [Subject] = [],
          lessons: [Lesson] = [],
          homework: [HomeworkEntry] = [],
+         noHomeworkDays: Set<String> = [],
          settings: AppSettings = AppSettings()) {
         self.version = version
         self.subjects = subjects
         self.lessons = lessons
         self.homework = homework
+        self.noHomeworkDays = noHomeworkDays
         self.settings = settings
     }
 
@@ -28,6 +33,7 @@ struct AppData: Codable {
         subjects = try container.decodeIfPresent([Subject].self, forKey: .subjects) ?? []
         lessons = try container.decodeIfPresent([Lesson].self, forKey: .lessons) ?? []
         homework = try container.decodeIfPresent([HomeworkEntry].self, forKey: .homework) ?? []
+        noHomeworkDays = try container.decodeIfPresent(Set<String>.self, forKey: .noHomeworkDays) ?? []
         settings = try container.decodeIfPresent(AppSettings.self, forKey: .settings) ?? AppSettings()
     }
 
@@ -50,5 +56,9 @@ struct AppData: Codable {
             return lesson.isEmpty ? nil : lesson
         }
         homework = homework.filter { validIDs.contains($0.subjectID) && $0.hasText }
+
+        // Ein Tag mit eingetragenen Aufgaben kann nicht zugleich "nichts auf" sein.
+        let tageMitAufgaben = Set(homework.map(\.dayKey))
+        noHomeworkDays = noHomeworkDays.filter { !tageMitAufgaben.contains($0) }
     }
 }

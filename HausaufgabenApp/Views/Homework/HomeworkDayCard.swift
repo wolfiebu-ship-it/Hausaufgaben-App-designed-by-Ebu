@@ -40,11 +40,23 @@ struct HomeworkDayCard: View {
         store.homeworkEntries(on: day).filter { !$0.isDone && $0.hasText }.count
     }
 
+    /// Steht an diesem Tag schon etwas?
+    private var hasEntries: Bool {
+        store.homeworkEntries(on: day).contains(where: \.hasText)
+    }
+
+    private var isMarkedFree: Bool {
+        store.isMarkedNoHomework(day: day)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
 
-            if rowSubjects.isEmpty {
+            if isMarkedFree {
+                // Als „nichts auf“ vermerkt: Zeilen bleiben eingeklappt.
+                freeMarker
+            } else if rowSubjects.isEmpty {
                 emptyState
             } else {
                 VStack(spacing: 0) {
@@ -59,7 +71,12 @@ struct HomeworkDayCard: View {
                 }
             }
 
-            if !addableSubjects.isEmpty {
+            if !isMarkedFree && !hasEntries && !rowSubjects.isEmpty {
+                Divider().padding(.leading, 68)
+                freeToggle
+            }
+
+            if !isMarkedFree && !addableSubjects.isEmpty {
                 Divider().padding(.leading, 68)
                 addSubjectMenu
             }
@@ -104,6 +121,59 @@ struct HomeworkDayCard: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
+    }
+
+    /// Der Vermerk, wenn der Tag als „nichts auf“ markiert ist.
+    private var freeMarker: some View {
+        Button {
+            withAnimation { store.setNoHomework(false, day: day) }
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(.tint)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Keine Hausaufgaben")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text("Antippen, um doch etwas einzutragen")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 14)
+            .padding(.bottom, 14)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Keine Hausaufgaben an diesem Tag. Antippen zum Aufheben.")
+    }
+
+    /// Das Feld zum Abhaken, solange nichts eingetragen ist.
+    private var freeToggle: some View {
+        Button {
+            withAnimation { store.setNoHomework(true, day: day) }
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "circle")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+
+                Text("Keine Hausaufgaben")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 11)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Vermerken, dass an diesem Tag nichts aufgegeben wurde")
     }
 
     private var emptyState: some View {

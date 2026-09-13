@@ -7,6 +7,8 @@ final class AppStore: ObservableObject {
     @Published private(set) var subjects: [Subject]
     @Published private(set) var lessons: [Lesson]
     @Published private(set) var homework: [HomeworkEntry]
+    /// Tage, an denen ausdrücklich nichts aufgegeben wurde.
+    @Published private(set) var noHomeworkDays: Set<String>
     @Published var settings: AppSettings {
         didSet {
             guard settings != oldValue else { return }
@@ -38,6 +40,7 @@ final class AppStore: ObservableObject {
         self.subjects = data.subjects
         self.lessons = data.lessons
         self.homework = data.homework
+        self.noHomeworkDays = data.noHomeworkDays
         self.settings = data.settings
 
         // Beim allerersten Start die Datei gleich anlegen.
@@ -286,6 +289,8 @@ final class AppStore: ObservableObject {
         } else {
             homework.append(HomeworkEntry(dayKey: key, subjectID: subjectID, text: text))
         }
+        // Sobald etwas eingetragen ist, stimmt „nichts auf“ nicht mehr.
+        noHomeworkDays.remove(key)
         scheduleSave()
     }
 
@@ -301,6 +306,27 @@ final class AppStore: ObservableObject {
     func deleteHomework(day: Date, subjectID: UUID) {
         let key = SchoolCalendar.dayKey(day)
         homework.removeAll { $0.dayKey == key && $0.subjectID == subjectID }
+        scheduleSave()
+    }
+
+    // MARK: - Tage ohne Hausaufgaben
+
+    /// Ist der Tag ausdrücklich als „nichts auf“ vermerkt?
+    func isMarkedNoHomework(day: Date) -> Bool {
+        noHomeworkDays.contains(SchoolCalendar.dayKey(day))
+    }
+
+    func setNoHomework(_ value: Bool, day: Date) {
+        let key = SchoolCalendar.dayKey(day)
+        if value {
+            // Der Vermerk gilt nur, solange nichts eingetragen ist.
+            guard !homework.contains(where: { $0.dayKey == key && $0.hasText }) else { return }
+            guard !noHomeworkDays.contains(key) else { return }
+            noHomeworkDays.insert(key)
+        } else {
+            guard noHomeworkDays.contains(key) else { return }
+            noHomeworkDays.remove(key)
+        }
         scheduleSave()
     }
 
@@ -322,6 +348,7 @@ final class AppStore: ObservableObject {
         subjects = data.subjects
         lessons = data.lessons
         homework = data.homework
+        noHomeworkDays = data.noHomeworkDays
         settings = data.settings
         dataRevision += 1
         saveNow()
@@ -333,12 +360,17 @@ final class AppStore: ObservableObject {
 
     func deleteAllHomework() {
         homework.removeAll()
+        noHomeworkDays.removeAll()
         dataRevision += 1
         saveNow()
     }
 
     var currentData: AppData {
-        AppData(subjects: subjects, lessons: lessons, homework: homework, settings: settings)
+        AppData(subjects: subjects,
+                lessons: lessons,
+                homework: homework,
+                noHomeworkDays: noHomeworkDays,
+                settings: settings)
     }
 
     // MARK: - Speichern und Laden
