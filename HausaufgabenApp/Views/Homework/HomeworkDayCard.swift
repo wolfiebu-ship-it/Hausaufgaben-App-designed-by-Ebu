@@ -7,6 +7,8 @@ struct HomeworkDayCard: View {
     @EnvironmentObject private var store: AppStore
     /// Fächer, die für diesen Tag von Hand ergänzt wurden (z. B. Vertretungsstunde).
     @State private var extraSubjectIDs: [UUID] = []
+    /// Tage starten zugeklappt; ein Tipp auf den Kopf klappt sie auf.
+    @State private var isExpanded = false
 
     private var isToday: Bool { SchoolCalendar.isToday(day) }
 
@@ -51,34 +53,36 @@ struct HomeworkDayCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            header
+            headerButton
 
-            if isMarkedFree {
-                // Als „nichts auf“ vermerkt: Zeilen bleiben eingeklappt.
-                freeMarker
-            } else if rowSubjects.isEmpty {
-                emptyState
-            } else {
-                VStack(spacing: 0) {
-                    ForEach(rowSubjects) { subject in
-                        if subject.id != rowSubjects.first?.id {
-                            Divider().padding(.leading, 68)
+            if isExpanded {
+                if isMarkedFree {
+                    // Als „nichts auf“ vermerkt: Zeilen bleiben eingeklappt.
+                    freeMarker
+                } else if rowSubjects.isEmpty {
+                    emptyState
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(rowSubjects) { subject in
+                            if subject.id != rowSubjects.first?.id {
+                                Divider().padding(.leading, 68)
+                            }
+                            HomeworkRow(day: day,
+                                        subject: subject,
+                                        entry: store.homeworkEntry(day: day, subjectID: subject.id))
                         }
-                        HomeworkRow(day: day,
-                                    subject: subject,
-                                    entry: store.homeworkEntry(day: day, subjectID: subject.id))
                     }
                 }
-            }
 
-            if !isMarkedFree && !hasEntries && !rowSubjects.isEmpty {
-                Divider().padding(.leading, 68)
-                freeToggle
-            }
+                if !isMarkedFree && !hasEntries && !rowSubjects.isEmpty {
+                    Divider().padding(.leading, 68)
+                    freeToggle
+                }
 
-            if !isMarkedFree && !addableSubjects.isEmpty {
-                Divider().padding(.leading, 68)
-                addSubjectMenu
+                if !isMarkedFree && !addableSubjects.isEmpty {
+                    Divider().padding(.leading, 68)
+                    addSubjectMenu
+                }
             }
         }
         .background(Color(.secondarySystemGroupedBackground),
@@ -90,6 +94,69 @@ struct HomeworkDayCard: View {
     }
 
     // MARK: - Teile
+
+    /// Der ganze Kopf ist ein Knopf: antippen klappt den Tag auf und zu.
+    private var headerButton: some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.22)) {
+                isExpanded.toggle()
+            }
+        } label: {
+            VStack(alignment: .leading, spacing: 0) {
+                header
+
+                // Zugeklappt zeigt der Kopf, was an dem Tag ansteht –
+                // damit man nicht blind aufklappen muss.
+                if !isExpanded {
+                    collapsedSummary
+                        .padding(.horizontal, 14)
+                        .padding(.bottom, 12)
+                }
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityHeaderLabel)
+        .accessibilityHint(isExpanded ? "Antippen zum Zuklappen" : "Antippen zum Aufklappen")
+    }
+
+    /// Kurzfassung für den zugeklappten Zustand.
+    @ViewBuilder
+    private var collapsedSummary: some View {
+        if isMarkedFree {
+            Label("Keine Hausaufgaben", systemImage: "checkmark.circle.fill")
+                .font(.footnote)
+                .foregroundStyle(.tint)
+        } else if hasEntries {
+            // Die Kürzel der Fächer, zu denen etwas eingetragen ist –
+            // Erledigtes blasser als das, was noch ansteht.
+            HStack(spacing: 5) {
+                ForEach(store.homeworkEntries(on: day).filter(\.hasText)) { entry in
+                    if let subject = store.subject(id: entry.subjectID) {
+                        SubjectBadge(subject: subject, width: 34, dimmed: entry.isDone)
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+        } else if rowSubjects.isEmpty {
+            Text(store.hasAnyLesson ? "Keine Stunden an diesem Tag" : "Noch kein Stundenplan")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        } else {
+            Text("Nichts eingetragen")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var accessibilityHeaderLabel: String {
+        let tag = "\(SchoolCalendar.weekdayName(SchoolCalendar.weekdayIndex(of: day))), \(SchoolCalendar.dayMonth(day))"
+        if isMarkedFree { return "\(tag). Keine Hausaufgaben." }
+        if openCount > 0 { return "\(tag). \(openCount) offen." }
+        if hasEntries { return "\(tag). Alles erledigt." }
+        return "\(tag). Nichts eingetragen."
+    }
 
     private var header: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -109,7 +176,9 @@ struct HomeworkDayCard: View {
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
                     .background(Color.accentColor, in: Capsule())
-            } else if openCount > 0 {
+            }
+
+            if openCount > 0 {
                 Text("\(openCount)")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.secondary)
@@ -117,10 +186,23 @@ struct HomeworkDayCard: View {
                     .padding(.vertical, 3)
                     .background(Color(.tertiarySystemFill), in: Capsule())
                     .accessibilityLabel("\(openCount) offene Aufgaben")
+            } else if hasEntries {
+                // Alles abgehakt.
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.footnote)
+                    .foregroundStyle(.green)
+                    .accessibilityLabel("Alles erledigt")
             }
+
+            Image(systemName: "chevron.down")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.tertiary)
+                .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                .padding(.leading, 2)
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 12)
+        .padding(.top, 12)
+        .padding(.bottom, isExpanded ? 12 : 6)
     }
 
     /// Der Vermerk, wenn der Tag als „nichts auf“ markiert ist.
