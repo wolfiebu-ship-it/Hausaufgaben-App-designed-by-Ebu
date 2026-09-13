@@ -40,7 +40,7 @@ struct HomeworkWeekView: View {
             .padding(.bottom, 24)
         }
         .scrollDismissesKeyboard(.interactively)
-        .background(Color(.systemGroupedBackground))
+        .background(DoodleCanvas())
     }
 }
 

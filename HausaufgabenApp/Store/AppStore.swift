@@ -9,6 +9,8 @@ final class AppStore: ObservableObject {
     @Published private(set) var homework: [HomeworkEntry]
     /// Tage, an denen ausdrücklich nichts aufgegeben wurde.
     @Published private(set) var noHomeworkDays: Set<String>
+    /// Freie Notizen, etwa anstehende Arbeiten.
+    @Published private(set) var notes: [Note]
     @Published var settings: AppSettings {
         didSet {
             guard settings != oldValue else { return }
@@ -41,6 +43,7 @@ final class AppStore: ObservableObject {
         self.lessons = data.lessons
         self.homework = data.homework
         self.noHomeworkDays = data.noHomeworkDays
+        self.notes = data.notes
         self.settings = data.settings
 
         // Beim allerersten Start die Datei gleich anlegen.
@@ -81,10 +84,14 @@ final class AppStore: ObservableObject {
     }
 
     /// Löscht ein Fach samt seiner Stundenplan-Einträge und Hausaufgaben.
+    /// Notizen bleiben erhalten und verlieren nur die Zuordnung.
     func deleteSubject(id: UUID) {
         subjects.removeAll { $0.id == id }
         lessons.removeAll { $0.subjectID == id }
         homework.removeAll { $0.subjectID == id }
+        for index in notes.indices where notes[index].subjectID == id {
+            notes[index].subjectID = nil
+        }
         scheduleSave()
     }
 
@@ -340,6 +347,66 @@ final class AppStore: ObservableObject {
         return count
     }
 
+    // MARK: - Notizen
+
+    /// Offene Notizen zuerst, darin Termine nach Datum, dann der Rest nach Alter.
+    /// Erledigtes wandert ans Ende.
+    var sortedNotes: [Note] {
+        notes.sorted { a, b in
+            if a.isDone != b.isDone { return !a.isDone }
+
+            switch (a.dueDate, b.dueDate) {
+            case let (da?, db?):
+                if da != db { return da < db }
+            case (_?, nil):
+                return true          // mit Termin vor ohne Termin
+            case (nil, _?):
+                return false
+            case (nil, nil):
+                break
+            }
+            return a.createdAt > b.createdAt
+        }
+    }
+
+    var openNoteCount: Int {
+        notes.filter { !$0.isDone }.count
+    }
+
+    func addNote(_ note: Note) {
+        guard note.hasText else { return }
+        notes.append(note)
+        scheduleSave()
+    }
+
+    func updateNote(_ note: Note) {
+        guard let index = notes.firstIndex(where: { $0.id == note.id }) else { return }
+        if note.hasText {
+            notes[index] = note
+        } else {
+            notes.remove(at: index)
+        }
+        scheduleSave()
+    }
+
+    func deleteNote(id: UUID) {
+        notes.removeAll { $0.id == id }
+        scheduleSave()
+    }
+
+    func setNoteDone(_ isDone: Bool, id: UUID) {
+        guard let index = notes.firstIndex(where: { $0.id == id }),
+              notes[index].isDone != isDone else { return }
+        notes[index].isDone = isDone
+        scheduleSave()
+    }
+
+    func deleteDoneNotes() {
+        notes.removeAll(where: \.isDone)
+        dataRevision += 1
+        saveNow()
+    }
+
     // MARK: - Daten ersetzen
 
     func replaceAll(with data: AppData) {
@@ -349,6 +416,7 @@ final class AppStore: ObservableObject {
         lessons = data.lessons
         homework = data.homework
         noHomeworkDays = data.noHomeworkDays
+        notes = data.notes
         settings = data.settings
         dataRevision += 1
         saveNow()
@@ -370,6 +438,7 @@ final class AppStore: ObservableObject {
                 lessons: lessons,
                 homework: homework,
                 noHomeworkDays: noHomeworkDays,
+                notes: notes,
                 settings: settings)
     }
 

@@ -41,13 +41,22 @@ Alles läuft auf dem Gerät – das Foto wird nicht hochgeladen und nirgends ges
 
 > Der Dokumentenscanner braucht eine echte Kamera und funktioniert deshalb **nicht im Simulator**. Zum Ausprobieren am Mac lässt sich stattdessen ein Foto aus der Mediathek wählen.
 
-### 4. Fächer
+### 4. Notizen
+
+Ein eigener Tab unten für alles, was keine Hausaufgabe ist – die nächste Klassenarbeit, ein Referat, Material zum Mitbringen.
+
+- Jede Notiz kann ein **Fach** und einen **Termin** bekommen.
+- Notizen mit Termin stehen oben und zeigen, wie lange es noch ist („morgen“, „in 4 Tagen“). Was bald ansteht, wird orange, Überfälliges rot.
+- Abhaken, bearbeiten, löschen; erledigte Notizen lassen sich gesammelt aufräumen.
+- Am Tab-Symbol steht die Zahl der offenen Notizen.
+
+### 5. Fächer
 
 - Name, Kürzel, Farbe, Lehrkraft und Raum je Fach.
 - Beim ersten Start sind typische Schulfächer schon angelegt (Deutsch, Mathematik, Englisch …) – umbenennen oder löschen, wie du möchtest.
 - Das Kürzel ist genau das, was im Stundenplan und neben dem Hausaufgabenfeld steht.
 
-### 5. Einstellungen
+### 6. Einstellungen
 
 - **Hell oder dunkel:** ganz oben unter „Darstellung“ lässt sich die App fest auf hell oder dunkel stellen – oder auf „Automatisch“, dann folgt sie der Einstellung des Geräts.
 - Stunden pro Tag, Samstag, Uhrzeiten, Unterrichtszeiten.
@@ -114,6 +123,7 @@ HausaufgabenApp/
 ├── HausaufgabenApp.swift        Einstiegspunkt der App
 ├── Models/                      Datenmodelle
 │   ├── Subject.swift            Fach (Name, Kürzel, Farbe)
+│   ├── Note.swift               Freie Notiz mit Fach und Termin
 │   ├── Lesson.swift             Feld im Stundenplan
 │   ├── HomeworkEntry.swift      Eine Hausaufgabe
 │   ├── AppSettings.swift        Einstellungen, Unterrichtszeiten
@@ -123,11 +133,13 @@ HausaufgabenApp/
 ├── Support/
 │   ├── SchoolCalendar.swift     Wochen- und Datumsberechnungen (Woche ab Montag)
 │   ├── AppTheme.swift           Farben (je Fach ein heller und ein kräftiger Ton)
+│   ├── DoodleBackground.swift   Schulmotive blass hinter den Schreib-Seiten
 │   ├── TimetableRecognizer.swift  Texterkennung und Rasteranalyse für den Scan
 │   └── BackupDocument.swift     Sicherungsdatei
 ├── Views/
 │   ├── RootView.swift           Die vier Tabs
 │   ├── Homework/                Hausaufgabenheft mit Wochenblättern
+│   ├── Notes/                   Notizen und Notiz-Editor
 │   ├── Timetable/               Stundenplan-Raster, Scannen und Prüfansicht
 │   ├── Subjects/                Fächerverwaltung
 │   └── Settings/                Einstellungen, Unterrichtszeiten

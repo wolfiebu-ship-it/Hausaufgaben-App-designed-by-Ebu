@@ -6,7 +6,7 @@ struct RootView: View {
     @State private var selection: Tab = .homework
 
     enum Tab: Hashable {
-        case homework, timetable, subjects, settings
+        case homework, notes, timetable, subjects, settings
     }
 
     var body: some View {
@@ -14,6 +14,11 @@ struct RootView: View {
             HomeworkPagerView()
                 .tabItem { Label("Hausaufgaben", systemImage: "square.and.pencil") }
                 .tag(Tab.homework)
+
+            NotesView()
+                .tabItem { Label("Notizen", systemImage: "note.text") }
+                .badge(store.openNoteCount)
+                .tag(Tab.notes)
 
             TimetableView()
                 .tabItem { Label("Stundenplan", systemImage: "calendar") }

@@ -104,6 +104,12 @@ enum SchoolCalendar {
     private static let dayMonthFormatter = formatter("d. MMMM")
     private static let shortDayFormatter = formatter("d.M.")
     private static let dayMonthYearFormatter = formatter("d. MMMM yyyy")
+    private static let weekdayDateFormatter = formatter("EE, d.M.")
+
+    /// z. B. "Do, 24.9."
+    static func shortWeekdayDate(_ date: Date) -> String {
+        weekdayDateFormatter.string(from: date)
+    }
 
     /// z. B. "15. September"
     static func dayMonth(_ date: Date) -> String {
