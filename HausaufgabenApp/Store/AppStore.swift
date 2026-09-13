@@ -349,43 +349,68 @@ final class AppStore: ObservableObject {
 
     // MARK: - Notizen
 
-    /// Offene Notizen zuerst, darin Termine nach Datum, dann der Rest nach Alter.
-    /// Erledigtes wandert ans Ende.
-    var sortedNotes: [Note] {
-        notes.sorted { a, b in
-            if a.isDone != b.isDone { return !a.isDone }
+    func note(id: UUID?) -> Note? {
+        guard let id else { return nil }
+        return notes.first { $0.id == id }
+    }
 
-            switch (a.dueDate, b.dueDate) {
-            case let (da?, db?):
+    /// Notizen mit einem noch bevorstehenden Termin – stehen oben in der Liste.
+    var upcomingNotes: [Note] {
+        notes.filter(\.isUpcoming)
+            .sorted { (a, b) in
+                let da = a.dueDate ?? .distantFuture
+                let db = b.dueDate ?? .distantFuture
                 if da != db { return da < db }
-            case (_?, nil):
-                return true          // mit Termin vor ohne Termin
-            case (nil, _?):
-                return false
-            case (nil, nil):
-                break
+                return a.updatedAt > b.updatedAt
             }
-            return a.createdAt > b.createdAt
-        }
+    }
+
+    /// Alle übrigen Notizen, zuletzt geändert zuerst – wie in Apples Notizen.
+    var otherNotes: [Note] {
+        notes.filter { !$0.isUpcoming }
+            .sorted { a, b in
+                if a.isDone != b.isDone { return !a.isDone }
+                return a.updatedAt > b.updatedAt
+            }
     }
 
     var openNoteCount: Int {
         notes.filter { !$0.isDone }.count
     }
 
-    func addNote(_ note: Note) {
-        guard note.hasText else { return }
+    /// Legt eine leere Notiz an und gibt ihre Kennung zurück,
+    /// damit sie sofort zum Schreiben geöffnet werden kann.
+    func createNote() -> UUID {
+        let note = Note()
         notes.append(note)
+        scheduleSave()
+        return note.id
+    }
+
+    /// Schreibt den Text während des Tippens. Leere Notizen bleiben
+    /// bestehen, solange sie offen sind – aufgeräumt wird beim Verlassen.
+    func setNoteText(_ text: String, id: UUID) {
+        guard let index = notes.firstIndex(where: { $0.id == id }),
+              notes[index].text != text else { return }
+        notes[index].text = text
+        notes[index].updatedAt = Date()
         scheduleSave()
     }
 
-    func updateNote(_ note: Note) {
-        guard let index = notes.firstIndex(where: { $0.id == note.id }) else { return }
-        if note.hasText {
-            notes[index] = note
-        } else {
-            notes.remove(at: index)
-        }
+    func setNoteSubject(_ subjectID: UUID?, id: UUID) {
+        guard let index = notes.firstIndex(where: { $0.id == id }),
+              notes[index].subjectID != subjectID else { return }
+        notes[index].subjectID = subjectID
+        notes[index].updatedAt = Date()
+        scheduleSave()
+    }
+
+    func setNoteDueDate(_ date: Date?, id: UUID) {
+        let key = date.map { SchoolCalendar.dayKey($0) }
+        guard let index = notes.firstIndex(where: { $0.id == id }),
+              notes[index].dueDayKey != key else { return }
+        notes[index].dueDayKey = key
+        notes[index].updatedAt = Date()
         scheduleSave()
     }
 
@@ -394,10 +419,20 @@ final class AppStore: ObservableObject {
         scheduleSave()
     }
 
+    /// Entfernt eine Notiz, in der nichts steht – etwa wenn man sie
+    /// anlegt und ohne zu schreiben wieder zurückgeht.
+    func discardIfEmpty(id: UUID) {
+        guard let index = notes.firstIndex(where: { $0.id == id }),
+              !notes[index].hasText else { return }
+        notes.remove(at: index)
+        scheduleSave()
+    }
+
     func setNoteDone(_ isDone: Bool, id: UUID) {
         guard let index = notes.firstIndex(where: { $0.id == id }),
               notes[index].isDone != isDone else { return }
         notes[index].isDone = isDone
+        notes[index].updatedAt = Date()
         scheduleSave()
     }
 

@@ -1,18 +1,19 @@
 import SwiftUI
 
-/// Eigene Notizen: anstehende Arbeiten, Referate, alles zum Nichtvergessen.
+/// Die Notizen-Liste – aufgebaut wie in Apples Notizen:
+/// Titel fett, darunter Datum und der Anfang des Textes.
 struct NotesView: View {
     @EnvironmentObject private var store: AppStore
-    @State private var editorMode: NoteEditorMode?
-    @State private var showDoneConfirmation = false
+    @State private var openNoteID: UUID?
 
-    private var notes: [Note] { store.sortedNotes }
-    private var doneCount: Int { store.notes.filter(\.isDone).count }
+    private var upcoming: [Note] { store.upcomingNotes }
+    private var others: [Note] { store.otherNotes }
+    private var isEmpty: Bool { store.notes.isEmpty }
 
     var body: some View {
         NavigationStack {
             Group {
-                if notes.isEmpty {
+                if isEmpty {
                     emptyState
                 } else {
                     list
@@ -22,52 +23,67 @@ struct NotesView: View {
             .navigationTitle("Notizen")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        editorMode = .create
-                    } label: {
-                        Image(systemName: "plus")
+                    Button(action: newNote) {
+                        Image(systemName: "square.and.pencil")
                     }
-                    .accessibilityLabel("Notiz hinzufügen")
-                }
-                if doneCount > 0 {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button {
-                            showDoneConfirmation = true
-                        } label: {
-                            Image(systemName: "checkmark.circle.badge.xmark")
-                        }
-                        .accessibilityLabel("Erledigte Notizen löschen")
-                    }
+                    .accessibilityLabel("Neue Notiz")
                 }
             }
-            .sheet(item: $editorMode) { mode in
-                NoteEditorView(mode: mode)
+            .navigationDestination(item: $openNoteID) { id in
+                NoteDetailView(noteID: id)
                     .environmentObject(store)
-            }
-            .alert("Erledigte Notizen löschen?", isPresented: $showDoneConfirmation) {
-                Button("Löschen", role: .destructive) { store.deleteDoneNotes() }
-                Button("Abbrechen", role: .cancel) { }
-            } message: {
-                Text(doneCount == 1
-                     ? "Die erledigte Notiz wird entfernt."
-                     : "Die \(doneCount) erledigten Notizen werden entfernt.")
             }
         }
     }
 
     private var list: some View {
-        ScrollView {
-            LazyVStack(spacing: 10) {
-                ForEach(notes) { note in
-                    NoteCard(note: note) {
-                        store.setNoteDone(!note.isDone, id: note.id)
-                    } onTap: {
-                        editorMode = .edit(note)
+        List {
+            if !upcoming.isEmpty {
+                Section {
+                    ForEach(upcoming) { note in
+                        row(note)
                     }
+                } header: {
+                    Text("Termine")
                 }
             }
-            .padding(16)
-            .padding(.bottom, 24)
+
+            if !others.isEmpty {
+                Section {
+                    ForEach(others) { note in
+                        row(note)
+                    }
+                } header: {
+                    Text(upcoming.isEmpty ? "" : "Weitere Notizen")
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+    }
+
+    private func row(_ note: Note) -> some View {
+        Button {
+            openNoteID = note.id
+        } label: {
+            NoteRow(note: note)
+        }
+        .buttonStyle(.plain)
+        .swipeActions(edge: .trailing) {
+            Button(role: .destructive) {
+                store.deleteNote(id: note.id)
+            } label: {
+                Label("Löschen", systemImage: "trash")
+            }
+        }
+        .swipeActions(edge: .leading) {
+            Button {
+                store.setNoteDone(!note.isDone, id: note.id)
+            } label: {
+                Label(note.isDone ? "Offen" : "Erledigt",
+                      systemImage: note.isDone ? "arrow.uturn.backward" : "checkmark")
+            }
+            .tint(note.isDone ? .gray : .green)
         }
     }
 
@@ -86,10 +102,8 @@ struct NotesView: View {
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Button {
-                editorMode = .create
-            } label: {
-                Label("Erste Notiz schreiben", systemImage: "square.and.pencil")
+            Button(action: newNote) {
+                Label("Notiz schreiben", systemImage: "square.and.pencil")
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
@@ -98,77 +112,87 @@ struct NotesView: View {
         .frame(maxWidth: 460)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+
+    private func newNote() {
+        openNoteID = store.createNote()
+    }
 }
 
-/// Eine Notiz als Karte, mit Fachfarbe als Streifen und Termin-Hinweis.
-struct NoteCard: View {
+/// Eine Zeile der Liste: Titel, Datum, Textanfang.
+struct NoteRow: View {
     let note: Note
-    let onToggleDone: () -> Void
-    let onTap: () -> Void
-
     @EnvironmentObject private var store: AppStore
 
     private var subject: Subject? { store.subject(id: note.subjectID) }
 
-    private var accent: Color {
-        subject?.tint ?? Color.accentColor
-    }
-
     var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 0) {
-                Rectangle()
-                    .fill(accent)
-                    .frame(width: 5)
-
-                HStack(alignment: .top, spacing: 12) {
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text(note.text)
-                            .font(.body)
-                            .foregroundStyle(note.isDone ? Color.secondary : Color.primary)
-                            .strikethrough(note.isDone, color: .secondary)
-                            .multilineTextAlignment(.leading)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        HStack(spacing: 6) {
-                            if let subject {
-                                Text(subject.displayShort)
-                                    .font(.caption2.weight(.bold))
-                                    .foregroundStyle(subject.tint)
-                                    .padding(.horizontal, 7)
-                                    .padding(.vertical, 3)
-                                    .background(subject.fill, in: Capsule())
-                            }
-
-                            if let dueText = note.dueText {
-                                Label(dueText, systemImage: "calendar")
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(dueColor)
-                                    .padding(.horizontal, 7)
-                                    .padding(.vertical, 3)
-                                    .background(dueColor.opacity(0.12), in: Capsule())
-                            }
-
-                            Spacer(minLength: 0)
-                        }
-                    }
-
-                    Button(action: onToggleDone) {
-                        Image(systemName: note.isDone ? "checkmark.circle.fill" : "circle")
-                            .font(.title3)
-                            .foregroundStyle(note.isDone ? Color.accentColor : Color.secondary)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(note.isDone ? "Als offen markieren" : "Als erledigt markieren")
-                }
-                .padding(14)
+        HStack(spacing: 10) {
+            if let subject {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(subject.tint)
+                    .frame(width: 4)
+                    .padding(.vertical, 2)
             }
-            .background(Color(.secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
-            .opacity(note.isDone ? 0.65 : 1)
+
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 6) {
+                    Text(note.title)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(note.isDone ? Color.secondary : Color.primary)
+                        .strikethrough(note.isDone, color: .secondary)
+                        .lineLimit(1)
+
+                    if note.isDone {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                    }
+
+                    Spacer(minLength: 0)
+                }
+
+                HStack(spacing: 6) {
+                    Text(SchoolCalendar.shortDate(note.updatedAt))
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+
+                    if !note.preview.isEmpty {
+                        Text(note.preview)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+
+                if note.dueText != nil || subject != nil {
+                    HStack(spacing: 6) {
+                        if let subject {
+                            Text(subject.displayShort)
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(subject.tint)
+                                .padding(.horizontal, 7)
+                                .padding(.vertical, 2)
+                                .background(subject.fill, in: Capsule())
+                        }
+
+                        if let dueText = note.dueText {
+                            Label(dueText, systemImage: "calendar")
+                                .font(.caption2.weight(.medium))
+                                .foregroundStyle(dueColor)
+                                .padding(.horizontal, 7)
+                                .padding(.vertical, 2)
+                                .background(dueColor.opacity(0.13), in: Capsule())
+                        }
+
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.top, 1)
+                }
+            }
         }
-        .buttonStyle(.plain)
+        .padding(.vertical, 3)
+        .opacity(note.isDone ? 0.6 : 1)
+        .contentShape(Rectangle())
     }
 
     private var dueColor: Color {

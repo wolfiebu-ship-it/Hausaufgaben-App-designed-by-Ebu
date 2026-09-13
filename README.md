@@ -43,12 +43,15 @@ Alles läuft auf dem Gerät – das Foto wird nicht hochgeladen und nirgends ges
 
 ### 4. Notizen
 
-Ein eigener Tab unten für alles, was keine Hausaufgabe ist – die nächste Klassenarbeit, ein Referat, Material zum Mitbringen.
+Ein eigener Tab unten für alles, was keine Hausaufgabe ist – die nächste Klassenarbeit, ein Referat, Material zum Mitbringen. Bedient wird er wie Apples Notizen-App.
 
-- Jede Notiz kann ein **Fach** und einen **Termin** bekommen.
-- Notizen mit Termin stehen oben und zeigen, wie lange es noch ist („morgen“, „in 4 Tagen“). Was bald ansteht, wird orange, Überfälliges rot.
-- Abhaken, bearbeiten, löschen; erledigte Notizen lassen sich gesammelt aufräumen.
+- **Einfach lostippen.** Oben rechts auf das Stift-Symbol, und das leere Blatt ist da – die Tastatur kommt von allein. Es gibt kein Titelfeld und keinen Sichern-Knopf: Die **erste Zeile wird automatisch zum Titel**, gespeichert wird während des Schreibens.
+- **Die Liste** zeigt je Notiz den Titel fett, darunter Uhrzeit bzw. Datum der letzten Änderung und den Anfang des Textes – wie man es von Notizen kennt. Sortiert nach zuletzt bearbeitet.
+- **Freiwillige Zusätze:** Über der Schreibfläche sitzen zwei Felder für **Fach** und **Termin**. Notizen mit Termin stehen unter „Termine“ ganz oben und zeigen, wie lange es noch ist („morgen“, „in 4 Tagen“); Bevorstehendes wird orange, Überfälliges rot.
+- Nach links wischen löscht, nach rechts hakt ab. Im „···“-Menü einer offenen Notiz lässt sie sich abhaken oder löschen.
 - Am Tab-Symbol steht die Zahl der offenen Notizen.
+
+> Anders als bei Apple wird die erste Zeile beim Schreiben nicht fett dargestellt – nur in der Liste. Für formatierten Text bräuchte es einen anderen Editor.
 
 ### 5. Fächer
 
@@ -139,7 +142,7 @@ HausaufgabenApp/
 ├── Views/
 │   ├── RootView.swift           Die vier Tabs
 │   ├── Homework/                Hausaufgabenheft mit Wochenblättern
-│   ├── Notes/                   Notizen und Notiz-Editor
+│   ├── Notes/                   Notizliste und Schreibblatt
 │   ├── Timetable/               Stundenplan-Raster, Scannen und Prüfansicht
 │   ├── Subjects/                Fächerverwaltung
 │   └── Settings/                Einstellungen, Unterrichtszeiten
