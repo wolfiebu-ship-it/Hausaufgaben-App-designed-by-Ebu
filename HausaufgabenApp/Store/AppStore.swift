@@ -183,6 +183,20 @@ final class AppStore: ObservableObject {
 
     var hasAnyLesson: Bool { lessons.contains { $0.subjectID != nil } }
 
+    /// Der Tag, um den es gerade geht: heute, wenn heute Unterricht ist,
+    /// sonst der nächste Tag mit Stunden. Am Wochenende ist das der Montag.
+    /// Gibt `nil` zurück, wenn im ganzen Plan keine Stunde steht.
+    func currentSchoolDay(from reference: Date = Date()) -> Date? {
+        let start = SchoolCalendar.startOfDay(reference)
+        for offset in 0..<7 {
+            guard let day = SchoolCalendar.calendar.date(byAdding: .day, value: offset, to: start) else { continue }
+            let weekday = SchoolCalendar.weekdayIndex(of: day)
+            guard settings.weekdays.contains(weekday) else { continue }
+            if !lessons(onWeekday: weekday).isEmpty { return day }
+        }
+        return nil
+    }
+
     /// Ersetzt den gesamten Stundenplan – wird nach einem geprüften Scan aufgerufen.
     /// Fächer und Hausaufgaben bleiben unangetastet.
     func replaceTimetable(with newLessons: [Lesson]) {

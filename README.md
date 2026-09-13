@@ -55,6 +55,8 @@ Ein eigener Tab unten für alles, was man sich aufschreiben will – aufgebaut w
 
 ### 5. Fächer
 
+- **Oben stehen die Stunden des Tages.** Ist heute Schule, siehst du „Heute · Montag“ mit allen Stunden dieses Tages in der Reihenfolge des Plans – mit Stundennummer, Uhrzeit und Raum. Am Wochenende oder an einem freien Tag springt die Liste auf den nächsten Schultag („Morgen · Montag“). Das stellt sich jeden Tag von allein um.
+- Darunter **alle Fächer** alphabetisch zum Bearbeiten.
 - Name, Kürzel, Farbe, Lehrkraft und Raum je Fach.
 - Beim ersten Start sind typische Schulfächer schon angelegt (Deutsch, Mathematik, Englisch …) – umbenennen oder löschen, wie du möchtest.
 - Das Kürzel ist genau das, was im Stundenplan und neben dem Hausaufgabenfeld steht.

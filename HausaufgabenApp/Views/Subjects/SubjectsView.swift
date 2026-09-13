@@ -48,8 +48,50 @@ struct SubjectsView: View {
         }
     }
 
+    /// Der Tag, dessen Stunden oben stehen – heute, oder der nächste Schultag.
+    private var schoolDay: Date? { store.currentSchoolDay() }
+
+    private var dayTitle: String {
+        guard let schoolDay else { return "" }
+        let name = SchoolCalendar.weekdayName(SchoolCalendar.weekdayIndex(of: schoolDay))
+        if SchoolCalendar.isToday(schoolDay) { return "Heute · \(name)" }
+        if SchoolCalendar.isSameDay(schoolDay,
+                                    SchoolCalendar.calendar.date(byAdding: .day, value: 1, to: Date()) ?? Date()) {
+            return "Morgen · \(name)"
+        }
+        return name
+    }
+
+    private var todaysLessons: [Lesson] {
+        guard let schoolDay else { return [] }
+        return store.lessons(onWeekday: SchoolCalendar.weekdayIndex(of: schoolDay))
+    }
+
     private var list: some View {
         List {
+            // Was an diesem Tag ansteht – in der Reihenfolge des Stundenplans.
+            if !todaysLessons.isEmpty {
+                Section {
+                    ForEach(todaysLessons) { lesson in
+                        if let subject = store.subject(id: lesson.subjectID) {
+                            Button {
+                                editorMode = .edit(subject)
+                            } label: {
+                                TodayLessonRow(lesson: lesson,
+                                               subject: subject,
+                                               time: store.settings.time(forPeriod: lesson.period),
+                                               showTime: store.settings.showTimes,
+                                               room: store.room(for: lesson))
+                            }
+                        }
+                    }
+                } header: {
+                    Text(dayTitle)
+                } footer: {
+                    Text("Diese Stunden hast du an dem Tag – die Liste stellt sich jeden Tag von allein um.")
+                }
+            }
+
             Section {
                 ForEach(store.sortedSubjects) { subject in
                     Button {
@@ -66,6 +108,8 @@ struct SubjectsView: View {
                         }
                     }
                 }
+            } header: {
+                Text(todaysLessons.isEmpty ? "" : "Alle Fächer")
             } footer: {
                 Text("Das Kürzel steht im Stundenplan und links neben dem Hausaufgabenfeld.")
             }
@@ -126,6 +170,49 @@ struct SubjectsView: View {
             parts.append(homework == 1 ? "1 Hausaufgabe" : "\(homework) Hausaufgaben")
         }
         return "Dabei werden auch \(parts.joined(separator: " und ")) gelöscht. Das lässt sich nicht rückgängig machen."
+    }
+}
+
+/// Eine Stunde des Tages: Nummer, Uhrzeit, Fach, Raum.
+struct TodayLessonRow: View {
+    let lesson: Lesson
+    let subject: Subject
+    let time: PeriodTime?
+    let showTime: Bool
+    let room: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text("\(lesson.period).")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                if showTime, let time {
+                    Text(time.startText)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .monospacedDigit()
+                }
+            }
+            .frame(width: 38, alignment: .leading)
+
+            SubjectBadge(subject: subject, width: 44)
+
+            Text(subject.displayName)
+                .foregroundStyle(.primary)
+
+            Spacer(minLength: 0)
+
+            if !room.isEmpty {
+                Text(room)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 3)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(lesson.period). Stunde, \(subject.displayName)\(room.isEmpty ? "" : ", Raum \(room)")")
     }
 }
 
