@@ -24,13 +24,28 @@ Geschrieben in Swift/SwiftUI als native App für iPhone **und** iPad. Alle Daten
 - Einstellbar: Anzahl der Stunden pro Tag (1–14), Samstag als sechster Schultag, Unterrichtszeiten je Stunde.
 - Der heutige Wochentag ist hervorgehoben.
 
-### 3. Fächer
+### 3. Stundenplan abfotografieren
+
+Statt jedes Feld einzeln einzutippen, lässt sich der eigene Stundenplan scannen:
+
+1. **Aufnehmen** – Apples Dokumentenscanner erkennt den Papierrand und entzerrt das Bild. Alternativ ein vorhandenes Foto aus der Mediathek.
+2. **Lesen** – die Texterkennung liest die Kürzel und leitet aus ihrer Lage im Bild das Raster ab: welche Spalte welcher Wochentag ist und welche Zeile welche Stunde.
+3. **Prüfen** – das Ergebnis wird als Raster angezeigt. Falsch gelesene Felder tippst du an und korrigierst sie; unbekannte Kürzel lassen sich mit einem Tipp als neue Fächer anlegen.
+4. **Übernehmen** – erst dann wird der Stundenplan ersetzt.
+
+Der Prüfschritt ist Absicht: Ein Foto kann schief, dunkel oder handgeschrieben sein, und dann liest die Erkennung Dinge falsch. **Gedruckte Pläne funktionieren deutlich besser als handgeschriebene.**
+
+Alles läuft auf dem Gerät – das Foto wird nicht hochgeladen und nirgends gespeichert. Beim ersten Scan fragt iOS nach der Kameraerlaubnis.
+
+> Der Dokumentenscanner braucht eine echte Kamera und funktioniert deshalb **nicht im Simulator**. Zum Ausprobieren am Mac lässt sich stattdessen ein Foto aus der Mediathek wählen.
+
+### 4. Fächer
 
 - Name, Kürzel, Farbe, Lehrkraft und Raum je Fach.
 - Beim ersten Start sind typische Schulfächer schon angelegt (Deutsch, Mathematik, Englisch …) – umbenennen oder löschen, wie du möchtest.
 - Das Kürzel ist genau das, was im Stundenplan und neben dem Hausaufgabenfeld steht.
 
-### 4. Einstellungen
+### 5. Einstellungen
 
 - Stunden pro Tag, Samstag, Uhrzeiten, Unterrichtszeiten.
 - **Sicherung speichern / wiederherstellen** als Datei (z. B. in iCloud Drive). Wichtig, denn die Daten liegen nur auf dem Gerät.
@@ -87,7 +102,7 @@ Dafür brauchst du einen **Mac mit Xcode** (kostenlos im Mac App Store). Ohne Ma
 - **Sprache/Framework:** Swift 5, SwiftUI
 - **Mindestversion:** iOS 17.0 (iPhone und iPad, Hoch- und Querformat)
 - **Speicherung:** eine JSON-Datei im Dokumentenordner der App (`hausaufgaben.json`). Änderungen werden kurz gesammelt und dann automatisch geschrieben; beim Verlassen der App wird sofort gesichert. Ist die Datei einmal beschädigt, wird sie zur Seite gelegt statt überschrieben.
-- **Keine fremden Bibliotheken**, keine Netzwerkzugriffe.
+- **Keine fremden Bibliotheken**, keine Netzwerkzugriffe. Für den Scan kommen Apples eigene Frameworks zum Einsatz: VisionKit (Dokumentenscanner), Vision (Texterkennung) und PhotosUI (Fotoauswahl).
 
 ### Aufbau des Projekts
 
@@ -104,12 +119,13 @@ HausaufgabenApp/
 │   └── AppStore.swift           Hält die Daten, speichert und lädt sie
 ├── Support/
 │   ├── SchoolCalendar.swift     Wochen- und Datumsberechnungen (Woche ab Montag)
-│   ├── AppTheme.swift           Farben und Maße
+│   ├── AppTheme.swift           Farben (je Fach ein heller und ein kräftiger Ton)
+│   ├── TimetableRecognizer.swift  Texterkennung und Rasteranalyse für den Scan
 │   └── BackupDocument.swift     Sicherungsdatei
 ├── Views/
 │   ├── RootView.swift           Die vier Tabs
 │   ├── Homework/                Hausaufgabenheft mit Wochenblättern
-│   ├── Timetable/               Stundenplan-Raster
+│   ├── Timetable/               Stundenplan-Raster, Scannen und Prüfansicht
 │   ├── Subjects/                Fächerverwaltung
 │   └── Settings/                Einstellungen, Unterrichtszeiten
 └── Assets.xcassets              App-Symbol und Akzentfarbe

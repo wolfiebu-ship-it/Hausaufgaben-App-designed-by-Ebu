@@ -176,6 +176,52 @@ final class AppStore: ObservableObject {
 
     var hasAnyLesson: Bool { lessons.contains { $0.subjectID != nil } }
 
+    /// Ersetzt den gesamten Stundenplan – wird nach einem geprüften Scan aufgerufen.
+    /// Fächer und Hausaufgaben bleiben unangetastet.
+    func replaceTimetable(with newLessons: [Lesson]) {
+        let validIDs = Set(subjects.map(\.id))
+        lessons = newLessons.filter { lesson in
+            guard (1...7).contains(lesson.weekday), lesson.period >= 1 else { return false }
+            guard let id = lesson.subjectID else { return false }
+            return validIDs.contains(id)
+        }
+        // Der Plan darf nicht mehr Stunden haben, als angezeigt werden.
+        if let höchste = lessons.map(\.period).max(), höchste > settings.periodCount {
+            settings.periodCount = min(14, höchste)
+        }
+        if lessons.contains(where: { $0.weekday == 6 }) {
+            settings.includeSaturday = true
+        }
+        dataRevision += 1
+        saveNow()
+    }
+
+    /// Legt für erkannte, aber unbekannte Kürzel neue Fächer an und gibt zurück,
+    /// welches Kürzel zu welchem Fach wurde.
+    @discardableResult
+    func createSubjects(forCodes codes: [String]) -> [String: UUID] {
+        var mapping: [String: UUID] = [:]
+        for code in codes {
+            let cleaned = code.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !cleaned.isEmpty else { continue }
+
+            if let existing = subjects.first(where: {
+                $0.short.localizedCaseInsensitiveCompare(cleaned) == .orderedSame
+            }) {
+                mapping[cleaned] = existing.id
+                continue
+            }
+
+            let subject = Subject(name: cleaned,
+                                  short: String(cleaned.prefix(4)),
+                                  colorIndex: AppTheme.suggestedColorIndex(usedBy: subjects))
+            subjects.append(subject)
+            mapping[cleaned] = subject.id
+        }
+        scheduleSave()
+        return mapping
+    }
+
     // MARK: - Hausaufgaben
 
     func homeworkEntry(day: Date, subjectID: UUID) -> HomeworkEntry? {

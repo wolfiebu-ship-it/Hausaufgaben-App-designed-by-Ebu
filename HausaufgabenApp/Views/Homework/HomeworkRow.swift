@@ -24,7 +24,7 @@ struct HomeworkRow: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
-            SubjectBadge(subject: subject)
+            SubjectBadge(subject: subject, dimmed: !hasText)
                 .padding(.top, 2)
 
             TextField("Hausaufgabe eintragen …", text: $text, axis: .vertical)
@@ -96,20 +96,23 @@ struct HomeworkRow: View {
     }
 }
 
-/// Farbiges Kürzel eines Fachs.
+/// Farbiges Kürzel eines Fachs – helle Fläche, kräftige Schrift.
 struct SubjectBadge: View {
     let subject: Subject
     var width: CGFloat = 44
+    /// Blasser, solange zu diesem Fach noch nichts eingetragen ist.
+    var dimmed: Bool = false
 
     var body: some View {
         Text(subject.displayShort)
             .font(.caption.weight(.bold))
-            .foregroundStyle(.white)
+            .foregroundStyle(subject.tint)
             .lineLimit(1)
             .minimumScaleFactor(0.6)
             .frame(width: width)
             .padding(.vertical, 6)
-            .background(subject.color, in: RoundedRectangle(cornerRadius: AppTheme.badgeCornerRadius))
+            .background(subject.fill, in: RoundedRectangle(cornerRadius: AppTheme.badgeCornerRadius))
+            .opacity(dimmed ? 0.55 : 1)
             .accessibilityLabel(subject.displayName)
     }
 }

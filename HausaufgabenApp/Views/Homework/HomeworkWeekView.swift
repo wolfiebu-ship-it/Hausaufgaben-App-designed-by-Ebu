@@ -28,6 +28,8 @@ struct HomeworkWeekView: View {
                     NoTimetableHint()
                 }
 
+                WeekSummary(days: days)
+
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
                     ForEach(days, id: \.self) { day in
                         HomeworkDayCard(day: day)
@@ -39,6 +41,64 @@ struct HomeworkWeekView: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .background(Color(.systemGroupedBackground))
+    }
+}
+
+/// Überblick über die ganze Woche: wie viel steht noch an, was ist geschafft.
+struct WeekSummary: View {
+    let days: [Date]
+    @EnvironmentObject private var store: AppStore
+
+    private var entries: [HomeworkEntry] {
+        days.flatMap { store.homeworkEntries(on: $0) }.filter(\.hasText)
+    }
+
+    private var open: Int { entries.filter { !$0.isDone }.count }
+    private var done: Int { entries.filter(\.isDone).count }
+    private var total: Int { entries.count }
+
+    var body: some View {
+        if total > 0 {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 8) {
+                    Text(headline)
+                        .font(.subheadline.weight(.semibold))
+
+                    Spacer(minLength: 0)
+
+                    Text("\(done) von \(total) erledigt")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                }
+
+                // Ein Balken je Aufgabe – auf einen Blick sichtbar, wie viel noch offen ist.
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(Color(.tertiarySystemFill))
+                        Capsule()
+                            .fill(Color.accentColor)
+                            .frame(width: geometry.size.width * progress)
+                    }
+                }
+                .frame(height: 6)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+        }
+    }
+
+    private var progress: Double {
+        total > 0 ? Double(done) / Double(total) : 0
+    }
+
+    private var headline: String {
+        if open == 0 { return "Alles erledigt 🎉" }
+        if open == 1 { return "Noch 1 Aufgabe offen" }
+        return "Noch \(open) Aufgaben offen"
     }
 }
 

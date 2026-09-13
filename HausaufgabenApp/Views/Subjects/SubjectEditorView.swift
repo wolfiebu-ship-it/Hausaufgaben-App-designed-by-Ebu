@@ -130,19 +130,25 @@ struct SubjectEditorView: View {
                 Button {
                     colorIndex = index
                 } label: {
+                    // Der Kreis zeigt beide Töne des Fachs: helle Fläche, kräftige Schrift.
                     Circle()
-                        .fill(AppTheme.color(at: index))
+                        .fill(AppTheme.fill(at: index))
                         .frame(width: 36, height: 36)
                         .overlay {
                             if colorIndex == index {
                                 Image(systemName: "checkmark")
                                     .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(AppTheme.tint(at: index))
+                            } else {
+                                Circle()
+                                    .fill(AppTheme.tint(at: index))
+                                    .frame(width: 13, height: 13)
                             }
                         }
                         .overlay {
                             Circle()
-                                .strokeBorder(Color.primary.opacity(colorIndex == index ? 0.6 : 0),
+                                .strokeBorder(AppTheme.tint(at: index)
+                                                .opacity(colorIndex == index ? 0.9 : 0),
                                               lineWidth: 2)
                                 .padding(-3)
                         }

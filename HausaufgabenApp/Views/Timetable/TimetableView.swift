@@ -4,6 +4,7 @@ import SwiftUI
 struct TimetableView: View {
     @EnvironmentObject private var store: AppStore
     @State private var editingSlot: LessonSlot?
+    @State private var showScanner = false
 
     struct LessonSlot: Identifiable, Hashable {
         let weekday: Int
@@ -31,11 +32,61 @@ struct TimetableView: View {
             .navigationTitle("Stundenplan")
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.systemGroupedBackground))
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showScanner = true
+                    } label: {
+                        Image(systemName: "doc.viewfinder")
+                    }
+                    .accessibilityLabel("Stundenplan scannen")
+                }
+            }
             .sheet(item: $editingSlot) { slot in
                 LessonEditorView(weekday: slot.weekday, period: slot.period)
                     .environmentObject(store)
             }
+            .sheet(isPresented: $showScanner) {
+                TimetableScanFlow()
+                    .environmentObject(store)
+            }
         }
+    }
+
+    /// Hinweis über dem Raster: den eigenen Plan abfotografieren statt tippen.
+    private var scanBanner: some View {
+        Button {
+            showScanner = true
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "doc.viewfinder")
+                    .font(.title2)
+                    .foregroundStyle(.tint)
+                    .frame(width: 32)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Eigenen Stundenplan scannen")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text("Plan abfotografieren – die Fächer werden automatisch eingetragen.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Raster
@@ -53,10 +104,16 @@ struct TimetableView: View {
     }
 
     private var grid: some View {
-        GeometryReader { geometry in
-            ScrollView([.horizontal, .vertical]) {
-                gridContent(columnWidth: columnWidth(availableWidth: geometry.size.width))
-                    .padding(Self.outerPadding)
+        VStack(spacing: 0) {
+            scanBanner
+                .padding(.horizontal, Self.outerPadding)
+                .padding(.top, Self.outerPadding)
+
+            GeometryReader { geometry in
+                ScrollView([.horizontal, .vertical]) {
+                    gridContent(columnWidth: columnWidth(availableWidth: geometry.size.width))
+                        .padding(Self.outerPadding)
+                }
             }
         }
     }
@@ -136,21 +193,34 @@ struct TimetableView: View {
                 .font(.system(size: 44))
                 .foregroundStyle(.tint)
 
-            Text("Zuerst die Fächer anlegen")
+            Text("Noch kein Stundenplan")
                 .font(.headline)
 
-            Text("Im Tab „Fächer“ legst du fest, welche Fächer du hast und welches Kürzel sie bekommen. Danach kannst du sie hier in den Stundenplan eintragen.")
+            Text("Fotografiere deinen Plan ab – die Fächer werden dabei gleich mit angelegt. Oder fang mit den typischen Schulfächern an und trage den Plan von Hand ein.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Button {
-                store.addStarterSubjects()
-            } label: {
-                Label("Typische Fächer übernehmen", systemImage: "sparkles")
+            VStack(spacing: 10) {
+                Button {
+                    showScanner = true
+                } label: {
+                    Label("Stundenplan scannen", systemImage: "doc.viewfinder")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+
+                Button {
+                    store.addStarterSubjects()
+                } label: {
+                    Label("Typische Fächer übernehmen", systemImage: "sparkles")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
             }
-            .buttonStyle(.borderedProminent)
         }
         .padding(32)
         .frame(maxWidth: 480)
@@ -158,7 +228,9 @@ struct TimetableView: View {
     }
 }
 
-/// Eine Zelle im Stundenplan.
+/// Eine Zelle im Stundenplan: helle Fläche in der Fachfarbe, links ein
+/// kräftiger Streifen – so bleiben die Fächer auch bei hellen Tönen
+/// gut auseinanderzuhalten.
 struct TimetableCell: View {
     let subject: Subject?
     let room: String
@@ -167,31 +239,40 @@ struct TimetableCell: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 2) {
+            HStack(spacing: 0) {
                 if let subject {
-                    Text(subject.displayShort)
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
-
-                    if !room.isEmpty {
-                        Text(room)
-                            .font(.system(size: 10))
-                            .foregroundStyle(.white.opacity(0.85))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.7)
-                    }
-                } else {
-                    Image(systemName: "plus")
-                        .font(.footnote)
-                        .foregroundStyle(.tertiary)
+                    Rectangle()
+                        .fill(subject.tint)
+                        .frame(width: 4)
                 }
+
+                VStack(spacing: 2) {
+                    if let subject {
+                        Text(subject.displayShort)
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(subject.tint)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+
+                        if !room.isEmpty {
+                            Text(room)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(subject.tint.opacity(0.75))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                        }
+                    } else {
+                        Image(systemName: "plus")
+                            .font(.footnote)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 3)
             }
-            .padding(.horizontal, 4)
             .frame(width: width, height: AppTheme.timetableCellHeight)
-            .background(subject?.color ?? Color(.tertiarySystemFill),
-                        in: RoundedRectangle(cornerRadius: 8))
+            .background(subject?.fill ?? Color(.tertiarySystemFill))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .buttonStyle(.plain)
         .accessibilityLabel(subject?.displayName ?? "Freie Stunde")

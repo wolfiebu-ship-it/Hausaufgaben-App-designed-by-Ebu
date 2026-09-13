@@ -28,7 +28,10 @@ struct Subject: Identifiable, Codable, Hashable {
         self.room = room
     }
 
-    var color: Color { AppTheme.color(at: colorIndex) }
+    /// Kräftiger Ton für Kürzel und Schrift.
+    var tint: Color { AppTheme.tint(at: colorIndex) }
+    /// Helle Fläche als Hintergrund.
+    var fill: Color { AppTheme.fill(at: colorIndex) }
 
     /// Kürzel für die Anzeige – fällt auf den Namensanfang zurück, falls leer.
     var displayShort: String {
