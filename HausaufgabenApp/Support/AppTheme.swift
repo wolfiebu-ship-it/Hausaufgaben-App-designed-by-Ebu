@@ -70,6 +70,17 @@ enum AppTheme {
     static let timetableMinColumnWidth: CGFloat = 64
 }
 
+extension AppearanceMode {
+    /// `nil` bedeutet: so, wie das Gerät eingestellt ist.
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: return nil
+        case .light:  return .light
+        case .dark:   return .dark
+        }
+    }
+}
+
 extension Color {
     /// Eine Farbe, die sich dem Hell- bzw. Dunkelmodus anpasst.
     init(lightHex: UInt32, darkHex: UInt32) {

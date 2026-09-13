@@ -32,6 +32,24 @@ struct PeriodTime: Codable, Hashable, Identifiable {
     }
 }
 
+/// Hell oder dunkel – oder so, wie das Gerät es gerade eingestellt hat.
+enum AppearanceMode: String, Codable, Hashable, CaseIterable, Identifiable {
+    case system
+    case light
+    case dark
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .system: return "Automatisch"
+        case .light:  return "Hell"
+        case .dark:   return "Dunkel"
+        }
+    }
+
+}
+
 /// Einstellungen des Stundenplans.
 struct AppSettings: Codable, Hashable {
     /// Anzahl der Stunden pro Tag (Zeilen im Stundenplan).
@@ -43,17 +61,21 @@ struct AppSettings: Codable, Hashable {
     /// Im Hausaufgabenblatt auch Fächer zeigen, zu denen noch nichts eingetragen ist.
     /// Aus = nur eine Übersicht der eingetragenen Aufgaben.
     var showEmptySubjects: Bool
+    /// Helles oder dunkles Erscheinungsbild der App.
+    var appearance: AppearanceMode
     var periodTimes: [PeriodTime]
 
     init(periodCount: Int = 9,
          includeSaturday: Bool = false,
          showTimes: Bool = true,
          showEmptySubjects: Bool = true,
+         appearance: AppearanceMode = .system,
          periodTimes: [PeriodTime]? = nil) {
         self.periodCount = periodCount
         self.includeSaturday = includeSaturday
         self.showTimes = showTimes
         self.showEmptySubjects = showEmptySubjects
+        self.appearance = appearance
         self.periodTimes = periodTimes ?? PeriodTime.defaultTimes(count: periodCount)
     }
 
@@ -89,6 +111,7 @@ struct AppSettings: Codable, Hashable {
         includeSaturday = try container.decodeIfPresent(Bool.self, forKey: .includeSaturday) ?? false
         showTimes = try container.decodeIfPresent(Bool.self, forKey: .showTimes) ?? true
         showEmptySubjects = try container.decodeIfPresent(Bool.self, forKey: .showEmptySubjects) ?? true
+        appearance = try container.decodeIfPresent(AppearanceMode.self, forKey: .appearance) ?? .system
         periodTimes = try container.decodeIfPresent([PeriodTime].self, forKey: .periodTimes)
             ?? PeriodTime.defaultTimes(count: periodCount)
     }

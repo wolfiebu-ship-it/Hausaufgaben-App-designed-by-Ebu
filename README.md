@@ -47,6 +47,7 @@ Alles läuft auf dem Gerät – das Foto wird nicht hochgeladen und nirgends ges
 
 ### 5. Einstellungen
 
+- **Hell oder dunkel:** ganz oben unter „Darstellung“ lässt sich die App fest auf hell oder dunkel stellen – oder auf „Automatisch“, dann folgt sie der Einstellung des Geräts.
 - Stunden pro Tag, Samstag, Uhrzeiten, Unterrichtszeiten.
 - **Sicherung speichern / wiederherstellen** als Datei (z. B. in iCloud Drive). Wichtig, denn die Daten liegen nur auf dem Gerät.
 

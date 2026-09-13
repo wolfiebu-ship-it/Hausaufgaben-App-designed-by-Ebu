@@ -23,6 +23,7 @@ struct SettingsView: View {
                     }
                 }
 
+                appearanceSection
                 timetableSection
                 homeworkSection
                 dataSection
@@ -83,6 +84,31 @@ struct SettingsView: View {
     }
 
     // MARK: - Abschnitte
+
+    private var appearanceSection: some View {
+        Section {
+            Picker("Erscheinungsbild", selection: $store.settings.appearance) {
+                ForEach(AppearanceMode.allCases) { mode in
+                    Text(mode.title).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .padding(.vertical, 2)
+        } header: {
+            Text("Darstellung")
+        } footer: {
+            Text(appearanceFooter)
+        }
+    }
+
+    private var appearanceFooter: String {
+        switch store.settings.appearance {
+        case .system: return "Die App richtet sich danach, ob dein Gerät gerade auf hell oder dunkel steht."
+        case .light:  return "Die App bleibt immer hell – auch wenn das Gerät auf dunkel steht."
+        case .dark:   return "Die App bleibt immer dunkel – auch wenn das Gerät auf hell steht."
+        }
+    }
 
     private var timetableSection: some View {
         Section {

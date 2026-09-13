@@ -8,6 +8,8 @@ struct HausaufgabenApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(store)
+                // Gilt für die ganze App, auch für Blätter und Auswahlfenster.
+                .preferredColorScheme(store.settings.appearance.colorScheme)
         }
     }
 }
