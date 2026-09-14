@@ -1,11 +1,13 @@
 import SwiftUI
 
 /// Eine Zeile im Hausaufgabenheft: links das Kürzel des Fachs, daneben das
-/// Eingabefeld – und rechts der Haken zum Abhaken, wenn die Aufgabe fertig ist.
+/// Eingabefeld, rechts zwei Felder zum Ankreuzen.
 ///
-/// Solange nichts eingetragen ist, steht dort stattdessen ein Kästchen:
-/// damit lässt sich für jedes Fach einzeln ankreuzen, dass es nichts
-/// aufgegeben hat.
+/// **Gelb** heißt: In diesem Fach ist nichts aufgegeben.
+/// **Blau** heißt: Die Hausaufgabe ist erledigt.
+///
+/// Beide lassen sich bei jedem Fach ankreuzen. Sie schließen einander aus –
+/// wer „keine Hausaufgaben“ ankreuzt, verwirft damit einen etwaigen Eintrag.
 struct HomeworkRow: View {
     let day: Date
     let subject: Subject
@@ -45,7 +47,7 @@ struct HomeworkRow: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 3)
             } else {
-                TextField("Hausaufgabe eintragen …", text: $text, axis: .vertical)
+                TextField(placeholder, text: $text, axis: .vertical)
                     .lineLimit(1...6)
                     .foregroundStyle(isDone ? Color.secondary : Color.primary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -87,22 +89,32 @@ struct HomeworkRow: View {
 
     // MARK: - Das Bedienelement rechts
 
+    private var placeholder: String {
+        isDone ? "Erledigt" : "Hausaufgabe eintragen …"
+    }
+
     /// Das gelbe Feld: in diesem Fach ist nichts aufgegeben.
-    /// Solange etwas im Textfeld steht, ist es blass – dann gibt es ja
-    /// offensichtlich Hausaufgaben.
+    /// Lässt sich bei jedem Fach ankreuzen.
     private var noHomeworkBox: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.15)) {
-                store.setNoHomework(!isFree, day: day, subjectID: subject.id)
+                if isFree {
+                    store.setNoHomework(false, day: day, subjectID: subject.id)
+                } else {
+                    // „Keine Hausaufgaben“ und ein Eintrag können nicht
+                    // beide stimmen – der Eintrag weicht.
+                    text = ""
+                    isDone = false
+                    store.setNoHomework(true, day: day, subjectID: subject.id)
+                }
             }
         } label: {
             Image(systemName: isFree ? "checkmark.circle.fill" : "circle")
                 .font(.title2)
                 .foregroundStyle(AppTheme.noHomeworkTint)
-                .opacity(isFree ? 1 : (hasText ? 0.2 : 0.55))
+                .opacity(isFree ? 1 : 0.5)
         }
         .buttonStyle(.plain)
-        .disabled(hasText)
         .frame(width: 30)
         .padding(.top, 1)
         .accessibilityLabel(isFree
@@ -110,19 +122,21 @@ struct HomeworkRow: View {
                             : "Ankreuzen: in \(subject.displayName) ist nichts aufgegeben")
     }
 
-    /// Das blaue Feld: die Aufgabe ist erledigt.
-    /// Ohne Eintrag gibt es nichts abzuhaken – dann ist es blass.
+    /// Das blaue Feld: die Hausaufgabe ist erledigt.
+    /// Lässt sich ebenfalls bei jedem Fach ankreuzen – auch bevor etwas
+    /// aufgeschrieben wurde.
     private var doneBox: some View {
         Button {
-            toggleDone()
+            withAnimation(.easeInOut(duration: 0.15)) {
+                toggleDone()
+            }
         } label: {
             Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
                 .font(.title2)
                 .foregroundStyle(Color.accentColor)
-                .opacity(isDone ? 1 : (hasText ? 0.55 : 0.2))
+                .opacity(isDone ? 1 : 0.5)
         }
         .buttonStyle(.plain)
-        .disabled(!hasText)
         .frame(width: 30)
         .padding(.top, 1)
         .accessibilityLabel(isDone
@@ -133,12 +147,13 @@ struct HomeworkRow: View {
     // MARK: - Aktionen
 
     private func save() {
-        if !hasText && isDone { isDone = false }
+        // Ein Haken ohne Text bleibt bestehen – „erledigt, aber nicht
+        // aufgeschrieben“ ist eine gültige Angabe.
         store.setHomeworkText(text, day: day, subjectID: subject.id)
     }
 
     private func toggleDone() {
-        // Der Eintrag muss existieren, bevor er abgehakt werden kann.
+        // Erst den bisher getippten Text sichern, dann abhaken.
         store.setHomeworkText(text, day: day, subjectID: subject.id)
         isDone.toggle()
         store.setHomeworkDone(isDone, day: day, subjectID: subject.id)

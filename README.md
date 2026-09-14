@@ -18,7 +18,8 @@ Geschrieben in Swift/SwiftUI als native App für iPhone **und** iPad. Alle Daten
 - **Rechts an jeder Zeile stehen zwei Felder zum Ankreuzen** – bei jedem Fach, nicht nur bei manchen. Über den Zeilen steht, welches welches ist:
   - **gelb** = in diesem Fach ist nichts aufgegeben. Die Zeile zeigt dann „Keine Hausaufgaben“; ein weiterer Tipp nimmt es zurück.
   - **blau** = die Aufgabe ist erledigt.
-  Die beiden sind farblich klar getrennt. Was gerade nicht passt, ist blass: Steht schon eine Aufgabe da, lässt sich „keine Hausaufgaben“ nicht ankreuzen – und umgekehrt gibt es ohne Eintrag nichts abzuhaken.
+  **Beide lassen sich bei jedem Fach ankreuzen**, unabhängig davon, ob schon etwas eingetragen ist. Sie schließen einander aus: Kreuzt du „Keine Hausaufgaben“ an, wird ein bereits eingetragener Text verworfen. Und abhaken kannst du auch, bevor du etwas aufgeschrieben hast – dann steht dort „Erledigt“.
+- **Was die Farben bedeuten**, steht ausführlich in den Einstellungen unter „Die Felder im Hausaufgabenheft“, und als kurze Legende über den Zeilen jedes Tages.
 - **Für den ganzen Tag** geht das ebenfalls: unten in der Tageskarte „Keine Hausaufgaben“ abhaken, dann klappt sie auf eine Zeile zusammen.
 - So bleibt später unterscheidbar, ob wirklich nichts aufgegeben wurde oder du es nur nicht eingetragen hast. Sobald du doch etwas einträgst, verschwindet der Vermerk von allein.
 - Hattest du ausnahmsweise ein Fach, das nicht im Plan steht (z. B. Vertretung), ergänzt du es unten über **„Fach ergänzen“**.

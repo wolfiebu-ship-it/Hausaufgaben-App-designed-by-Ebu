@@ -23,6 +23,7 @@ struct SettingsView: View {
                     }
                 }
 
+                legendSection
                 appearanceSection
                 timetableSection
                 homeworkSection
@@ -84,6 +85,42 @@ struct SettingsView: View {
     }
 
     // MARK: - Abschnitte
+
+    /// Erklärt die beiden Felder, die an jeder Hausaufgabenzeile stehen.
+    private var legendSection: some View {
+        Section {
+            legendRow(color: AppTheme.noHomeworkTint,
+                      title: "Keine Hausaufgaben",
+                      text: "Kreuze das gelbe Feld an, wenn in dem Fach nichts aufgegeben wurde. Die Zeile zeigt dann „Keine Hausaufgaben“.")
+
+            legendRow(color: .accentColor,
+                      title: "Erledigt",
+                      text: "Kreuze das blaue Feld an, wenn du die Hausaufgabe gemacht hast. Aufschreiben kannst du sie im Feld daneben.")
+        } header: {
+            Text("Die Felder im Hausaufgabenheft")
+        } footer: {
+            Text("Beide lassen sich bei jedem Fach ankreuzen. Sie schließen einander aus: Kreuzt du „Keine Hausaufgaben“ an, wird ein schon eingetragener Text verworfen.")
+        }
+    }
+
+    private func legendRow(color: Color, title: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.title2)
+                .foregroundStyle(color)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                Text(text)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.vertical, 3)
+        .accessibilityElement(children: .combine)
+    }
 
     private var appearanceSection: some View {
         Section {

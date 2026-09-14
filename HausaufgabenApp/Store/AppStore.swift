@@ -298,7 +298,15 @@ final class AppStore: ObservableObject {
 
         if trimmed.isEmpty {
             guard let index else { return }
-            homework.remove(at: index)
+            // Ein abgehakter Eintrag ohne Text bleibt bestehen: „erledigt,
+            // aber nicht aufgeschrieben“ ist eine gültige Angabe.
+            if homework[index].isDone {
+                guard homework[index].text != text else { return }
+                homework[index].text = text
+                homework[index].updatedAt = Date()
+            } else {
+                homework.remove(at: index)
+            }
             scheduleSave()
             return
         }
@@ -316,12 +324,30 @@ final class AppStore: ObservableObject {
         scheduleSave()
     }
 
+    /// Hakt ein Fach ab. Das geht auch, wenn nichts eingetragen ist –
+    /// dann entsteht ein Eintrag ohne Text, der für „erledigt“ steht.
     func setHomeworkDone(_ isDone: Bool, day: Date, subjectID: UUID) {
+        guard subjects.contains(where: { $0.id == subjectID }) else { return }
         let key = SchoolCalendar.dayKey(day)
-        guard let index = homework.firstIndex(where: { $0.dayKey == key && $0.subjectID == subjectID }),
-              homework[index].isDone != isDone else { return }
-        homework[index].isDone = isDone
-        homework[index].updatedAt = Date()
+
+        if let index = homework.firstIndex(where: { $0.dayKey == key && $0.subjectID == subjectID }) {
+            guard homework[index].isDone != isDone else { return }
+            homework[index].isDone = isDone
+            homework[index].updatedAt = Date()
+            // Ohne Text und ohne Haken bleibt nichts übrig.
+            if !isDone && !homework[index].hasText {
+                homework.remove(at: index)
+            }
+        } else {
+            guard isDone else { return }
+            homework.append(HomeworkEntry(dayKey: key, subjectID: subjectID, text: "", isDone: true))
+        }
+
+        // „Erledigt“ und „keine Hausaufgaben“ schließen sich aus.
+        if isDone {
+            noHomeworkDays.remove(key)
+            noHomeworkSubjects.remove(subjectKey(day: day, subjectID: subjectID))
+        }
         scheduleSave()
     }
 
@@ -363,11 +389,16 @@ final class AppStore: ObservableObject {
         noHomeworkSubjects.contains(subjectKey(day: day, subjectID: subjectID))
     }
 
+    /// Vermerkt „keine Hausaufgaben“ für ein Fach. Das geht immer –
+    /// ein bereits eingetragener Text wird dabei verworfen, denn beides
+    /// zugleich kann nicht stimmen.
     func setNoHomework(_ value: Bool, day: Date, subjectID: UUID) {
+        guard subjects.contains(where: { $0.id == subjectID }) else { return }
         let key = subjectKey(day: day, subjectID: subjectID)
+        let dayKey = SchoolCalendar.dayKey(day)
+
         if value {
-            // Gilt nur, solange in dem Fach nichts eingetragen ist.
-            guard homeworkEntry(day: day, subjectID: subjectID)?.hasText != true else { return }
+            homework.removeAll { $0.dayKey == dayKey && $0.subjectID == subjectID }
             guard !noHomeworkSubjects.contains(key) else { return }
             noHomeworkSubjects.insert(key)
         } else {

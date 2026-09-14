@@ -66,10 +66,10 @@ struct AppData: Codable {
             guard (1...7).contains(lesson.weekday), lesson.period >= 1 else { return nil }
             return lesson.isEmpty ? nil : lesson
         }
-        homework = homework.filter { validIDs.contains($0.subjectID) && $0.hasText }
+        homework = homework.filter { validIDs.contains($0.subjectID) && ($0.hasText || $0.isDone) }
 
         // Ein Tag mit eingetragenen Aufgaben kann nicht zugleich "nichts auf" sein.
-        let tageMitAufgaben = Set(homework.map(\.dayKey))
+        let tageMitAufgaben = Set(homework.filter(\.hasText).map(\.dayKey))
         noHomeworkDays = noHomeworkDays.filter { !tageMitAufgaben.contains($0) }
 
         // Dasselbe je Fach: wo etwas eingetragen ist, gilt "nichts auf" nicht.
