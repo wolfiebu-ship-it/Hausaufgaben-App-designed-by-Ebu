@@ -85,29 +85,20 @@ struct HomeworkRow: View {
 
     // MARK: - Das Bedienelement rechts
 
+    /// Rechts an der Zeile steht immer ein Feld zum Ankreuzen.
+    ///
+    /// Damit die beiden Bedeutungen auseinanderzuhalten sind, haben sie
+    /// verschiedene Formen: ein **Kästchen** für „keine Hausaufgaben“,
+    /// ein **Kreis** zum Abhaken einer eingetragenen Aufgabe.
     @ViewBuilder
     private var trailingControl: some View {
-        if isFree {
-            // Vermerk wieder aufheben.
-            Button {
-                withAnimation(.easeInOut(duration: 0.15)) {
-                    store.setNoHomework(false, day: day, subjectID: subject.id)
-                }
-            } label: {
-                Image(systemName: "minus.circle.fill")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("„Keine Hausaufgaben“ für \(subject.displayName) aufheben")
-
-        } else if hasText {
-            // Abhaken, wenn die Aufgabe fertig ist.
+        if hasText {
+            // Kreis: Aufgabe erledigt?
             Button {
                 toggleDone()
             } label: {
                 Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
-                    .font(.title3)
+                    .font(.title2)
                     .foregroundStyle(isDone ? Color.accentColor : Color.secondary)
             }
             .buttonStyle(.plain)
@@ -117,22 +108,21 @@ struct HomeworkRow: View {
                                 : "\(subject.displayName) als erledigt markieren")
 
         } else {
-            // Nichts eingetragen: für dieses Fach „nichts auf“ vermerken.
+            // Kästchen: in diesem Fach ist nichts aufgegeben.
             Button {
                 withAnimation(.easeInOut(duration: 0.15)) {
-                    store.setNoHomework(true, day: day, subjectID: subject.id)
+                    store.setNoHomework(!isFree, day: day, subjectID: subject.id)
                 }
             } label: {
-                Text("nichts auf")
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 5)
-                    .background(Color(.tertiarySystemFill), in: Capsule())
+                Image(systemName: isFree ? "checkmark.square.fill" : "square")
+                    .font(.title2)
+                    .foregroundStyle(isFree ? Color.accentColor : Color.secondary)
             }
             .buttonStyle(.plain)
             .padding(.top, 1)
-            .accessibilityLabel("In \(subject.displayName) ist nichts aufgegeben")
+            .accessibilityLabel(isFree
+                                ? "„Keine Hausaufgaben“ in \(subject.displayName) aufheben"
+                                : "Ankreuzen: in \(subject.displayName) ist nichts aufgegeben")
         }
     }
 
