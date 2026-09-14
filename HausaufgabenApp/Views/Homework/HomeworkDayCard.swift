@@ -100,6 +100,7 @@ struct HomeworkDayCard: View {
     /// Der ganze Kopf ist ein Knopf: antippen klappt den Tag auf und zu.
     private var headerButton: some View {
         Button {
+            Haptics.tap()
             withAnimation(.easeInOut(duration: 0.22)) {
                 isExpanded.toggle()
             }
@@ -242,6 +243,7 @@ struct HomeworkDayCard: View {
     /// Der Vermerk, wenn der Tag als „nichts auf“ markiert ist.
     private var freeMarker: some View {
         Button {
+            Haptics.tap()
             withAnimation { store.setNoHomework(false, day: day) }
         } label: {
             HStack(spacing: 10) {
@@ -271,6 +273,7 @@ struct HomeworkDayCard: View {
     /// Das Feld zum Abhaken, solange nichts eingetragen ist.
     private var freeToggle: some View {
         Button {
+            Haptics.tap()
             withAnimation { store.setNoHomework(true, day: day) }
         } label: {
             HStack(spacing: 10) {

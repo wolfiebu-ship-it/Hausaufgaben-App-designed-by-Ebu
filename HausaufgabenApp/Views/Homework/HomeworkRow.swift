@@ -97,6 +97,7 @@ struct HomeworkRow: View {
     /// Lässt sich bei jedem Fach ankreuzen.
     private var noHomeworkBox: some View {
         Button {
+            Haptics.tap()
             withAnimation(.easeInOut(duration: 0.15)) {
                 if isFree {
                     store.setNoHomework(false, day: day, subjectID: subject.id)
@@ -157,6 +158,7 @@ struct HomeworkRow: View {
         store.setHomeworkText(text, day: day, subjectID: subject.id)
         isDone.toggle()
         store.setHomeworkDone(isDone, day: day, subjectID: subject.id)
+        isDone ? Haptics.success() : Haptics.tap()
     }
 
     private func clear() {

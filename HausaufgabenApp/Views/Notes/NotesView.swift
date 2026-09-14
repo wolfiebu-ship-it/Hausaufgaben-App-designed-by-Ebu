@@ -40,6 +40,7 @@ struct NotesView: View {
                     Button(action: newNote) {
                         Image(systemName: "square.and.pencil")
                     }
+                    .keyboardShortcut("n", modifiers: .command)
                     .accessibilityLabel("Neue Notiz")
                 }
             }
@@ -91,6 +92,7 @@ struct NotesView: View {
     }
 
     private func newNote() {
+        Haptics.tap()
         openNoteID = store.createNote()
     }
 }

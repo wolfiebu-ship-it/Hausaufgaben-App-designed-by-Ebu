@@ -9,6 +9,7 @@ struct HomeworkPagerView: View {
     @State private var weekOffset = 0
     @State private var showDatePicker = false
     @State private var pickedDate = Date()
+    @State private var showSearch = false
 
     /// So viele Wochen lassen sich vor und zurück blättern (gut zwei Schuljahre).
     private static let range = -80...80
@@ -43,6 +44,7 @@ struct HomeworkPagerView: View {
                         Image(systemName: "chevron.left")
                     }
                     .disabled(weekOffset <= Self.range.lowerBound)
+                    .keyboardShortcut(.leftArrow, modifiers: .command)
                     .accessibilityLabel("Vorherige Woche")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -52,7 +54,17 @@ struct HomeworkPagerView: View {
                         Image(systemName: "chevron.right")
                     }
                     .disabled(weekOffset >= Self.range.upperBound)
+                    .keyboardShortcut(.rightArrow, modifiers: .command)
                     .accessibilityLabel("Nächste Woche")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showSearch = true
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                    }
+                    .keyboardShortcut("f", modifiers: .command)
+                    .accessibilityLabel("Suchen")
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
@@ -61,6 +73,13 @@ struct HomeworkPagerView: View {
             }
             .sheet(isPresented: $showDatePicker) {
                 weekPickerSheet
+            }
+            .sheet(isPresented: $showSearch) {
+                SearchView { day in
+                    // Zur Woche springen, in der der Treffer steht.
+                    jump(to: day)
+                }
+                .environmentObject(store)
             }
         }
     }

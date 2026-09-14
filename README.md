@@ -24,6 +24,7 @@ Geschrieben in Swift/SwiftUI als native App für iPhone **und** iPad. Alle Daten
 - So bleibt später unterscheidbar, ob wirklich nichts aufgegeben wurde oder du es nur nicht eingetragen hast. Sobald du doch etwas einträgst, verschwindet der Vermerk von allein.
 - Hattest du ausnahmsweise ein Fach, das nicht im Plan steht (z. B. Vertretung), ergänzt du es unten über **„Fach ergänzen“**.
 - Getipptes wird automatisch gespeichert – es gibt keinen Sichern-Knopf.
+- **Suchen** über die Lupe oben rechts: findet Hausaufgaben aus *allen* Wochen und alle Notizen. Einen Treffer antippen springt zu der Woche, in der er steht.
 
 ### 2. Stundenplan
 
@@ -129,6 +130,8 @@ Dafür brauchst du einen **Mac mit Xcode** (kostenlos im Mac App Store). Ohne Ma
 
 - **Sprache/Framework:** Swift 5, SwiftUI
 - **Mindestversion:** iOS 17.0 (iPhone und iPad, Hoch- und Querformat)
+- **Mit Tastatur am iPad:** ⌘← und ⌘→ blättern durch die Wochen, ⌘F öffnet die Suche, ⌘N legt eine neue Notiz an.
+- Kleine haptische Rückmeldung beim Ankreuzen und Aufklappen (iPhone).
 - **Speicherung:** eine JSON-Datei im Dokumentenordner der App (`hausaufgaben.json`). Änderungen werden kurz gesammelt und dann automatisch geschrieben; beim Verlassen der App wird sofort gesichert. Ist die Datei einmal beschädigt, wird sie zur Seite gelegt statt überschrieben.
 - **Keine fremden Bibliotheken**, keine Netzwerkzugriffe. Für den Scan kommen Apples eigene Frameworks zum Einsatz: VisionKit (Dokumentenscanner), Vision (Texterkennung) und PhotosUI (Fotoauswahl).
 
@@ -150,6 +153,7 @@ HausaufgabenApp/
 ├── Support/
 │   ├── SchoolCalendar.swift     Wochen- und Datumsberechnungen (Woche ab Montag)
 │   ├── AppTheme.swift           Farben (je Fach ein heller und ein kräftiger Ton)
+│   ├── Haptics.swift            Kurze Rückmeldung beim Antippen
 │   ├── DoodleBackground.swift   Schulmotive blass hinter den Schreib-Seiten
 │   ├── TimetableRecognizer.swift  Texterkennung und Rasteranalyse für den Scan
 │   └── BackupDocument.swift     Sicherungsdatei

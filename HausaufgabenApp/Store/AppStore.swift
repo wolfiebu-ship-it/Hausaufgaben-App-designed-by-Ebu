@@ -437,6 +437,63 @@ final class AppStore: ObservableObject {
         return count
     }
 
+    // MARK: - Suchen
+
+    /// Ein Treffer der Suche – eine Hausaufgabe oder eine Notiz.
+    struct SearchResult: Identifiable {
+        enum Kind { case homework, note }
+
+        let id: UUID
+        let kind: Kind
+        let title: String
+        let detail: String
+        let subjectID: UUID?
+        /// Bei Hausaufgaben der Tag, an dem sie steht.
+        let day: Date?
+        let isDone: Bool
+    }
+
+    /// Durchsucht Hausaufgaben und Notizen nach einem Stichwort.
+    /// Neueste zuerst, damit das Gesuchte meist oben steht.
+    func search(_ query: String) -> [SearchResult] {
+        let needle = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard needle.count >= 2 else { return [] }
+
+        var results: [SearchResult] = []
+
+        for entry in homework where entry.hasText {
+            guard entry.text.localizedCaseInsensitiveContains(needle) else { continue }
+            let day = SchoolCalendar.date(fromDayKey: entry.dayKey)
+            let fach = subject(id: entry.subjectID)?.displayName ?? ""
+            let datum = day.map { SchoolCalendar.longDate($0) } ?? ""
+            results.append(SearchResult(id: entry.id,
+                                        kind: .homework,
+                                        title: entry.text,
+                                        detail: [fach, datum].filter { !$0.isEmpty }.joined(separator: " · "),
+                                        subjectID: entry.subjectID,
+                                        day: day,
+                                        isDone: entry.isDone))
+        }
+
+        for note in notes where note.hasText {
+            guard note.text.localizedCaseInsensitiveContains(needle) else { continue }
+            results.append(SearchResult(id: note.id,
+                                        kind: .note,
+                                        title: note.title,
+                                        detail: note.preview.isEmpty ? "Notiz" : note.preview,
+                                        subjectID: nil,
+                                        day: nil,
+                                        isDone: false))
+        }
+
+        return results.sorted { a, b in
+            let da = a.day ?? .distantPast
+            let db = b.day ?? .distantPast
+            if da != db { return da > db }
+            return a.title < b.title
+        }
+    }
+
     // MARK: - Notizen
 
     func note(id: UUID?) -> Note? {
