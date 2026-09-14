@@ -3,8 +3,8 @@ import SwiftUI
 /// Eine Zeile im Hausaufgabenheft: links das Kürzel des Fachs, daneben das
 /// Eingabefeld – und rechts der Haken zum Abhaken, wenn die Aufgabe fertig ist.
 ///
-/// Solange nichts eingetragen ist, steht dort stattdessen „nichts auf“:
-/// damit lässt sich für jedes Fach einzeln festhalten, dass es nichts
+/// Solange nichts eingetragen ist, steht dort stattdessen ein Kästchen:
+/// damit lässt sich für jedes Fach einzeln ankreuzen, dass es nichts
 /// aufgegeben hat.
 struct HomeworkRow: View {
     let day: Date
