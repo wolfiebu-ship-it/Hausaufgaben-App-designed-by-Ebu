@@ -9,6 +9,8 @@ final class AppStore: ObservableObject {
     @Published private(set) var homework: [HomeworkEntry]
     /// Tage, an denen ausdrücklich nichts aufgegeben wurde.
     @Published private(set) var noHomeworkDays: Set<String>
+    /// Einzelne Fächer, in denen an einem Tag nichts aufgegeben wurde.
+    @Published private(set) var noHomeworkSubjects: Set<String>
     /// Freie Notizen, etwa anstehende Arbeiten.
     @Published private(set) var notes: [Note]
     @Published var settings: AppSettings {
@@ -43,6 +45,7 @@ final class AppStore: ObservableObject {
         self.lessons = data.lessons
         self.homework = data.homework
         self.noHomeworkDays = data.noHomeworkDays
+        self.noHomeworkSubjects = data.noHomeworkSubjects
         self.notes = data.notes
         self.settings = data.settings
 
@@ -309,6 +312,7 @@ final class AppStore: ObservableObject {
         }
         // Sobald etwas eingetragen ist, stimmt „nichts auf“ nicht mehr.
         noHomeworkDays.remove(key)
+        noHomeworkSubjects.remove(subjectKey(day: day, subjectID: subjectID))
         scheduleSave()
     }
 
@@ -346,6 +350,42 @@ final class AppStore: ObservableObject {
             noHomeworkDays.remove(key)
         }
         scheduleSave()
+    }
+
+    // MARK: - "Nichts auf" je Fach
+
+    private func subjectKey(day: Date, subjectID: UUID) -> String {
+        "\(SchoolCalendar.dayKey(day))|\(subjectID.uuidString)"
+    }
+
+    /// Ist für dieses Fach an diesem Tag „nichts auf“ vermerkt?
+    func isNoHomework(day: Date, subjectID: UUID) -> Bool {
+        noHomeworkSubjects.contains(subjectKey(day: day, subjectID: subjectID))
+    }
+
+    func setNoHomework(_ value: Bool, day: Date, subjectID: UUID) {
+        let key = subjectKey(day: day, subjectID: subjectID)
+        if value {
+            // Gilt nur, solange in dem Fach nichts eingetragen ist.
+            guard homeworkEntry(day: day, subjectID: subjectID)?.hasText != true else { return }
+            guard !noHomeworkSubjects.contains(key) else { return }
+            noHomeworkSubjects.insert(key)
+        } else {
+            guard noHomeworkSubjects.contains(key) else { return }
+            noHomeworkSubjects.remove(key)
+        }
+        scheduleSave()
+    }
+
+    /// Sind an dem Tag alle Fächer geklärt – also überall entweder etwas
+    /// eingetragen oder „nichts auf“ vermerkt?
+    func allSubjectsSettled(on day: Date) -> Bool {
+        let faecher = homeworkSubjects(on: day)
+        guard !faecher.isEmpty else { return false }
+        return faecher.allSatisfy { fach in
+            homeworkEntry(day: day, subjectID: fach.id)?.hasText == true
+                || isNoHomework(day: day, subjectID: fach.id)
+            }
     }
 
     /// Anzahl offener Hausaufgaben in einer Woche – für die Anzeige im Wochenkopf.
@@ -411,6 +451,7 @@ final class AppStore: ObservableObject {
         lessons = data.lessons
         homework = data.homework
         noHomeworkDays = data.noHomeworkDays
+        noHomeworkSubjects = data.noHomeworkSubjects
         notes = data.notes
         settings = data.settings
         dataRevision += 1
@@ -424,6 +465,7 @@ final class AppStore: ObservableObject {
     func deleteAllHomework() {
         homework.removeAll()
         noHomeworkDays.removeAll()
+        noHomeworkSubjects.removeAll()
         dataRevision += 1
         saveNow()
     }
@@ -433,6 +475,7 @@ final class AppStore: ObservableObject {
                 lessons: lessons,
                 homework: homework,
                 noHomeworkDays: noHomeworkDays,
+                noHomeworkSubjects: noHomeworkSubjects,
                 notes: notes,
                 settings: settings)
     }

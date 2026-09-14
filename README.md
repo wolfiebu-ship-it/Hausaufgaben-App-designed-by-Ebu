@@ -15,7 +15,11 @@ Geschrieben in Swift/SwiftUI als native App für iPhone **und** iPad. Alle Daten
 - **Die Kürzel stehen schon da.** Zu jedem Tag zeigt die App automatisch die Fächer, die du laut deinem Stundenplan an diesem Tag hast – als farbiges Kürzel links neben dem Eingabefeld. Du tippst nur noch die Aufgabe daneben.
 - Der heutige Tag ist farbig umrandet.
 - Erledigtes hakst du rechts mit einem Tipp ab.
-- **„Keine Hausaufgaben“:** Gab es an einem Tag nichts auf, hakst du das unten in der Tageskarte ab. Die Karte klappt dann auf eine Zeile zusammen. So bleibt später unterscheidbar, ob wirklich nichts aufgegeben wurde oder du es nur nicht eingetragen hast. Sobald du doch etwas einträgst, verschwindet der Vermerk von allein.
+- **Rechts an jeder Zeile** steht, je nach Lage:
+  - **ein Kreis zum Abhaken**, sobald etwas eingetragen ist – ein Tipp, und die Aufgabe ist erledigt;
+  - **„nichts auf“**, solange das Feld leer ist. Antippen hält fest, dass es *in diesem Fach* nichts aufgegeben hat; die Zeile zeigt dann „Keine Hausaufgaben“ und lässt sich über das Minus wieder zurücknehmen.
+- **Für den ganzen Tag** geht das ebenfalls: unten in der Tageskarte „Keine Hausaufgaben“ abhaken, dann klappt sie auf eine Zeile zusammen.
+- So bleibt später unterscheidbar, ob wirklich nichts aufgegeben wurde oder du es nur nicht eingetragen hast. Sobald du doch etwas einträgst, verschwindet der Vermerk von allein.
 - Hattest du ausnahmsweise ein Fach, das nicht im Plan steht (z. B. Vertretung), ergänzt du es unten über **„Fach ergänzen“**.
 - Getipptes wird automatisch gespeichert – es gibt keinen Sichern-Knopf.
 

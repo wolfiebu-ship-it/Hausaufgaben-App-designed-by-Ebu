@@ -1,6 +1,11 @@
 import SwiftUI
 
-/// Eine Zeile im Hausaufgabenheft: links das Kürzel des Fachs, rechts das Eingabefeld.
+/// Eine Zeile im Hausaufgabenheft: links das Kürzel des Fachs, daneben das
+/// Eingabefeld – und rechts der Haken zum Abhaken, wenn die Aufgabe fertig ist.
+///
+/// Solange nichts eingetragen ist, steht dort stattdessen „nichts auf“:
+/// damit lässt sich für jedes Fach einzeln festhalten, dass es nichts
+/// aufgegeben hat.
 struct HomeworkRow: View {
     let day: Date
     let subject: Subject
@@ -22,28 +27,31 @@ struct HomeworkRow: View {
         !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
+    /// Ist für dieses Fach „nichts auf“ vermerkt?
+    private var isFree: Bool {
+        store.isNoHomework(day: day, subjectID: subject.id)
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
-            SubjectBadge(subject: subject, dimmed: !hasText)
+            SubjectBadge(subject: subject, dimmed: !hasText && !isFree)
                 .padding(.top, 2)
 
-            TextField("Hausaufgabe eintragen …", text: $text, axis: .vertical)
-                .lineLimit(1...6)
-                .foregroundStyle(isDone ? Color.secondary : Color.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            if hasText {
-                Button {
-                    toggleDone()
-                } label: {
-                    Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
-                        .font(.title3)
-                        .foregroundStyle(isDone ? Color.accentColor : Color.secondary)
-                }
-                .buttonStyle(.plain)
-                .padding(.top, 1)
-                .accessibilityLabel(isDone ? "Als offen markieren" : "Als erledigt markieren")
+            if isFree {
+                // Für dieses Fach ist nichts aufgegeben.
+                Text("Keine Hausaufgaben")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 3)
+            } else {
+                TextField("Hausaufgabe eintragen …", text: $text, axis: .vertical)
+                    .lineLimit(1...6)
+                    .foregroundStyle(isDone ? Color.secondary : Color.primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
+
+            trailingControl
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
@@ -72,6 +80,59 @@ struct HomeworkRow: View {
         .onDisappear { save() }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase != .active { save() }
+        }
+    }
+
+    // MARK: - Das Bedienelement rechts
+
+    @ViewBuilder
+    private var trailingControl: some View {
+        if isFree {
+            // Vermerk wieder aufheben.
+            Button {
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    store.setNoHomework(false, day: day, subjectID: subject.id)
+                }
+            } label: {
+                Image(systemName: "minus.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("„Keine Hausaufgaben“ für \(subject.displayName) aufheben")
+
+        } else if hasText {
+            // Abhaken, wenn die Aufgabe fertig ist.
+            Button {
+                toggleDone()
+            } label: {
+                Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(isDone ? Color.accentColor : Color.secondary)
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 1)
+            .accessibilityLabel(isDone
+                                ? "\(subject.displayName) als offen markieren"
+                                : "\(subject.displayName) als erledigt markieren")
+
+        } else {
+            // Nichts eingetragen: für dieses Fach „nichts auf“ vermerken.
+            Button {
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    store.setNoHomework(true, day: day, subjectID: subject.id)
+                }
+            } label: {
+                Text("nichts auf")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 5)
+                    .background(Color(.tertiarySystemFill), in: Capsule())
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 1)
+            .accessibilityLabel("In \(subject.displayName) ist nichts aufgegeben")
         }
     }
 

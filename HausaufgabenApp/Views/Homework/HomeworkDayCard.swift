@@ -143,6 +143,11 @@ struct HomeworkDayCard: View {
             Text(store.hasAnyLesson ? "Keine Stunden an diesem Tag" : "Noch kein Stundenplan")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
+        } else if store.allSubjectsSettled(on: day) {
+            // In jedem Fach steht entweder etwas oder „nichts auf“.
+            Label("Keine Hausaufgaben", systemImage: "checkmark.circle.fill")
+                .font(.footnote)
+                .foregroundStyle(.tint)
         } else {
             Text("Nichts eingetragen")
                 .font(.footnote)

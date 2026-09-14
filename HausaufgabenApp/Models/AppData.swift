@@ -9,6 +9,9 @@ struct AppData: Codable {
     /// Tage ("yyyy-MM-dd"), an denen ausdrücklich nichts aufgegeben wurde.
     /// So bleibt unterscheidbar, ob es nichts gab oder nur nichts eingetragen wurde.
     var noHomeworkDays: Set<String>
+    /// Einzelne Fächer, in denen an einem Tag nichts aufgegeben wurde.
+    /// Schlüssel: "yyyy-MM-dd|Fach-Kennung".
+    var noHomeworkSubjects: Set<String>
     /// Freie Notizen, etwa anstehende Arbeiten.
     var notes: [Note]
     var settings: AppSettings
@@ -20,6 +23,7 @@ struct AppData: Codable {
          lessons: [Lesson] = [],
          homework: [HomeworkEntry] = [],
          noHomeworkDays: Set<String> = [],
+         noHomeworkSubjects: Set<String> = [],
          notes: [Note] = [],
          settings: AppSettings = AppSettings()) {
         self.version = version
@@ -27,6 +31,7 @@ struct AppData: Codable {
         self.lessons = lessons
         self.homework = homework
         self.noHomeworkDays = noHomeworkDays
+        self.noHomeworkSubjects = noHomeworkSubjects
         self.notes = notes
         self.settings = settings
     }
@@ -38,6 +43,7 @@ struct AppData: Codable {
         lessons = try container.decodeIfPresent([Lesson].self, forKey: .lessons) ?? []
         homework = try container.decodeIfPresent([HomeworkEntry].self, forKey: .homework) ?? []
         noHomeworkDays = try container.decodeIfPresent(Set<String>.self, forKey: .noHomeworkDays) ?? []
+        noHomeworkSubjects = try container.decodeIfPresent(Set<String>.self, forKey: .noHomeworkSubjects) ?? []
         notes = try container.decodeIfPresent([Note].self, forKey: .notes) ?? []
         settings = try container.decodeIfPresent(AppSettings.self, forKey: .settings) ?? AppSettings()
     }
@@ -65,6 +71,15 @@ struct AppData: Codable {
         // Ein Tag mit eingetragenen Aufgaben kann nicht zugleich "nichts auf" sein.
         let tageMitAufgaben = Set(homework.map(\.dayKey))
         noHomeworkDays = noHomeworkDays.filter { !tageMitAufgaben.contains($0) }
+
+        // Dasselbe je Fach: wo etwas eingetragen ist, gilt "nichts auf" nicht.
+        let belegt = Set(homework.map { "\($0.dayKey)|\($0.subjectID.uuidString)" })
+        noHomeworkSubjects = noHomeworkSubjects.filter { schluessel in
+            guard !belegt.contains(schluessel) else { return false }
+            let teile = schluessel.split(separator: "|")
+            guard teile.count == 2, let id = UUID(uuidString: String(teile[1])) else { return false }
+            return validIDs.contains(id)
+        }
 
         notes = notes.filter(\.hasText)
     }
