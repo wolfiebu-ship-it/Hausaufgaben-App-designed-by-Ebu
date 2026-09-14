@@ -13,6 +13,13 @@ final class AppStore: ObservableObject {
     @Published private(set) var noHomeworkSubjects: Set<String>
     /// Freie Notizen, etwa anstehende Arbeiten.
     @Published private(set) var notes: [Note]
+    /// Die eigenen Angaben – frei änderbar, deshalb ohne private(set).
+    @Published var profile: Profile {
+        didSet {
+            guard profile != oldValue else { return }
+            scheduleSave()
+        }
+    }
     @Published var settings: AppSettings {
         didSet {
             guard settings != oldValue else { return }
@@ -47,6 +54,7 @@ final class AppStore: ObservableObject {
         self.noHomeworkDays = data.noHomeworkDays
         self.noHomeworkSubjects = data.noHomeworkSubjects
         self.notes = data.notes
+        self.profile = data.profile
         self.settings = data.settings
 
         // Beim allerersten Start die Datei gleich anlegen.
@@ -484,6 +492,7 @@ final class AppStore: ObservableObject {
         noHomeworkDays = data.noHomeworkDays
         noHomeworkSubjects = data.noHomeworkSubjects
         notes = data.notes
+        profile = data.profile
         settings = data.settings
         dataRevision += 1
         saveNow()
@@ -508,6 +517,7 @@ final class AppStore: ObservableObject {
                 noHomeworkDays: noHomeworkDays,
                 noHomeworkSubjects: noHomeworkSubjects,
                 notes: notes,
+                profile: profile,
                 settings: settings)
     }
 

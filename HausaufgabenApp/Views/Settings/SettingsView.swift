@@ -23,6 +23,7 @@ struct SettingsView: View {
                     }
                 }
 
+                profileSection
                 legendSection
                 appearanceSection
                 timetableSection
@@ -85,6 +86,35 @@ struct SettingsView: View {
     }
 
     // MARK: - Abschnitte
+
+    /// Der Einstieg zu den eigenen Angaben.
+    private var profileSection: some View {
+        Section {
+            NavigationLink {
+                ProfileView()
+                    .environmentObject(store)
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "person.crop.circle.fill")
+                        .font(.system(size: 34))
+                        .foregroundStyle(.tint)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(store.profile.isEmpty ? "Meine Daten" : store.profile.summary)
+                            .font(.body.weight(.semibold))
+                        Text(store.profile.isEmpty
+                             ? "Name, Klasse, Telefon, Adresse eintragen"
+                             : "Angaben ansehen und ändern")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        } header: {
+            Text("Über mich")
+        }
+    }
 
     /// Erklärt die beiden Felder, die an jeder Hausaufgabenzeile stehen.
     private var legendSection: some View {

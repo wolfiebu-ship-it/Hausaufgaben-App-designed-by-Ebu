@@ -14,6 +14,8 @@ struct AppData: Codable {
     var noHomeworkSubjects: Set<String>
     /// Freie Notizen, etwa anstehende Arbeiten.
     var notes: [Note]
+    /// Die eigenen Angaben (Name, Klasse, Telefon …).
+    var profile: Profile
     var settings: AppSettings
 
     static let currentVersion = 1
@@ -25,6 +27,7 @@ struct AppData: Codable {
          noHomeworkDays: Set<String> = [],
          noHomeworkSubjects: Set<String> = [],
          notes: [Note] = [],
+         profile: Profile = Profile(),
          settings: AppSettings = AppSettings()) {
         self.version = version
         self.subjects = subjects
@@ -33,6 +36,7 @@ struct AppData: Codable {
         self.noHomeworkDays = noHomeworkDays
         self.noHomeworkSubjects = noHomeworkSubjects
         self.notes = notes
+        self.profile = profile
         self.settings = settings
     }
 
@@ -45,6 +49,7 @@ struct AppData: Codable {
         noHomeworkDays = try container.decodeIfPresent(Set<String>.self, forKey: .noHomeworkDays) ?? []
         noHomeworkSubjects = try container.decodeIfPresent(Set<String>.self, forKey: .noHomeworkSubjects) ?? []
         notes = try container.decodeIfPresent([Note].self, forKey: .notes) ?? []
+        profile = try container.decodeIfPresent(Profile.self, forKey: .profile) ?? Profile()
         settings = try container.decodeIfPresent(AppSettings.self, forKey: .settings) ?? AppSettings()
     }
 

@@ -69,6 +69,11 @@ Ein eigener Tab unten für alles, was man sich aufschreiben will – aufgebaut w
 
 ### 6. Einstellungen
 
+- **Meine Daten** – ganz oben ein eigener Bereich für die Angaben über dich: Vor- und Nachname, Klasse, Schule, Telefon, E-Mail, Adresse und ein freies Feld für alles Weitere (Spind-Nummer, Buslinie, Notfallkontakt). Alles freiwillig, nichts muss ausgefüllt werden.
+
+  > Diese Angaben bleiben auf dem Gerät. Die App verschickt nichts und hat keine Verbindung ins Internet. Nur wenn du selbst eine Sicherung speicherst, stehen sie mit in dieser Datei – gib sie also nicht unbedacht weiter.
+
+- **Die Felder im Hausaufgabenheft** – erklärt, was das gelbe und das blaue Feld bedeuten.
 - **Hell oder dunkel:** ganz oben unter „Darstellung“ lässt sich die App fest auf hell oder dunkel stellen – oder auf „Automatisch“, dann folgt sie der Einstellung des Geräts.
 - Stunden pro Tag, Samstag, Uhrzeiten, Unterrichtszeiten.
 - **Sicherung speichern / wiederherstellen** als Datei (z. B. in iCloud Drive). Wichtig, denn die Daten liegen nur auf dem Gerät.
@@ -134,7 +139,8 @@ HausaufgabenApp/
 ├── HausaufgabenApp.swift        Einstiegspunkt der App
 ├── Models/                      Datenmodelle
 │   ├── Subject.swift            Fach (Name, Kürzel, Farbe)
-│   ├── Note.swift               Freie Notiz mit Fach und Termin
+│   ├── Note.swift               Freie Notiz
+│   ├── Profile.swift            Die eigenen Angaben (Name, Klasse, Kontakt)
 │   ├── Lesson.swift             Feld im Stundenplan
 │   ├── HomeworkEntry.swift      Eine Hausaufgabe
 │   ├── AppSettings.swift        Einstellungen, Unterrichtszeiten
