@@ -15,9 +15,10 @@ Geschrieben in Swift/SwiftUI als native App für iPhone **und** iPad. Alle Daten
 - **Die Kürzel stehen schon da.** Zu jedem Tag zeigt die App automatisch die Fächer, die du laut deinem Stundenplan an diesem Tag hast – als farbiges Kürzel links neben dem Eingabefeld. Du tippst nur noch die Aufgabe daneben.
 - Der heutige Tag ist farbig umrandet.
 - Erledigtes hakst du rechts mit einem Tipp ab.
-- **Rechts an jeder Zeile** steht ein Feld zum Ankreuzen. Die Form sagt, worum es geht:
-  - **Kreis ○**, sobald etwas eingetragen ist – ankreuzen heißt: Aufgabe erledigt.
-  - **Kästchen ☐**, solange das Feld leer ist – ankreuzen heißt: *in diesem Fach* ist nichts aufgegeben. Die Zeile zeigt dann „Keine Hausaufgaben“; ein weiterer Tipp nimmt es zurück.
+- **Rechts an jeder Zeile stehen zwei Felder zum Ankreuzen** – bei jedem Fach, nicht nur bei manchen. Über den Zeilen steht, welches welches ist:
+  - **gelb** = in diesem Fach ist nichts aufgegeben. Die Zeile zeigt dann „Keine Hausaufgaben“; ein weiterer Tipp nimmt es zurück.
+  - **blau** = die Aufgabe ist erledigt.
+  Die beiden sind farblich klar getrennt. Was gerade nicht passt, ist blass: Steht schon eine Aufgabe da, lässt sich „keine Hausaufgaben“ nicht ankreuzen – und umgekehrt gibt es ohne Eintrag nichts abzuhaken.
 - **Für den ganzen Tag** geht das ebenfalls: unten in der Tageskarte „Keine Hausaufgaben“ abhaken, dann klappt sie auf eine Zeile zusammen.
 - So bleibt später unterscheidbar, ob wirklich nichts aufgegeben wurde oder du es nur nicht eingetragen hast. Sobald du doch etwas einträgst, verschwindet der Vermerk von allein.
 - Hattest du ausnahmsweise ein Fach, das nicht im Plan steht (z. B. Vertretung), ergänzt du es unten über **„Fach ergänzen“**.

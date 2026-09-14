@@ -51,7 +51,9 @@ struct HomeworkRow: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            trailingControl
+            // Beide Felder stehen an jeder Zeile – bei jedem Fach.
+            noHomeworkBox
+            doneBox
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
@@ -85,45 +87,47 @@ struct HomeworkRow: View {
 
     // MARK: - Das Bedienelement rechts
 
-    /// Rechts an der Zeile steht immer ein Feld zum Ankreuzen.
-    ///
-    /// Damit die beiden Bedeutungen auseinanderzuhalten sind, haben sie
-    /// verschiedene Formen: ein **Kästchen** für „keine Hausaufgaben“,
-    /// ein **Kreis** zum Abhaken einer eingetragenen Aufgabe.
-    @ViewBuilder
-    private var trailingControl: some View {
-        if hasText {
-            // Kreis: Aufgabe erledigt?
-            Button {
-                toggleDone()
-            } label: {
-                Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
-                    .font(.title2)
-                    .foregroundStyle(isDone ? Color.accentColor : Color.secondary)
+    /// Das gelbe Feld: in diesem Fach ist nichts aufgegeben.
+    /// Solange etwas im Textfeld steht, ist es blass – dann gibt es ja
+    /// offensichtlich Hausaufgaben.
+    private var noHomeworkBox: some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                store.setNoHomework(!isFree, day: day, subjectID: subject.id)
             }
-            .buttonStyle(.plain)
-            .padding(.top, 1)
-            .accessibilityLabel(isDone
-                                ? "\(subject.displayName) als offen markieren"
-                                : "\(subject.displayName) als erledigt markieren")
-
-        } else {
-            // Kästchen: in diesem Fach ist nichts aufgegeben.
-            Button {
-                withAnimation(.easeInOut(duration: 0.15)) {
-                    store.setNoHomework(!isFree, day: day, subjectID: subject.id)
-                }
-            } label: {
-                Image(systemName: isFree ? "checkmark.square.fill" : "square")
-                    .font(.title2)
-                    .foregroundStyle(isFree ? Color.accentColor : Color.secondary)
-            }
-            .buttonStyle(.plain)
-            .padding(.top, 1)
-            .accessibilityLabel(isFree
-                                ? "„Keine Hausaufgaben“ in \(subject.displayName) aufheben"
-                                : "Ankreuzen: in \(subject.displayName) ist nichts aufgegeben")
+        } label: {
+            Image(systemName: isFree ? "checkmark.circle.fill" : "circle")
+                .font(.title2)
+                .foregroundStyle(AppTheme.noHomeworkTint)
+                .opacity(isFree ? 1 : (hasText ? 0.2 : 0.55))
         }
+        .buttonStyle(.plain)
+        .disabled(hasText)
+        .frame(width: 30)
+        .padding(.top, 1)
+        .accessibilityLabel(isFree
+                            ? "„Keine Hausaufgaben“ in \(subject.displayName) aufheben"
+                            : "Ankreuzen: in \(subject.displayName) ist nichts aufgegeben")
+    }
+
+    /// Das blaue Feld: die Aufgabe ist erledigt.
+    /// Ohne Eintrag gibt es nichts abzuhaken – dann ist es blass.
+    private var doneBox: some View {
+        Button {
+            toggleDone()
+        } label: {
+            Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
+                .font(.title2)
+                .foregroundStyle(Color.accentColor)
+                .opacity(isDone ? 1 : (hasText ? 0.55 : 0.2))
+        }
+        .buttonStyle(.plain)
+        .disabled(!hasText)
+        .frame(width: 30)
+        .padding(.top, 1)
+        .accessibilityLabel(isDone
+                            ? "\(subject.displayName) als offen markieren"
+                            : "\(subject.displayName) als erledigt markieren")
     }
 
     // MARK: - Aktionen

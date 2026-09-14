@@ -62,6 +62,10 @@ enum AppTheme {
         return counts.firstIndex(of: minimum) ?? 0
     }
 
+    /// Gelb für „keine Hausaufgaben“ – deutlich anders als das Blau des
+    /// Erledigt-Hakens, damit die beiden nicht zu verwechseln sind.
+    static let noHomeworkTint = Color(lightHex: 0xD08700, darkHex: 0xF5C542)
+
     // Maße, die an mehreren Stellen gebraucht werden.
     static let cornerRadius: CGFloat = 14
     static let badgeCornerRadius: CGFloat = 9

@@ -63,6 +63,8 @@ struct HomeworkDayCard: View {
                     emptyState
                 } else {
                     VStack(spacing: 0) {
+                        columnLegend
+
                         ForEach(rowSubjects) { subject in
                             if subject.id != rowSubjects.first?.id {
                                 Divider().padding(.leading, 68)
@@ -208,6 +210,33 @@ struct HomeworkDayCard: View {
         .padding(.horizontal, 14)
         .padding(.top, 12)
         .padding(.bottom, isExpanded ? 12 : 6)
+    }
+
+    /// Erklärt die beiden Felder rechts an jeder Zeile.
+    private var columnLegend: some View {
+        HStack(spacing: 12) {
+            HStack(spacing: 5) {
+                Image(systemName: "circle.fill")
+                    .font(.system(size: 9))
+                    .foregroundStyle(AppTheme.noHomeworkTint)
+                Text("keine Hausaufgaben")
+            }
+
+            HStack(spacing: 5) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 10))
+                    .foregroundStyle(Color.accentColor)
+                Text("fertig")
+            }
+
+            Spacer(minLength: 0)
+        }
+        .font(.caption2)
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 14)
+        .padding(.bottom, 8)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Rechts an jeder Zeile: gelb für keine Hausaufgaben, blau für erledigt")
     }
 
     /// Der Vermerk, wenn der Tag als „nichts auf“ markiert ist.
