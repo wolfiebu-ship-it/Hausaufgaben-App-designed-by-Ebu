@@ -13,6 +13,8 @@ final class AppStore: ObservableObject {
     @Published private(set) var noHomeworkSubjects: Set<String>
     /// Freie Notizen, etwa anstehende Arbeiten.
     @Published private(set) var notes: [Note]
+    /// Termine im Kalender.
+    @Published private(set) var events: [CalendarEvent]
     /// Die eigenen Angaben – frei änderbar, deshalb ohne private(set).
     @Published var profile: Profile {
         didSet {
@@ -63,6 +65,7 @@ final class AppStore: ObservableObject {
         self.noHomeworkDays = data.noHomeworkDays
         self.noHomeworkSubjects = data.noHomeworkSubjects
         self.notes = data.notes
+        self.events = data.events
         self.profile = data.profile
         self.settings = data.settings
         self.lock = data.lock
@@ -548,6 +551,89 @@ final class AppStore: ObservableObject {
         scheduleSave()
     }
 
+    // MARK: - Kalender
+
+    /// Termine eines Tages, nach Uhrzeit sortiert – ganztägige zuerst.
+    func events(on day: Date) -> [CalendarEvent] {
+        let key = SchoolCalendar.dayKey(day)
+        return events
+            .filter { $0.dayKey == key }
+            .sorted { a, b in
+                switch (a.startMinutes, b.startMinutes) {
+                case (nil, nil):        return a.createdAt < b.createdAt
+                case (nil, _):          return true
+                case (_, nil):          return false
+                case let (x?, y?):      return x == y ? a.createdAt < b.createdAt : x < y
+                }
+            }
+    }
+
+    func event(id: UUID?) -> CalendarEvent? {
+        guard let id else { return nil }
+        return events.first { $0.id == id }
+    }
+
+    /// Gibt es an dem Tag überhaupt etwas?
+    func hasEvents(on day: Date) -> Bool {
+        let key = SchoolCalendar.dayKey(day)
+        return events.contains { $0.dayKey == key }
+    }
+
+    /// Die nächsten Termine ab heute – für die Übersicht über dem Kalender.
+    func upcomingEvents(limit: Int = 5, from reference: Date = Date()) -> [CalendarEvent] {
+        let heute = SchoolCalendar.dayKey(SchoolCalendar.startOfDay(reference))
+        return events
+            .filter { $0.dayKey >= heute }
+            .sorted { a, b in
+                if a.dayKey != b.dayKey { return a.dayKey < b.dayKey }
+                return (a.startMinutes ?? -1) < (b.startMinutes ?? -1)
+            }
+            .prefix(limit)
+            .map { $0 }
+    }
+
+    /// Wie viele Tage es noch bis zu dem Termin sind (0 = heute).
+    func daysUntil(_ event: CalendarEvent, from reference: Date = Date()) -> Int? {
+        guard let day = event.date else { return nil }
+        return SchoolCalendar.calendar.dateComponents(
+            [.day],
+            from: SchoolCalendar.startOfDay(reference),
+            to: SchoolCalendar.startOfDay(day)).day
+    }
+
+    /// Legt einen Termin an oder ersetzt einen bestehenden.
+    func saveEvent(_ event: CalendarEvent) {
+        var event = event
+        event.updatedAt = Date()
+
+        if let index = events.firstIndex(where: { $0.id == event.id }) {
+            events[index] = event
+        } else {
+            events.append(event)
+        }
+        scheduleSave()
+        syncReminders()
+    }
+
+    func deleteEvent(id: UUID) {
+        events.removeAll { $0.id == id }
+        scheduleSave()
+        syncReminders()
+    }
+
+    /// Übergibt iOS die anstehenden Erinnerungen – nach jeder Änderung
+    /// und einmal beim Start, damit beides immer zusammenpasst.
+    func syncReminders() {
+        let liste = events
+        let namen = Dictionary(uniqueKeysWithValues: subjects.map { ($0.id, $0.displayName) })
+        let erlaubt = settings.remindersEnabled
+        Task {
+            await Reminders.reschedule(events: liste,
+                                       subjectName: { id in id.flatMap { namen[$0] } },
+                                       enabled: erlaubt)
+        }
+    }
+
     // MARK: - Daten ersetzen
 
     func replaceAll(with data: AppData) {
@@ -559,12 +645,14 @@ final class AppStore: ObservableObject {
         noHomeworkDays = data.noHomeworkDays
         noHomeworkSubjects = data.noHomeworkSubjects
         notes = data.notes
+        events = data.events
         profile = data.profile
         settings = data.settings
         // Die Anmeldung bleibt, wie sie auf diesem Gerät eingestellt ist:
         // Eine fremde Sicherung soll den eigenen Code weder setzen noch aufheben.
         dataRevision += 1
         saveNow()
+        syncReminders()
     }
 
     func resetToFactoryDefaults() {
@@ -587,6 +675,7 @@ final class AppStore: ObservableObject {
                 noHomeworkDays: noHomeworkDays,
                 noHomeworkSubjects: noHomeworkSubjects,
                 notes: notes,
+                events: events,
                 profile: profile,
                 settings: settings,
                 lock: lock)

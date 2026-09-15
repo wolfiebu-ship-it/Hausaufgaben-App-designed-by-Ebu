@@ -14,6 +14,8 @@ struct AppData: Codable {
     var noHomeworkSubjects: Set<String>
     /// Freie Notizen, etwa anstehende Arbeiten.
     var notes: [Note]
+    /// Termine im Kalender (Arbeiten, Abgaben, Ausflüge).
+    var events: [CalendarEvent]
     /// Die eigenen Angaben (Name, Klasse, Telefon …).
     var profile: Profile
     var settings: AppSettings
@@ -29,6 +31,7 @@ struct AppData: Codable {
          noHomeworkDays: Set<String> = [],
          noHomeworkSubjects: Set<String> = [],
          notes: [Note] = [],
+         events: [CalendarEvent] = [],
          profile: Profile = Profile(),
          settings: AppSettings = AppSettings(),
          lock: LockSettings = LockSettings()) {
@@ -39,6 +42,7 @@ struct AppData: Codable {
         self.noHomeworkDays = noHomeworkDays
         self.noHomeworkSubjects = noHomeworkSubjects
         self.notes = notes
+        self.events = events
         self.profile = profile
         self.settings = settings
         self.lock = lock
@@ -53,6 +57,7 @@ struct AppData: Codable {
         noHomeworkDays = try container.decodeIfPresent(Set<String>.self, forKey: .noHomeworkDays) ?? []
         noHomeworkSubjects = try container.decodeIfPresent(Set<String>.self, forKey: .noHomeworkSubjects) ?? []
         notes = try container.decodeIfPresent([Note].self, forKey: .notes) ?? []
+        events = try container.decodeIfPresent([CalendarEvent].self, forKey: .events) ?? []
         profile = try container.decodeIfPresent(Profile.self, forKey: .profile) ?? Profile()
         settings = try container.decodeIfPresent(AppSettings.self, forKey: .settings) ?? AppSettings()
         lock = try container.decodeIfPresent(LockSettings.self, forKey: .lock) ?? LockSettings()
@@ -92,5 +97,19 @@ struct AppData: Codable {
         }
 
         notes = notes.filter(\.hasText)
+
+        // Termine ohne Tag oder ohne Inhalt sind nichts wert; Verweise auf
+        // gelöschte Fächer werden gelöst statt den Termin mitzunehmen.
+        events = events.compactMap { event in
+            var event = event
+            guard SchoolCalendar.date(fromDayKey: event.dayKey) != nil else { return nil }
+            guard event.hasTitle || !event.details.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            else { return nil }
+            if let id = event.subjectID, !validIDs.contains(id) { event.subjectID = nil }
+            if let minutes = event.startMinutes, !(0..<(24 * 60)).contains(minutes) {
+                event.startMinutes = nil
+            }
+            return event
+        }
     }
 }

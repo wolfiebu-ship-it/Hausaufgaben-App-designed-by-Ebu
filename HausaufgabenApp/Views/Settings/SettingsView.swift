@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import UserNotifications
 
 struct SettingsView: View {
     @EnvironmentObject private var store: AppStore
@@ -15,6 +16,7 @@ struct SettingsView: View {
     @State private var showLockSetup = false
     @State private var isChangingCode = false
     @State private var showLockOffConfirmation = false
+    @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
 
     var body: some View {
         NavigationStack {
@@ -28,6 +30,8 @@ struct SettingsView: View {
                 }
 
                 profileSection
+                subjectsSection
+                remindersSection
                 lockSection
                 legendSection
                 appearanceSection
@@ -88,6 +92,117 @@ struct SettingsView: View {
                 Text(infoMessage ?? "")
             }
         }
+    }
+
+    // MARK: - Fächer
+
+    /// Die Fächer wohnen beim Stundenplan – von hier führt ebenfalls ein Weg hin.
+    private var subjectsSection: some View {
+        Section {
+            NavigationLink {
+                SubjectsView()
+                    .environmentObject(store)
+            } label: {
+                Label("Fächer", systemImage: "books.vertical.fill")
+            }
+        } footer: {
+            Text("Name, Kürzel, Farbe, Lehrkraft und Raum. Im Stundenplan oben links kommst du auch hierhin.")
+        }
+    }
+
+    // MARK: - Erinnerungen
+
+    /// Benachrichtigungen zu Kalenderterminen.
+    private var remindersSection: some View {
+        Section {
+            Toggle(isOn: remindersBinding) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("An Termine erinnern")
+                    Text("Homy meldet sich, bevor eine Arbeit oder Abgabe ansteht.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            if store.settings.remindersEnabled {
+                Picker(selection: defaultReminderBinding) {
+                    ForEach(ReminderOffset.allCases) { offset in
+                        Text(offset.title).tag(offset)
+                    }
+                } label: {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Neue Termine erinnern")
+                        Text(store.settings.defaultReminder.explanation)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .pickerStyle(.navigationLink)
+
+                if notificationStatus == .denied {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("iOS lässt keine Benachrichtigungen zu", systemImage: "bell.slash.fill")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.orange)
+                        Text("Solange das so ist, kommt keine Erinnerung an. Du kannst es in den Einstellungen des iPhones wieder erlauben.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                        Button("Einstellungen des iPhones öffnen") {
+                            openSystemSettings()
+                        }
+                        .font(.footnote)
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+        } header: {
+            Text("Erinnerungen")
+        } footer: {
+            Text(remindersFooter)
+        }
+        .task { await refreshNotificationStatus() }
+    }
+
+    private var remindersBinding: Binding<Bool> {
+        Binding(get: { store.settings.remindersEnabled },
+                set: { neu in
+                    store.settings.remindersEnabled = neu
+                    store.syncReminders()
+                    if neu {
+                        Task {
+                            await Reminders.requestAuthorization()
+                            await refreshNotificationStatus()
+                            store.syncReminders()
+                        }
+                    }
+                })
+    }
+
+    private var defaultReminderBinding: Binding<ReminderOffset> {
+        Binding(get: { store.settings.defaultReminder },
+                set: { store.settings.defaultReminder = $0 })
+    }
+
+    private var remindersFooter: String {
+        guard store.settings.remindersEnabled else {
+            return "Aus. Bereits eingetragene Termine bleiben im Kalender stehen, es kommt nur keine Benachrichtigung mehr."
+        }
+        var text = "Bei jedem Termin lässt sich die Erinnerung auch einzeln einstellen. "
+        text += "Die Benachrichtigung schickt iOS – sie kommt auch, wenn Homy geschlossen ist, und nichts davon geht ins Internet."
+        if store.events.isEmpty {
+            text += "\n\nNoch kein Termin eingetragen: Das geht im Kalender über das Plus oben rechts."
+        }
+        return text
+    }
+
+    private func refreshNotificationStatus() async {
+        let status = await Reminders.authorizationStatus()
+        await MainActor.run { notificationStatus = status }
+    }
+
+    private func openSystemSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 
     // MARK: - Anmeldung
@@ -404,6 +519,7 @@ struct SettingsView: View {
             LabeledContent("Fächer", value: "\(store.subjects.count)")
             LabeledContent("Stunden im Plan", value: "\(store.lessons.filter { $0.subjectID != nil }.count)")
             LabeledContent("Hausaufgaben", value: "\(store.homework.filter(\.hasText).count)")
+            LabeledContent("Termine", value: "\(store.events.count)")
             LabeledContent("Version", value: appVersion)
         } header: {
             Text("Über die App")

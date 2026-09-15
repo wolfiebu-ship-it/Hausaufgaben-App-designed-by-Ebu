@@ -30,14 +30,35 @@ Geschrieben in Swift/SwiftUI als native App für iPhone **und** iPad. Alle Daten
 - Getipptes wird automatisch gespeichert – es gibt keinen Sichern-Knopf.
 - **Suchen** über die Lupe oben rechts: findet Hausaufgaben aus *allen* Wochen und alle Notizen. Einen Treffer antippen springt zu der Woche, in der er steht.
 
-### 2. Stundenplan
+### 2. Kalender und Erinnerungen
+
+Ein eigener Tab für alles, was an einem bestimmten Tag ansteht – Arbeiten, Tests, Abgaben, Ausflüge.
+
+- **Der Monat auf einen Blick.** Unter jedem Tag stehen kleine Punkte: je ein farbiger für einen Termin (die Farbe sagt, was für einer) und ein grauer, wenn an dem Tag noch Hausaufgaben offen sind. Der heutige Tag ist umrandet.
+- **Termin eintragen:** Titel, Art (Arbeit, Test, Abgabe, Ausflug, Schulfrei, Sonstiges), Fach, Tag, wahlweise eine Uhrzeit und eine Notiz für Einzelheiten.
+- **„Als Nächstes"** steht über dem Monat und zeigt die drei nächsten Termine mit „in 5 Tagen“, „morgen“, „heute“.
+- **Tippst du einen Tag an**, siehst du darunter alles zu diesem Tag: die Termine, die Hausaufgaben (zum Nachsehen – geändert werden sie im Hausaufgabenheft) und die Stunden aus dem Stundenplan.
+
+#### Die Erinnerung
+
+Trägst du einen Termin ein, meldet sich Homy von selbst rechtzeitig – auch wenn die App gar nicht offen ist.
+
+- Voreingestellt ist **am Abend davor um 18:00 Uhr**, wenn noch Zeit zum Lernen ist. Je Termin wählbar sind außerdem: wenn es losgeht, 1 Stunde vorher, 2 Tage vorher, 1 Woche vorher – oder gar keine.
+- Im Formular steht immer darunter, **wann die Benachrichtigung genau käme**. Liegt der Zeitpunkt schon in der Vergangenheit, sagt Homy das auch.
+- In der Benachrichtigung stehen der Titel, die Art und das Fach, dazu „Morgen um 8:00 Uhr“ oder „In 2 Tagen (Do, 24.9.)“.
+- Beim **ersten Mal fragt iOS um Erlaubnis** – und zwar erst dann, wenn du wirklich eine Erinnerung einstellst, nicht schon beim Start der App. Sagst du Nein, steht das als Hinweis in den Einstellungen, mit einem Knopf zu den iPhone-Einstellungen.
+- In den Einstellungen unter **Erinnerungen** lässt sich alles zusammen abschalten und die Voreinstellung für neue Termine ändern.
+
+> Die Benachrichtigung schickt **iOS**, nicht Homy: Die App übergibt nur Text und Zeitpunkt, den Rest macht das System. Es geht nichts ins Internet, und es braucht keinen Server. iOS merkt sich höchstens 64 solcher Erinnerungen je App – Homy stellt darum die nächsten 56 und schiebt weiter entfernte beim nächsten Öffnen nach. Wer sehr viele Termine weit im Voraus einträgt, bekommt für die entferntesten also erst später eine Erinnerung gestellt.
+
+### 3. Stundenplan
 
 - Raster mit den Wochentagen als Spalten und den Stunden als Zeilen.
 - Auf ein Feld tippen → Fach auswählen, fertig. Raum und Lehrkraft lassen sich für einzelne Stunden abweichend eintragen.
 - Einstellbar: Anzahl der Stunden pro Tag (1–14), Samstag als sechster Schultag, Unterrichtszeiten je Stunde.
 - Der heutige Wochentag ist hervorgehoben.
 
-### 3. Stundenplan abfotografieren
+### 4. Stundenplan abfotografieren
 
 Statt jedes Feld einzeln einzutippen, lässt sich der eigene Stundenplan scannen:
 
@@ -52,7 +73,7 @@ Alles läuft auf dem Gerät – das Foto wird nicht hochgeladen und nirgends ges
 
 > Der Dokumentenscanner braucht eine echte Kamera und funktioniert deshalb **nicht im Simulator**. Zum Ausprobieren am Mac lässt sich stattdessen ein Foto aus der Mediathek wählen.
 
-### 4. Notizen
+### 5. Notizen
 
 Ein eigener Tab unten für alles, was man sich aufschreiben will – aufgebaut wie Apples Notizen-App.
 
@@ -64,7 +85,9 @@ Ein eigener Tab unten für alles, was man sich aufschreiben will – aufgebaut w
 
 > Anders als bei Apple wird die erste Zeile beim Schreiben nicht fett dargestellt, nur in der Liste. Für formatierten Text bräuchte es einen anderen Editor.
 
-### 5. Fächer
+### 6. Fächer
+
+Zu finden **im Stundenplan oben links** oder in den Einstellungen – seit dem Kalender haben die Fächer keinen eigenen Tab mehr (siehe *Technisches*).
 
 - **Oben stehen die Stunden des Tages.** Ist heute Schule, siehst du „Heute · Montag“ mit allen Stunden dieses Tages in der Reihenfolge des Plans – mit Stundennummer, Uhrzeit und Raum. Am Wochenende oder an einem freien Tag springt die Liste auf den nächsten Schultag („Morgen · Montag“). Das stellt sich jeden Tag von allein um.
 - Darunter **alle Fächer** alphabetisch zum Bearbeiten.
@@ -72,7 +95,7 @@ Ein eigener Tab unten für alles, was man sich aufschreiben will – aufgebaut w
 - Beim ersten Start sind typische Schulfächer schon angelegt (Deutsch, Mathematik, Englisch …) – umbenennen oder löschen, wie du möchtest.
 - Das Kürzel ist genau das, was im Stundenplan und neben dem Hausaufgabenfeld steht.
 
-### 6. Anmeldung
+### 7. Anmeldung
 
 Damit nicht jeder, der das Gerät in die Hand nimmt, in deinen Sachen liest, kann Homy beim Öffnen einen **Zahlencode** verlangen. Eingeschaltet wird das in den Einstellungen unter *Anmeldung*; ab Werk ist es aus.
 
@@ -91,9 +114,11 @@ Was dabei wichtig ist – ehrlich gesagt:
 - Das Ganze ist ein **Schloss vor der App**, keine Verschlüsselung der Datei. Wer den Code nicht kennt, kommt in der App nicht weiter – wer aber technisch an den Dateispeicher des Geräts kommt, ist damit nicht aufgehalten. Für ein Hausaufgabenheft ist das genau richtig, für Geheimnisse wäre es zu wenig.
 - Es ist eine Anmeldung **auf diesem Gerät**, kein Konto: Es gibt keinen Server, bei dem man sich anmelden könnte. Wer Homy auf seinem eigenen iPhone lädt, legt dort seinen eigenen Code fest.
 
-### 7. Einstellungen
+### 8. Einstellungen
 
 - **Anmeldung** – Code einrichten, Schnellstart einschalten, sofort zusperren (siehe oben).
+- **Erinnerungen** – an Termine erinnern lassen, Voreinstellung für neue Termine.
+- **Fächer** – der zweite Weg zur Fächerliste (der erste ist im Stundenplan oben links).
 - **Meine Daten** – ein eigener Bereich für die Angaben über dich: Vor- und Nachname, Klasse, Schule, Telefon, E-Mail, Adresse und ein freies Feld für alles Weitere (Spind-Nummer, Buslinie, Notfallkontakt). Alles freiwillig, nichts muss ausgefüllt werden.
 
   > Diese Angaben bleiben auf dem Gerät. Die App verschickt nichts und hat keine Verbindung ins Internet. Nur wenn du selbst eine Sicherung speicherst, stehen sie mit in dieser Datei – gib sie also nicht unbedacht weiter.
@@ -154,8 +179,10 @@ Dafür brauchst du einen **Mac mit Xcode** (kostenlos im Mac App Store). Ohne Ma
 
 - **Sprache/Framework:** Swift 5, SwiftUI
 - **Mindestversion:** iOS 17.0 (iPhone und iPad, Hoch- und Querformat)
+- **Die fünf Tabs** sind Hausaufgaben, Kalender, Stundenplan, Notizen und Einstellungen. Die **Fächer** haben keinen eigenen Tab mehr: Sie sitzen jetzt beim Stundenplan (oben links) und stehen zusätzlich in den Einstellungen. Grund ist iOS: Ab dem sechsten Tab faltet das iPhone alles Weitere in ein „Mehr“-Menü, und das wäre umständlicher als ein Tipp mehr. Die Liste „welche Stunden habe ich heute“ findest du außerdem im Kalender unter dem gewählten Tag.
 - **Name auf dem Home-Bildschirm:** Homy (`CFBundleDisplayName`). Der Projekt- und Zielname im Xcode-Projekt heißt weiterhin `HausaufgabenApp`, ebenso die gespeicherte Datei – so bleiben vorhandene Installationen und Sicherungen lesbar.
 - **Anmeldung:** CryptoKit (SHA-256 für den Prüfwert des Codes) und LocalAuthentication (Face ID / Touch ID). Beides gehört zu iOS, es kommt nichts dazu.
+- **Erinnerungen:** UserNotifications mit `UNCalendarNotificationTrigger`. Nach jeder Änderung und einmal beim Start werden alle vorgemerkten Erinnerungen verworfen und die anstehenden neu gestellt – so passt das, was iOS vorgemerkt hat, immer zu dem, was im Kalender steht.
 - **Mit Tastatur am iPad:** ⌘← und ⌘→ blättern durch die Wochen, ⌘F öffnet die Suche, ⌘N legt eine neue Notiz an.
 - Kleine haptische Rückmeldung beim Ankreuzen und Aufklappen (iPhone).
 - **Speicherung:** eine JSON-Datei im Dokumentenordner der App (`hausaufgaben.json`). Änderungen werden kurz gesammelt und dann automatisch geschrieben; beim Verlassen der App wird sofort gesichert. Ist die Datei einmal beschädigt, wird sie zur Seite gelegt statt überschrieben.
@@ -174,6 +201,7 @@ HausaufgabenApp/
 │   ├── HomeworkEntry.swift      Eine Hausaufgabe
 │   ├── AppSettings.swift        Einstellungen, Unterrichtszeiten
 │   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Schnellstart
+│   ├── CalendarEvent.swift      Ein Termin samt Erinnerungszeitpunkt
 │   └── AppData.swift            Alles zusammen (auch das Format der Sicherung)
 ├── Store/
 │   ├── AppStore.swift           Hält die Daten, speichert und lädt sie
@@ -184,12 +212,14 @@ HausaufgabenApp/
 │   ├── Haptics.swift            Kurze Rückmeldung beim Antippen
 │   ├── HomyLogo.swift           Das Zeichen von Homy, gezeichnet statt als Bild
 │   ├── BiometricAuth.swift      Face ID / Touch ID über LocalAuthentication
+│   ├── Reminders.swift          Benachrichtigungen bei iOS anmelden
 │   ├── DoodleBackground.swift   Schulmotive blass hinter den Schreib-Seiten
 │   ├── TimetableRecognizer.swift  Texterkennung und Rasteranalyse für den Scan
 │   └── BackupDocument.swift     Sicherungsdatei
 ├── Views/
 │   ├── RootView.swift           Die fünf Tabs
 │   ├── Lock/                    Anmeldebild, Code einrichten, Tür vor der App
+│   ├── Calendar/                Monatsraster und Termin-Formular
 │   ├── Homework/                Hausaufgabenheft mit Wochenblättern
 │   ├── Notes/                   Notizliste und Schreibblatt
 │   ├── Timetable/               Stundenplan-Raster, Scannen und Prüfansicht

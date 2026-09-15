@@ -1,0 +1,466 @@
+import SwiftUI
+
+/// Der Kalender: ein Monat auf einen Blick, darunter der gewählte Tag.
+///
+/// Unter dem Raster steht alles, was an dem Tag ansteht – die eingetragenen
+/// Termine, die Hausaufgaben und die Stunden aus dem Stundenplan.
+struct CalendarView: View {
+    @EnvironmentObject private var store: AppStore
+
+    /// Erster Tag des angezeigten Monats.
+    @State private var monthStart = SchoolCalendar.startOfMonth(Date())
+    @State private var selectedDay = SchoolCalendar.startOfDay(Date())
+    @State private var editingEvent: CalendarEvent?
+
+    private var calendar: Calendar { SchoolCalendar.calendar }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 16) {
+                    monthCard
+                    upcomingCard
+                    dayCard
+                }
+                .padding(16)
+                .padding(.bottom, 24)
+            }
+            .background(DoodleCanvas())
+            .navigationTitle("Kalender")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Heute") { goToToday() }
+                        .disabled(isShowingToday)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        newEvent()
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .keyboardShortcut("t", modifiers: .command)
+                    .accessibilityLabel("Termin eintragen")
+                }
+            }
+            .sheet(item: $editingEvent) { event in
+                EventEditorView(event: event)
+                    .environmentObject(store)
+            }
+        }
+    }
+
+    // MARK: - Der Monat
+
+    private var monthCard: some View {
+        VStack(spacing: 10) {
+            monthHeader
+            weekdayHeader
+            monthGrid
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+    }
+
+    private var monthHeader: some View {
+        HStack {
+            Button {
+                step(by: -1)
+            } label: {
+                Image(systemName: "chevron.left").font(.body.weight(.semibold))
+            }
+            .keyboardShortcut(.leftArrow, modifiers: .command)
+            .accessibilityLabel("Voriger Monat")
+
+            Spacer(minLength: 0)
+
+            Text(SchoolCalendar.monthYear(monthStart))
+                .font(.headline)
+
+            Spacer(minLength: 0)
+
+            Button {
+                step(by: 1)
+            } label: {
+                Image(systemName: "chevron.right").font(.body.weight(.semibold))
+            }
+            .keyboardShortcut(.rightArrow, modifiers: .command)
+            .accessibilityLabel("Nächster Monat")
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.tint)
+    }
+
+    private var weekdayHeader: some View {
+        HStack(spacing: 4) {
+            ForEach(1...7, id: \.self) { index in
+                Text(SchoolCalendar.weekdayShortName(index))
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(index >= 6 ? Color.secondary : Color.primary.opacity(0.75))
+                    .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    private var monthGrid: some View {
+        let days = SchoolCalendar.gridDays(forMonthOf: monthStart)
+        return LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7),
+                         spacing: 4) {
+            ForEach(days, id: \.self) { day in
+                dayCell(day)
+            }
+        }
+    }
+
+    private func dayCell(_ day: Date) -> some View {
+        let isInMonth = calendar.isDate(day, equalTo: monthStart, toGranularity: .month)
+        let isSelected = SchoolCalendar.isSameDay(day, selectedDay)
+        let isToday = SchoolCalendar.isToday(day)
+        let dayEvents = store.events(on: day)
+        let openHomework = store.homeworkEntries(on: day).filter { !$0.isDone && $0.hasText }.count
+
+        return Button {
+            Haptics.tap()
+            selectedDay = SchoolCalendar.startOfDay(day)
+        } label: {
+            VStack(spacing: 3) {
+                Text("\(calendar.component(.day, from: day))")
+                    .font(.system(size: 16, weight: isToday ? .bold : .regular, design: .rounded))
+                    .foregroundStyle(cellTextColor(isInMonth: isInMonth,
+                                                   isSelected: isSelected,
+                                                   isToday: isToday))
+
+                // Je Termin ein Punkt, dazu ein grauer für offene Hausaufgaben.
+                HStack(spacing: 2.5) {
+                    ForEach(dayEvents.prefix(3)) { event in
+                        Circle()
+                            .fill(event.kind.tint)
+                            .frame(width: 5, height: 5)
+                    }
+                    if openHomework > 0 {
+                        Circle()
+                            .fill(Color.secondary.opacity(0.55))
+                            .frame(width: 5, height: 5)
+                    }
+                }
+                .frame(height: 5)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 7)
+            .background(cellBackground(isSelected: isSelected, isToday: isToday))
+            .contentShape(RoundedRectangle(cornerRadius: 9))
+        }
+        .buttonStyle(.plain)
+        .opacity(isInMonth ? 1 : 0.38)
+        .accessibilityLabel(cellAccessibilityLabel(day, events: dayEvents.count, homework: openHomework))
+    }
+
+    private func cellTextColor(isInMonth: Bool, isSelected: Bool, isToday: Bool) -> Color {
+        if isSelected { return .white }
+        if isToday { return .accentColor }
+        return .primary
+    }
+
+    @ViewBuilder
+    private func cellBackground(isSelected: Bool, isToday: Bool) -> some View {
+        if isSelected {
+            RoundedRectangle(cornerRadius: 9).fill(Color.accentColor)
+        } else if isToday {
+            RoundedRectangle(cornerRadius: 9).strokeBorder(Color.accentColor, lineWidth: 1.5)
+        } else {
+            Color.clear
+        }
+    }
+
+    private func cellAccessibilityLabel(_ day: Date, events: Int, homework: Int) -> String {
+        var text = "\(SchoolCalendar.weekdayName(SchoolCalendar.weekdayIndex(of: day))), \(SchoolCalendar.dayMonth(day))"
+        if SchoolCalendar.isToday(day) { text += ", heute" }
+        if events > 0 { text += ", \(events) \(events == 1 ? "Termin" : "Termine")" }
+        if homework > 0 { text += ", \(homework) offene Hausaufgaben" }
+        return text
+    }
+
+    // MARK: - Was als Nächstes kommt
+
+    private var upcoming: [CalendarEvent] { store.upcomingEvents(limit: 3) }
+
+    @ViewBuilder
+    private var upcomingCard: some View {
+        if !upcoming.isEmpty {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Als Nächstes")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 14)
+                    .padding(.top, 12)
+                    .padding(.bottom, 8)
+
+                ForEach(upcoming) { event in
+                    if event.id != upcoming.first?.id {
+                        Divider().padding(.leading, 52)
+                    }
+                    Button {
+                        if let day = event.date {
+                            withAnimation {
+                                selectedDay = SchoolCalendar.startOfDay(day)
+                                monthStart = SchoolCalendar.startOfMonth(day)
+                            }
+                        }
+                    } label: {
+                        EventRow(event: event,
+                                 subject: store.subject(id: event.subjectID),
+                                 countdown: countdownText(for: event))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.bottom, 4)
+            .background(Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+        }
+    }
+
+    private func countdownText(for event: CalendarEvent) -> String? {
+        guard let tage = store.daysUntil(event) else { return nil }
+        switch tage {
+        case ..<0:  return nil
+        case 0:     return "heute"
+        case 1:     return "morgen"
+        case 2:     return "übermorgen"
+        default:    return "in \(tage) Tagen"
+        }
+    }
+
+    // MARK: - Der gewählte Tag
+
+    private var dayCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            dayHeader
+
+            if dayEvents.isEmpty {
+                emptyDayHint
+            } else {
+                ForEach(dayEvents) { event in
+                    Divider().padding(.leading, 52)
+                    Button {
+                        editingEvent = event
+                    } label: {
+                        EventRow(event: event,
+                                 subject: store.subject(id: event.subjectID),
+                                 countdown: nil,
+                                 showsChevron: true)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            Divider().padding(.leading, 52)
+            addButton
+
+            homeworkSummary
+            lessonSummary
+        }
+        .background(Color(.secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+    }
+
+    private var dayEvents: [CalendarEvent] { store.events(on: selectedDay) }
+
+    private var dayHeader: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(SchoolCalendar.weekdayName(SchoolCalendar.weekdayIndex(of: selectedDay)))
+                .font(.headline)
+            Text(SchoolCalendar.dayMonth(selectedDay))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            Spacer(minLength: 0)
+
+            if SchoolCalendar.isToday(selectedDay) {
+                Text("Heute")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.accentColor, in: Capsule())
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.top, 12)
+        .padding(.bottom, 10)
+    }
+
+    private var emptyDayHint: some View {
+        Text("An diesem Tag steht nichts im Kalender.")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 14)
+            .padding(.bottom, 12)
+    }
+
+    private var addButton: some View {
+        Button(action: newEvent) {
+            HStack(spacing: 10) {
+                Image(systemName: "plus.circle.fill")
+                    .font(.title3)
+                Text("Termin eintragen")
+                    .font(.subheadline)
+                Spacer(minLength: 0)
+            }
+            .foregroundStyle(.tint)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    /// Was an dem Tag aufgegeben ist – zum Nachsehen, geändert wird es im Heft.
+    private var dayHomework: [HomeworkEntry] {
+        store.homeworkEntries(on: selectedDay).filter(\.hasText)
+    }
+
+    @ViewBuilder
+    private var homeworkSummary: some View {
+        if !dayHomework.isEmpty {
+            Divider().padding(.leading, 52)
+            VStack(alignment: .leading, spacing: 7) {
+                Text("Hausaufgaben an diesem Tag")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                ForEach(dayHomework) { entry in
+                    HStack(alignment: .top, spacing: 8) {
+                        if let subject = store.subject(id: entry.subjectID) {
+                            SubjectBadge(subject: subject, width: 36, dimmed: entry.isDone)
+                        }
+                        Text(entry.text)
+                            .font(.footnote)
+                            .foregroundStyle(entry.isDone ? .secondary : .primary)
+                            .strikethrough(entry.isDone, color: .secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+        }
+    }
+
+    /// Die Stunden des Tages laut Stundenplan.
+    private var daySubjects: [Subject] {
+        store.subjects(onWeekday: SchoolCalendar.weekdayIndex(of: selectedDay))
+    }
+
+    @ViewBuilder
+    private var lessonSummary: some View {
+        if !daySubjects.isEmpty {
+            Divider().padding(.leading, 52)
+            VStack(alignment: .leading, spacing: 7) {
+                Text("Stunden an diesem Tag")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                HStack(spacing: 5) {
+                    ForEach(daySubjects) { subject in
+                        SubjectBadge(subject: subject, width: 36)
+                    }
+                    Spacer(minLength: 0)
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+        }
+    }
+
+    // MARK: - Aktionen
+
+    private var isShowingToday: Bool {
+        SchoolCalendar.isToday(selectedDay)
+            && calendar.isDate(monthStart, equalTo: Date(), toGranularity: .month)
+    }
+
+    private func goToToday() {
+        Haptics.tap()
+        withAnimation {
+            selectedDay = SchoolCalendar.startOfDay(Date())
+            monthStart = SchoolCalendar.startOfMonth(Date())
+        }
+    }
+
+    private func step(by months: Int) {
+        guard let neu = calendar.date(byAdding: .month, value: months, to: monthStart) else { return }
+        Haptics.tap()
+        withAnimation(.easeInOut(duration: 0.18)) {
+            monthStart = SchoolCalendar.startOfMonth(neu)
+        }
+    }
+
+    private func newEvent() {
+        Haptics.tap()
+        editingEvent = CalendarEvent(dayKey: SchoolCalendar.dayKey(selectedDay),
+                                     reminder: store.settings.defaultReminder)
+    }
+}
+
+/// Eine Zeile mit einem Termin: Symbol, Titel, Einzelheiten.
+struct EventRow: View {
+    let event: CalendarEvent
+    var subject: Subject?
+    var countdown: String?
+    var showsChevron: Bool = false
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: event.kind.symbol)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(event.kind.tint)
+                .frame(width: 30, height: 30)
+                .background(event.kind.fill, in: RoundedRectangle(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(event.displayTitle)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                if !detailLine.isEmpty {
+                    Text(detailLine)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            if let countdown {
+                Text(countdown)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(event.kind.tint)
+                    .padding(.top, 2)
+            }
+
+            if showsChevron {
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .padding(.top, 3)
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+        .contentShape(Rectangle())
+    }
+
+    private var detailLine: String {
+        var parts: [String] = []
+        if event.hasTitle { parts.append(event.kind.title) }
+        if let subject { parts.append(subject.displayName) }
+        if let zeit = event.timeText { parts.append(zeit) }
+        if let day = event.date, countdown != nil {
+            parts.append(SchoolCalendar.shortDate(day))
+        }
+        if event.reminder != .none {
+            parts.append("🔔")
+        }
+        return parts.joined(separator: " · ")
+    }
+}

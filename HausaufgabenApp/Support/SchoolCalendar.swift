@@ -65,6 +65,38 @@ enum SchoolCalendar {
         calendar.component(.weekOfYear, from: date)
     }
 
+    // MARK: - Monate (für den Kalender)
+
+    /// Der Erste des Monats, in dem `date` liegt.
+    static func startOfMonth(_ date: Date) -> Date {
+        let parts = calendar.dateComponents([.year, .month], from: date)
+        return calendar.date(from: parts) ?? startOfDay(date)
+    }
+
+    /// Alle Tage, die im Monatsraster stehen: der Monat selbst, davor die
+    /// letzten Tage des Vormonats und dahinter die ersten des nächsten –
+    /// damit jede Zeile von Montag bis Sonntag voll ist.
+    static func gridDays(forMonthOf date: Date) -> [Date] {
+        let first = startOfMonth(date)
+        let dayCount = calendar.range(of: .day, in: .month, for: first)?.count ?? 30
+        let leading = weekdayIndex(of: first) - 1          // Tage vor dem Ersten
+        guard let start = calendar.date(byAdding: .day, value: -leading, to: first) else {
+            return []
+        }
+        // Immer volle Wochen, damit das Raster nicht springt.
+        let total = Int((Double(leading + dayCount) / 7).rounded(.up)) * 7
+        return (0..<total).compactMap {
+            calendar.date(byAdding: .day, value: $0, to: start)
+        }
+    }
+
+    private static let monthYearFormatter = formatter("MMMM yyyy")
+
+    /// z. B. "September 2026"
+    static func monthYear(_ date: Date) -> String {
+        monthYearFormatter.string(from: date)
+    }
+
     static func isToday(_ date: Date) -> Bool {
         calendar.isDateInToday(date)
     }

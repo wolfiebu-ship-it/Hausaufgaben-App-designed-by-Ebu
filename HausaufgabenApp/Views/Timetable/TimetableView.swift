@@ -5,6 +5,7 @@ struct TimetableView: View {
     @EnvironmentObject private var store: AppStore
     @State private var editingSlot: LessonSlot?
     @State private var showScanner = false
+    @State private var showSubjects = false
 
     struct LessonSlot: Identifiable, Hashable {
         let weekday: Int
@@ -33,6 +34,14 @@ struct TimetableView: View {
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.systemGroupedBackground))
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showSubjects = true
+                    } label: {
+                        Label("Fächer", systemImage: "books.vertical")
+                    }
+                    .accessibilityLabel("Fächer verwalten")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showScanner = true
@@ -41,6 +50,10 @@ struct TimetableView: View {
                     }
                     .accessibilityLabel("Stundenplan scannen")
                 }
+            }
+            .sheet(isPresented: $showSubjects) {
+                SubjectsView(showsDoneButton: true)
+                    .environmentObject(store)
             }
             .sheet(item: $editingSlot) { slot in
                 LessonEditorView(weekday: slot.weekday, period: slot.period)

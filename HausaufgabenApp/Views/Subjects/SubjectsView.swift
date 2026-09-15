@@ -2,7 +2,11 @@ import SwiftUI
 
 /// Liste aller Fächer mit Kürzel, Farbe, Lehrkraft und Raum.
 struct SubjectsView: View {
+    /// Wird die Ansicht als Blatt gezeigt, braucht sie einen Schließen-Knopf.
+    var showsDoneButton = false
+
     @EnvironmentObject private var store: AppStore
+    @Environment(\.dismiss) private var dismiss
     @State private var editorMode: SubjectEditorMode?
     @State private var subjectToDelete: Subject?
 
@@ -17,6 +21,11 @@ struct SubjectsView: View {
             }
             .navigationTitle("Fächer")
             .toolbar {
+                if showsDoneButton {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Fertig") { dismiss() }
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         editorMode = .create

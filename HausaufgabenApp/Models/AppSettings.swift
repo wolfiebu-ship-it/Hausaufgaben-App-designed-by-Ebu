@@ -63,6 +63,10 @@ struct AppSettings: Codable, Hashable {
     var showEmptySubjects: Bool
     /// Helles oder dunkles Erscheinungsbild der App.
     var appearance: AppearanceMode
+    /// Erinnerungen an Kalendertermine verschicken.
+    var remindersEnabled: Bool
+    /// Welche Erinnerung ein neuer Termin von sich aus bekommt.
+    var defaultReminder: ReminderOffset
     var periodTimes: [PeriodTime]
 
     init(periodCount: Int = 9,
@@ -70,12 +74,16 @@ struct AppSettings: Codable, Hashable {
          showTimes: Bool = true,
          showEmptySubjects: Bool = true,
          appearance: AppearanceMode = .system,
+         remindersEnabled: Bool = true,
+         defaultReminder: ReminderOffset = .eveningBefore,
          periodTimes: [PeriodTime]? = nil) {
         self.periodCount = periodCount
         self.includeSaturday = includeSaturday
         self.showTimes = showTimes
         self.showEmptySubjects = showEmptySubjects
         self.appearance = appearance
+        self.remindersEnabled = remindersEnabled
+        self.defaultReminder = defaultReminder
         self.periodTimes = periodTimes ?? PeriodTime.defaultTimes(count: periodCount)
     }
 
@@ -112,6 +120,9 @@ struct AppSettings: Codable, Hashable {
         showTimes = try container.decodeIfPresent(Bool.self, forKey: .showTimes) ?? true
         showEmptySubjects = try container.decodeIfPresent(Bool.self, forKey: .showEmptySubjects) ?? true
         appearance = try container.decodeIfPresent(AppearanceMode.self, forKey: .appearance) ?? .system
+        remindersEnabled = try container.decodeIfPresent(Bool.self, forKey: .remindersEnabled) ?? true
+        defaultReminder = try container.decodeIfPresent(ReminderOffset.self, forKey: .defaultReminder)
+            ?? .eveningBefore
         periodTimes = try container.decodeIfPresent([PeriodTime].self, forKey: .periodTimes)
             ?? PeriodTime.defaultTimes(count: periodCount)
     }
