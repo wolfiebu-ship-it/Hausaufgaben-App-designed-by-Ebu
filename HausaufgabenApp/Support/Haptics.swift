@@ -16,4 +16,11 @@ enum Haptics {
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
     }
+
+    /// Das kurze Doppelzucken, wenn etwas nicht gestimmt hat –
+    /// etwa ein falscher Code beim Anmelden.
+    static func error() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.error)
+    }
 }

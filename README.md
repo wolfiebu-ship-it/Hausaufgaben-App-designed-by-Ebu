@@ -1,6 +1,10 @@
-# Hausaufgaben – App für iPhone und iPad
+<img src="docs/homy-logo.png" alt="" width="104" align="left" hspace="14" vspace="4">
 
-Eine App, um die Hausaufgaben des Tages einzutragen und den eigenen Stundenplan immer dabeizuhaben.
+# Homy
+
+**Dein Hausaufgabenheft für iPhone und iPad.** Die Hausaufgaben des Tages eintragen und den eigenen Stundenplan immer dabeihaben.
+
+<br clear="left">
 
 Geschrieben in Swift/SwiftUI als native App für iPhone **und** iPad. Alle Daten bleiben auf dem Gerät – kein Konto, kein Internet, keine Werbung.
 
@@ -68,9 +72,29 @@ Ein eigener Tab unten für alles, was man sich aufschreiben will – aufgebaut w
 - Beim ersten Start sind typische Schulfächer schon angelegt (Deutsch, Mathematik, Englisch …) – umbenennen oder löschen, wie du möchtest.
 - Das Kürzel ist genau das, was im Stundenplan und neben dem Hausaufgabenfeld steht.
 
-### 6. Einstellungen
+### 6. Anmeldung
 
-- **Meine Daten** – ganz oben ein eigener Bereich für die Angaben über dich: Vor- und Nachname, Klasse, Schule, Telefon, E-Mail, Adresse und ein freies Feld für alles Weitere (Spind-Nummer, Buslinie, Notfallkontakt). Alles freiwillig, nichts muss ausgefüllt werden.
+Damit nicht jeder, der das Gerät in die Hand nimmt, in deinen Sachen liest, kann Homy beim Öffnen einen **Zahlencode** verlangen. Eingeschaltet wird das in den Einstellungen unter *Anmeldung*; ab Werk ist es aus.
+
+- **Der Code** sind 4 bis 8 Ziffern. Auf dem Anmeldebild gibt es ein eigenes Tastenfeld – sobald die letzte Ziffer steht, prüft Homy von selbst.
+- **Schnellstart für dich.** Ein Knopf stellt in einem Rutsch das ein, was du für dich willst: mit **Face ID bzw. Touch ID** öffnen und nur **beim Neustart** überhaupt fragen. Du schaust die App also nur an und bist drin – den Code tippen müssen die anderen.
+- **Wann gefragt wird**, lässt sich auch einzeln wählen: jedes Mal, nach 5 Minuten, nach 1 Stunde oder nur beim Neustart.
+- **Nach fünf Fehlversuchen** gibt es eine halbe Minute Pause.
+- **„Homy jetzt zusperren“** macht die App sofort zu, etwa bevor du sie aus der Hand gibst.
+- Ein freiwilliger **Merkzettel** erscheint auf dem Anmeldebild unter „Code vergessen?“.
+
+Was dabei wichtig ist – ehrlich gesagt:
+
+- Der Code wird **nicht im Klartext gespeichert**, sondern nur als Prüfwert (SHA-256 mit Zufallsbeigabe). Die App kann ihn dir deshalb nie wieder anzeigen. **Vergisst du ihn, hilft nur Löschen und Neuladen der App** – und die Hausaufgaben sind weg, wenn du keine Sicherung hast.
+- Face ID und Touch ID prüft **iOS**, nicht Homy. Die App bekommt nie ein Gesicht oder einen Fingerabdruck zu sehen, sondern nur ein Ja oder Nein.
+- Der Code steht **nicht in den Sicherungsdateien**. Eine fremde Sicherung kann deine Anmeldung also weder setzen noch aufheben, und ein Zurücksetzen der Daten hebt sie auch nicht auf.
+- Das Ganze ist ein **Schloss vor der App**, keine Verschlüsselung der Datei. Wer den Code nicht kennt, kommt in der App nicht weiter – wer aber technisch an den Dateispeicher des Geräts kommt, ist damit nicht aufgehalten. Für ein Hausaufgabenheft ist das genau richtig, für Geheimnisse wäre es zu wenig.
+- Es ist eine Anmeldung **auf diesem Gerät**, kein Konto: Es gibt keinen Server, bei dem man sich anmelden könnte. Wer Homy auf seinem eigenen iPhone lädt, legt dort seinen eigenen Code fest.
+
+### 7. Einstellungen
+
+- **Anmeldung** – Code einrichten, Schnellstart einschalten, sofort zusperren (siehe oben).
+- **Meine Daten** – ein eigener Bereich für die Angaben über dich: Vor- und Nachname, Klasse, Schule, Telefon, E-Mail, Adresse und ein freies Feld für alles Weitere (Spind-Nummer, Buslinie, Notfallkontakt). Alles freiwillig, nichts muss ausgefüllt werden.
 
   > Diese Angaben bleiben auf dem Gerät. Die App verschickt nichts und hat keine Verbindung ins Internet. Nur wenn du selbst eine Sicherung speicherst, stehen sie mit in dieser Datei – gib sie also nicht unbedacht weiter.
 
@@ -130,6 +154,8 @@ Dafür brauchst du einen **Mac mit Xcode** (kostenlos im Mac App Store). Ohne Ma
 
 - **Sprache/Framework:** Swift 5, SwiftUI
 - **Mindestversion:** iOS 17.0 (iPhone und iPad, Hoch- und Querformat)
+- **Name auf dem Home-Bildschirm:** Homy (`CFBundleDisplayName`). Der Projekt- und Zielname im Xcode-Projekt heißt weiterhin `HausaufgabenApp`, ebenso die gespeicherte Datei – so bleiben vorhandene Installationen und Sicherungen lesbar.
+- **Anmeldung:** CryptoKit (SHA-256 für den Prüfwert des Codes) und LocalAuthentication (Face ID / Touch ID). Beides gehört zu iOS, es kommt nichts dazu.
 - **Mit Tastatur am iPad:** ⌘← und ⌘→ blättern durch die Wochen, ⌘F öffnet die Suche, ⌘N legt eine neue Notiz an.
 - Kleine haptische Rückmeldung beim Ankreuzen und Aufklappen (iPhone).
 - **Speicherung:** eine JSON-Datei im Dokumentenordner der App (`hausaufgaben.json`). Änderungen werden kurz gesammelt und dann automatisch geschrieben; beim Verlassen der App wird sofort gesichert. Ist die Datei einmal beschädigt, wird sie zur Seite gelegt statt überschrieben.
@@ -147,18 +173,23 @@ HausaufgabenApp/
 │   ├── Lesson.swift             Feld im Stundenplan
 │   ├── HomeworkEntry.swift      Eine Hausaufgabe
 │   ├── AppSettings.swift        Einstellungen, Unterrichtszeiten
+│   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Schnellstart
 │   └── AppData.swift            Alles zusammen (auch das Format der Sicherung)
 ├── Store/
-│   └── AppStore.swift           Hält die Daten, speichert und lädt sie
+│   ├── AppStore.swift           Hält die Daten, speichert und lädt sie
+│   └── LockController.swift     Wann Homy zu ist und wann wieder gefragt wird
 ├── Support/
 │   ├── SchoolCalendar.swift     Wochen- und Datumsberechnungen (Woche ab Montag)
 │   ├── AppTheme.swift           Farben (je Fach ein heller und ein kräftiger Ton)
 │   ├── Haptics.swift            Kurze Rückmeldung beim Antippen
+│   ├── HomyLogo.swift           Das Zeichen von Homy, gezeichnet statt als Bild
+│   ├── BiometricAuth.swift      Face ID / Touch ID über LocalAuthentication
 │   ├── DoodleBackground.swift   Schulmotive blass hinter den Schreib-Seiten
 │   ├── TimetableRecognizer.swift  Texterkennung und Rasteranalyse für den Scan
 │   └── BackupDocument.swift     Sicherungsdatei
 ├── Views/
-│   ├── RootView.swift           Die vier Tabs
+│   ├── RootView.swift           Die fünf Tabs
+│   ├── Lock/                    Anmeldebild, Code einrichten, Tür vor der App
 │   ├── Homework/                Hausaufgabenheft mit Wochenblättern
 │   ├── Notes/                   Notizliste und Schreibblatt
 │   ├── Timetable/               Stundenplan-Raster, Scannen und Prüfansicht

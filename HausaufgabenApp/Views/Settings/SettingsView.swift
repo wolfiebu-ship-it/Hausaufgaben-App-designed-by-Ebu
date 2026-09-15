@@ -3,6 +3,7 @@ import UniformTypeIdentifiers
 
 struct SettingsView: View {
     @EnvironmentObject private var store: AppStore
+    @EnvironmentObject private var lockController: LockController
 
     @State private var exportDocument: BackupDocument?
     @State private var showExporter = false
@@ -11,6 +12,9 @@ struct SettingsView: View {
     @State private var showResetConfirmation = false
     @State private var showDeleteHomeworkConfirmation = false
     @State private var infoMessage: String?
+    @State private var showLockSetup = false
+    @State private var isChangingCode = false
+    @State private var showLockOffConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -24,6 +28,7 @@ struct SettingsView: View {
                 }
 
                 profileSection
+                lockSection
                 legendSection
                 appearanceSection
                 timetableSection
@@ -83,6 +88,141 @@ struct SettingsView: View {
                 Text(infoMessage ?? "")
             }
         }
+    }
+
+    // MARK: - Anmeldung
+
+    /// Die Anmeldung: ein Code für alle – und der Schnellstart für einen selbst.
+    @ViewBuilder
+    private var lockSection: some View {
+        Section {
+            if store.lock.isActive {
+                activeLockRows
+            } else {
+                Button {
+                    isChangingCode = false
+                    showLockSetup = true
+                } label: {
+                    Label("Anmeldung einrichten", systemImage: "lock.fill")
+                }
+            }
+        } header: {
+            Text("Anmeldung")
+        } footer: {
+            Text(lockFooter)
+        }
+        .sheet(isPresented: $showLockSetup) {
+            LockSetupView(isChanging: isChangingCode)
+                .environmentObject(store)
+        }
+        .confirmationDialog("Anmeldung ausschalten?",
+                            isPresented: $showLockOffConfirmation,
+                            titleVisibility: .visible) {
+            Button("Ausschalten", role: .destructive) {
+                var neu = store.lock
+                neu.clearCode()
+                store.lock = neu
+            }
+        } message: {
+            Text("Danach kann jeder, der das Gerät in der Hand hat, Homy öffnen. Der Code wird gelöscht.")
+        }
+    }
+
+    @ViewBuilder
+    private var activeLockRows: some View {
+        Label {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Anmeldung ist an")
+                    .font(.body.weight(.semibold))
+                Text("\(store.lock.codeLength)-stelliger Code")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        } icon: {
+            Image(systemName: "lock.fill")
+                .foregroundStyle(.green)
+        }
+
+        if biometrics.isAvailable {
+            Toggle(isOn: biometricsBinding) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Schnellstart mit \(biometrics.title)")
+                    Text("Nur ansehen statt tippen – gilt für dich, nicht für andere.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+
+        Picker(selection: timingBinding) {
+            ForEach(LockTiming.allCases) { timing in
+                Text(timing.title).tag(timing)
+            }
+        } label: {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Code abfragen")
+                Text(store.lock.timing.explanation)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .pickerStyle(.navigationLink)
+
+        Button {
+            var neu = store.lock
+            neu.useBiometrics = biometrics.isAvailable
+            neu.timing = .onlyOnLaunch
+            store.lock = neu
+            Haptics.success()
+            infoMessage = biometrics.isAvailable
+                ? "Schnellstart an: \(biometrics.title) genügt, und nur beim Neustart wird gefragt."
+                : "Homy fragt jetzt nur noch beim Neustart nach dem Code."
+        } label: {
+            Label("Schnellstart für mich einrichten", systemImage: "bolt.fill")
+        }
+
+        Button {
+            isChangingCode = true
+            showLockSetup = true
+        } label: {
+            Label("Code ändern", systemImage: "key.fill")
+        }
+
+        Button {
+            lockController.lockNow()
+        } label: {
+            Label("Homy jetzt zusperren", systemImage: "lock.rotation")
+        }
+
+        Button(role: .destructive) {
+            showLockOffConfirmation = true
+        } label: {
+            Label("Anmeldung ausschalten", systemImage: "lock.open")
+        }
+    }
+
+    private var biometrics: BiometricKind { BiometricAuth.availableKind() }
+
+    private var biometricsBinding: Binding<Bool> {
+        Binding(get: { store.lock.useBiometrics },
+                set: { store.lock.useBiometrics = $0 })
+    }
+
+    private var timingBinding: Binding<LockTiming> {
+        Binding(get: { store.lock.timing },
+                set: { store.lock.timing = $0 })
+    }
+
+    private var lockFooter: String {
+        if store.lock.isActive {
+            var text = "Ohne den Code kommt niemand an deine Hausaufgaben, Notizen und Daten. Mit dem Schnellstart musst du selbst so gut wie nie etwas eingeben."
+            if biometrics.isAvailable {
+                text += " \(biometrics.title) prüft iOS – Homy bekommt dein Gesicht bzw. deinen Finger nie zu sehen."
+            }
+            text += "\n\nDer Code steht nicht in den Sicherungsdateien: Eine Sicherung kann die Anmeldung weder setzen noch aufheben."
+            return text
+        }
+        return "Wenn du magst, verlangt Homy beim Öffnen einen Zahlencode. Für dich selbst lässt sich danach ein Schnellstart einstellen, damit du nicht jedes Mal tippen musst."
     }
 
     // MARK: - Abschnitte
@@ -248,12 +388,27 @@ struct SettingsView: View {
 
     private var aboutSection: some View {
         Section {
+            HStack(spacing: 14) {
+                HomyMark(size: 54)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Homy")
+                        .font(.title3.weight(.bold))
+                    Text("Dein Hausaufgabenheft")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.vertical, 4)
+
             LabeledContent("Fächer", value: "\(store.subjects.count)")
             LabeledContent("Stunden im Plan", value: "\(store.lessons.filter { $0.subjectID != nil }.count)")
             LabeledContent("Hausaufgaben", value: "\(store.homework.filter(\.hasText).count)")
             LabeledContent("Version", value: appVersion)
         } header: {
             Text("Über die App")
+        } footer: {
+            Text("Alles bleibt auf diesem Gerät: kein Konto, keine Anmeldung im Internet, keine Werbung.")
         }
     }
 

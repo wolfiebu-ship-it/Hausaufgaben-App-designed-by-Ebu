@@ -17,6 +17,8 @@ struct AppData: Codable {
     /// Die eigenen Angaben (Name, Klasse, Telefon …).
     var profile: Profile
     var settings: AppSettings
+    /// Die Anmeldung (Code, Schnellstart). Enthält nur einen Prüfwert des Codes.
+    var lock: LockSettings
 
     static let currentVersion = 1
 
@@ -28,7 +30,8 @@ struct AppData: Codable {
          noHomeworkSubjects: Set<String> = [],
          notes: [Note] = [],
          profile: Profile = Profile(),
-         settings: AppSettings = AppSettings()) {
+         settings: AppSettings = AppSettings(),
+         lock: LockSettings = LockSettings()) {
         self.version = version
         self.subjects = subjects
         self.lessons = lessons
@@ -38,6 +41,7 @@ struct AppData: Codable {
         self.notes = notes
         self.profile = profile
         self.settings = settings
+        self.lock = lock
     }
 
     init(from decoder: Decoder) throws {
@@ -51,6 +55,7 @@ struct AppData: Codable {
         notes = try container.decodeIfPresent([Note].self, forKey: .notes) ?? []
         profile = try container.decodeIfPresent(Profile.self, forKey: .profile) ?? Profile()
         settings = try container.decodeIfPresent(AppSettings.self, forKey: .settings) ?? AppSettings()
+        lock = try container.decodeIfPresent(LockSettings.self, forKey: .lock) ?? LockSettings()
     }
 
     /// Startzustand beim allerersten Öffnen der App.

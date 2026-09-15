@@ -28,6 +28,15 @@ final class AppStore: ObservableObject {
         }
     }
 
+    /// Die Anmeldung: Code, Schnellstart und wann nachgefragt wird.
+    /// Bleibt auf diesem Gerät – Sicherungen enthalten sie nicht.
+    @Published var lock: LockSettings {
+        didSet {
+            guard lock != oldValue else { return }
+            scheduleSave()
+        }
+    }
+
     /// Wird hochgezählt, wenn die Daten komplett ersetzt wurden (Import, Zurücksetzen).
     /// Ansichten hängen sich mit `.id(store.dataRevision)` daran, um sich neu aufzubauen.
     @Published private(set) var dataRevision: Int = 0
@@ -56,6 +65,7 @@ final class AppStore: ObservableObject {
         self.notes = data.notes
         self.profile = data.profile
         self.settings = data.settings
+        self.lock = data.lock
 
         // Beim allerersten Start die Datei gleich anlegen.
         if !FileManager.default.fileExists(atPath: url.path) {
@@ -551,6 +561,8 @@ final class AppStore: ObservableObject {
         notes = data.notes
         profile = data.profile
         settings = data.settings
+        // Die Anmeldung bleibt, wie sie auf diesem Gerät eingestellt ist:
+        // Eine fremde Sicherung soll den eigenen Code weder setzen noch aufheben.
         dataRevision += 1
         saveNow()
     }
@@ -567,6 +579,7 @@ final class AppStore: ObservableObject {
         saveNow()
     }
 
+    /// Alles, was in die Datei auf dem Gerät gehört.
     var currentData: AppData {
         AppData(subjects: subjects,
                 lessons: lessons,
@@ -575,7 +588,16 @@ final class AppStore: ObservableObject {
                 noHomeworkSubjects: noHomeworkSubjects,
                 notes: notes,
                 profile: profile,
-                settings: settings)
+                settings: settings,
+                lock: lock)
+    }
+
+    /// Dasselbe für eine Sicherungsdatei – aber ohne die Anmeldung.
+    /// So lässt sich aus einer Sicherung kein Code mitnehmen oder aufheben.
+    var exportableData: AppData {
+        var data = currentData
+        data.lock = LockSettings()
+        return data
     }
 
     // MARK: - Speichern und Laden
@@ -595,7 +617,7 @@ final class AppStore: ObservableObject {
 
     /// JSON für Sicherungsdateien.
     func exportData() throws -> Data {
-        try AppStore.makeEncoder().encode(currentData)
+        try AppStore.makeEncoder().encode(exportableData)
     }
 
     /// Liest eine Sicherungsdatei ein.
