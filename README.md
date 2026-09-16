@@ -34,14 +34,38 @@ Geschrieben in Swift/SwiftUI als native App für iPhone **und** iPad. Alle Daten
 
 Ein eigener Tab für alles, was an einem bestimmten Tag ansteht – Arbeiten, Tests, Abgaben, Ausflüge.
 
-- **Der Monat auf einen Blick.** Unter jedem Tag stehen kleine Punkte: je ein farbiger für einen Termin (die Farbe sagt, was für einer) und ein grauer, wenn an dem Tag noch Hausaufgaben offen sind. Der heutige Tag ist umrandet.
-- **Termin eintragen:** Titel, Art (Arbeit, Test, Abgabe, Ausflug, Schulfrei, Sonstiges), Fach, Tag, wahlweise eine Uhrzeit und eine Notiz für Einzelheiten.
+- **Der Monat auf einen Blick.** Unter jedem Tag stehen kleine Punkte: **grün** für einen Ferientag, je ein farbiger für einen Termin (die Farbe sagt, was für einer) und ein grauer, wenn an dem Tag noch Hausaufgaben offen sind. Was die Punkte bedeuten, steht als Legende direkt darunter. Der heutige Tag ist umrandet.
+- **Termin eintragen:** Titel, Art (Arbeit, Test, Abgabe, Ausflug, Schulfrei, Sonstiges), Fach, Tag, wahlweise eine Uhrzeit und eine Notiz für Einzelheiten. Jede Art hat ihre Farbe: rot Arbeit, orange Test, lila Abgabe, braun Ausflug, grün Schulfrei, grau Sonstiges.
 - **„Als Nächstes"** steht über dem Monat und zeigt die drei nächsten Termine mit „in 5 Tagen“, „morgen“, „heute“.
 - **Tippst du einen Tag an**, siehst du darunter alles zu diesem Tag: die Termine, die Hausaufgaben (zum Nachsehen – geändert werden sie im Hausaufgabenheft) und die Stunden aus dem Stundenplan.
 
+#### Ferien
+
+Ferien sind keine einzelnen Termine, sondern Zeiträume – dafür gibt es einen eigenen Eintrag mit **Anfang und Ende**.
+
+- **Eintragen** über das Plus oben rechts → *Ferien eintragen*: Name (mit Vorschlägen wie Herbstferien, Weihnachtsferien, Osterferien …), erster Ferientag, letzter Ferientag, wahlweise eine Notiz.
+- Der **letzte Ferientag zählt noch dazu** – einzutragen ist der Tag, an dem du noch frei hast, nicht der erste Schultag danach. Schon im Formular steht darum in Worten, was daraus wird:
+
+  | | |
+  |---|---|
+  | Anfang | Mittwoch, 23. Dezember 2026 |
+  | Ende | Mittwoch, 6. Januar 2027 |
+  | Dauer | 15 Tage |
+  | Wieder Schule | Donnerstag, 7. Januar 2027 |
+
+- **Im Monatsraster** bekommt jeder Ferientag einen **grünen Punkt** – der erste, der letzte und alle dazwischen. Zusätzlich sind die Ferientage grün hinterlegt, damit man den Zeitraum am Stück sieht und erkennt, wo er anfängt und wo er aufhört.
+- **Direkt unter dem Monat steht, was die Punkte bedeuten:** grün = Ferien, farbig = ein Termin, grau = an dem Tag sind noch Hausaufgaben offen. Ausführlicher steht dasselbe in den Einstellungen unter „Die Punkte im Kalender“.
+- **Unter dem Monat** steht die Liste aller Ferien: Name, „Von Montag, 19. Oktober 2026“, „Bis Freitag, 30. Oktober 2026“, die Dauer und der erste Schultag danach. Rechts daneben ein Countdown: „in 33 Tagen“, „ab morgen“, „Tag 3 von 12“ oder „vorbei“.
+- **Der erste Schultag danach** wird richtig gerechnet: Wochenenden werden übersprungen (und der Samstag nur mitgezählt, wenn du ihn in den Einstellungen als Schultag hast), ebenso direkt anschließende weitere Ferien.
+- **Tippst du einen Ferientag an**, steht darunter „Erster Ferientag · 12 Tage lang“, „Ferien · Tag 3 von 12“ oder „Letzter Ferientag · wieder Schule am Montag“. An Ferientagen blendet der Kalender die Stunden aus dem Stundenplan aus, und im Hausaufgabenheft zeigt der zugeklappte Tag den Namen der Ferien.
+- **Auch Ferien können erinnern** – voreingestellt am Abend vor dem ersten Ferientag.
+- Vertauschst du Anfang und Ende, rückt Homy es beim Sichern gerade.
+
+> **Die Ferientermine bringt Homy nicht mit.** Sie sind in jedem Bundesland und jedem Schuljahr anders, und erfundene Daten wären schlimmer als gar keine – darum trägst du sie einmal aus dem Ferienplan deiner Schule ein. Für einen einzelnen freien Tag (beweglicher Ferientag, Feiertag) reicht auch ein normaler Termin mit der Art „Schulfrei“.
+
 #### Die Erinnerung
 
-Trägst du einen Termin ein, meldet sich Homy von selbst rechtzeitig – auch wenn die App gar nicht offen ist.
+Trägst du einen Termin oder Ferien ein, meldet sich Homy von selbst rechtzeitig – auch wenn die App gar nicht offen ist.
 
 - Voreingestellt ist **am Abend davor um 18:00 Uhr**, wenn noch Zeit zum Lernen ist. Je Termin wählbar sind außerdem: wenn es losgeht, 1 Stunde vorher, 2 Tage vorher, 1 Woche vorher – oder gar keine.
 - Im Formular steht immer darunter, **wann die Benachrichtigung genau käme**. Liegt der Zeitpunkt schon in der Vergangenheit, sagt Homy das auch.
@@ -117,13 +141,14 @@ Was dabei wichtig ist – ehrlich gesagt:
 ### 8. Einstellungen
 
 - **Anmeldung** – Code einrichten, Schnellstart einschalten, sofort zusperren (siehe oben).
-- **Erinnerungen** – an Termine erinnern lassen, Voreinstellung für neue Termine.
+- **Erinnerungen** – an Termine und Ferien erinnern lassen, Voreinstellung für neue Einträge.
 - **Fächer** – der zweite Weg zur Fächerliste (der erste ist im Stundenplan oben links).
 - **Meine Daten** – ein eigener Bereich für die Angaben über dich: Vor- und Nachname, Klasse, Schule, Telefon, E-Mail, Adresse und ein freies Feld für alles Weitere (Spind-Nummer, Buslinie, Notfallkontakt). Alles freiwillig, nichts muss ausgefüllt werden.
 
   > Diese Angaben bleiben auf dem Gerät. Die App verschickt nichts und hat keine Verbindung ins Internet. Nur wenn du selbst eine Sicherung speicherst, stehen sie mit in dieser Datei – gib sie also nicht unbedacht weiter.
 
 - **Die Felder im Hausaufgabenheft** – erklärt, was das gelbe und das blaue Feld bedeuten.
+- **Die Punkte im Kalender** – erklärt den grünen, den farbigen und den grauen Punkt.
 - **Hell oder dunkel:** ganz oben unter „Darstellung“ lässt sich die App fest auf hell oder dunkel stellen – oder auf „Automatisch“, dann folgt sie der Einstellung des Geräts.
 - Stunden pro Tag, Samstag, Uhrzeiten, Unterrichtszeiten.
 - **Sicherung speichern / wiederherstellen** als Datei (z. B. in iCloud Drive). Wichtig, denn die Daten liegen nur auf dem Gerät.
@@ -182,7 +207,7 @@ Dafür brauchst du einen **Mac mit Xcode** (kostenlos im Mac App Store). Ohne Ma
 - **Die fünf Tabs** sind Hausaufgaben, Kalender, Stundenplan, Notizen und Einstellungen. Die **Fächer** haben keinen eigenen Tab mehr: Sie sitzen jetzt beim Stundenplan (oben links) und stehen zusätzlich in den Einstellungen. Grund ist iOS: Ab dem sechsten Tab faltet das iPhone alles Weitere in ein „Mehr“-Menü, und das wäre umständlicher als ein Tipp mehr. Die Liste „welche Stunden habe ich heute“ findest du außerdem im Kalender unter dem gewählten Tag.
 - **Name auf dem Home-Bildschirm:** Homy (`CFBundleDisplayName`). Der Projekt- und Zielname im Xcode-Projekt heißt weiterhin `HausaufgabenApp`, ebenso die gespeicherte Datei – so bleiben vorhandene Installationen und Sicherungen lesbar.
 - **Anmeldung:** CryptoKit (SHA-256 für den Prüfwert des Codes) und LocalAuthentication (Face ID / Touch ID). Beides gehört zu iOS, es kommt nichts dazu.
-- **Erinnerungen:** UserNotifications mit `UNCalendarNotificationTrigger`. Nach jeder Änderung und einmal beim Start werden alle vorgemerkten Erinnerungen verworfen und die anstehenden neu gestellt – so passt das, was iOS vorgemerkt hat, immer zu dem, was im Kalender steht.
+- **Erinnerungen:** UserNotifications mit `UNCalendarNotificationTrigger`. Termine und Ferien werden vorher zu einer gemeinsamen Liste von `ReminderItem` gerechnet. Nach jeder Änderung und einmal beim Start werden alle vorgemerkten Erinnerungen verworfen und die anstehenden neu gestellt – so passt das, was iOS vorgemerkt hat, immer zu dem, was im Kalender steht.
 - **Mit Tastatur am iPad:** ⌘← und ⌘→ blättern durch die Wochen, ⌘F öffnet die Suche, ⌘N legt eine neue Notiz an.
 - Kleine haptische Rückmeldung beim Ankreuzen und Aufklappen (iPhone).
 - **Speicherung:** eine JSON-Datei im Dokumentenordner der App (`hausaufgaben.json`). Änderungen werden kurz gesammelt und dann automatisch geschrieben; beim Verlassen der App wird sofort gesichert. Ist die Datei einmal beschädigt, wird sie zur Seite gelegt statt überschrieben.
@@ -202,6 +227,7 @@ HausaufgabenApp/
 │   ├── AppSettings.swift        Einstellungen, Unterrichtszeiten
 │   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Schnellstart
 │   ├── CalendarEvent.swift      Ein Termin samt Erinnerungszeitpunkt
+│   ├── Holiday.swift            Ferien: Zeitraum von … bis …
 │   └── AppData.swift            Alles zusammen (auch das Format der Sicherung)
 ├── Store/
 │   ├── AppStore.swift           Hält die Daten, speichert und lädt sie
@@ -219,7 +245,7 @@ HausaufgabenApp/
 ├── Views/
 │   ├── RootView.swift           Die fünf Tabs
 │   ├── Lock/                    Anmeldebild, Code einrichten, Tür vor der App
-│   ├── Calendar/                Monatsraster und Termin-Formular
+│   ├── Calendar/                Monatsraster, Termin- und Ferien-Formular
 │   ├── Homework/                Hausaufgabenheft mit Wochenblättern
 │   ├── Notes/                   Notizliste und Schreibblatt
 │   ├── Timetable/               Stundenplan-Raster, Scannen und Prüfansicht

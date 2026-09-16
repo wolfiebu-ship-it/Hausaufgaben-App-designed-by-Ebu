@@ -34,6 +34,7 @@ struct SettingsView: View {
                 remindersSection
                 lockSection
                 legendSection
+                dotLegendSection
                 appearanceSection
                 timetableSection
                 homeworkSection
@@ -118,7 +119,7 @@ struct SettingsView: View {
             Toggle(isOn: remindersBinding) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("An Termine erinnern")
-                    Text("Homy meldet sich, bevor eine Arbeit oder Abgabe ansteht.")
+                    Text("Homy meldet sich, bevor eine Arbeit ansteht oder die Ferien anfangen.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -189,8 +190,8 @@ struct SettingsView: View {
         }
         var text = "Bei jedem Termin lässt sich die Erinnerung auch einzeln einstellen. "
         text += "Die Benachrichtigung schickt iOS – sie kommt auch, wenn Homy geschlossen ist, und nichts davon geht ins Internet."
-        if store.events.isEmpty {
-            text += "\n\nNoch kein Termin eingetragen: Das geht im Kalender über das Plus oben rechts."
+        if store.events.isEmpty && store.holidays.isEmpty {
+            text += "\n\nNoch nichts eingetragen: Termine und Ferien legst du im Kalender über das Plus oben rechts an."
         }
         return text
     }
@@ -388,6 +389,48 @@ struct SettingsView: View {
         }
     }
 
+    /// Erklärt die Punkte unter den Tagen im Kalender.
+    private var dotLegendSection: some View {
+        Section {
+            dotRow(color: Holiday.tint,
+                   title: "Grün: Ferien",
+                   text: "Jeder Ferientag bekommt einen grünen Punkt – der erste, der letzte und alle dazwischen. Die ganzen Ferien sind außerdem grün hinterlegt, so siehst du auf einen Blick, wo sie anfangen und wo sie aufhören.")
+
+            dotRow(color: EventKind.exam.tint,
+                   title: "Farbig: ein Termin",
+                   text: "Je Termin ein Punkt. Die Farbe sagt, was für einer: rot Arbeit, orange Test, lila Abgabe, braun Ausflug, grau Sonstiges.")
+
+            dotRow(color: Color.secondary.opacity(0.55),
+                   title: "Grau: offene Hausaufgaben",
+                   text: "An diesem Tag ist noch etwas aufgeschrieben, das du nicht abgehakt hast.")
+        } header: {
+            Text("Die Punkte im Kalender")
+        } footer: {
+            Text("Dieselbe Erklärung steht auch klein unter dem Monat im Kalender.")
+        }
+    }
+
+    private func dotRow(color: Color, title: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Circle()
+                .fill(color)
+                .frame(width: 12, height: 12)
+                .padding(.top, 5)
+                .frame(width: 26)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                Text(text)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.vertical, 3)
+        .accessibilityElement(children: .combine)
+    }
+
     private func legendRow(color: Color, title: String, text: String) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "checkmark.circle.fill")
@@ -520,6 +563,7 @@ struct SettingsView: View {
             LabeledContent("Stunden im Plan", value: "\(store.lessons.filter { $0.subjectID != nil }.count)")
             LabeledContent("Hausaufgaben", value: "\(store.homework.filter(\.hasText).count)")
             LabeledContent("Termine", value: "\(store.events.count)")
+            LabeledContent("Ferien", value: "\(store.holidays.count)")
             LabeledContent("Version", value: appVersion)
         } header: {
             Text("Über die App")

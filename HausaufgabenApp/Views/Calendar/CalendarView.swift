@@ -11,6 +11,7 @@ struct CalendarView: View {
     @State private var monthStart = SchoolCalendar.startOfMonth(Date())
     @State private var selectedDay = SchoolCalendar.startOfDay(Date())
     @State private var editingEvent: CalendarEvent?
+    @State private var editingHoliday: Holiday?
 
     private var calendar: Calendar { SchoolCalendar.calendar }
 
@@ -21,6 +22,7 @@ struct CalendarView: View {
                     monthCard
                     upcomingCard
                     dayCard
+                    holidayCard
                 }
                 .padding(16)
                 .padding(.bottom, 24)
@@ -33,17 +35,29 @@ struct CalendarView: View {
                         .disabled(isShowingToday)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        newEvent()
+                    Menu {
+                        Button {
+                            newEvent()
+                        } label: {
+                            Label("Termin eintragen", systemImage: "calendar.badge.plus")
+                        }
+                        Button {
+                            newHoliday()
+                        } label: {
+                            Label("Ferien eintragen", systemImage: "sun.max.fill")
+                        }
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .keyboardShortcut("t", modifiers: .command)
-                    .accessibilityLabel("Termin eintragen")
+                    .accessibilityLabel("Eintragen")
                 }
             }
             .sheet(item: $editingEvent) { event in
                 EventEditorView(event: event)
+                    .environmentObject(store)
+            }
+            .sheet(item: $editingHoliday) { holiday in
+                HolidayEditorView(holiday: holiday)
                     .environmentObject(store)
             }
         }
@@ -56,6 +70,7 @@ struct CalendarView: View {
             monthHeader
             weekdayHeader
             monthGrid
+            dotLegend
         }
         .padding(14)
         .background(Color(.secondarySystemGroupedBackground),
@@ -118,6 +133,7 @@ struct CalendarView: View {
         let isToday = SchoolCalendar.isToday(day)
         let dayEvents = store.events(on: day)
         let openHomework = store.homeworkEntries(on: day).filter { !$0.isDone && $0.hasText }.count
+        let isHoliday = store.holiday(on: day) != nil
 
         return Button {
             Haptics.tap()
@@ -130,9 +146,15 @@ struct CalendarView: View {
                                                    isSelected: isSelected,
                                                    isToday: isToday))
 
-                // Je Termin ein Punkt, dazu ein grauer für offene Hausaufgaben.
+                // Punkte unter dem Tag: grün für Ferien, je Termin einer in
+                // seiner Farbe, grau für offene Hausaufgaben.
                 HStack(spacing: 2.5) {
-                    ForEach(dayEvents.prefix(3)) { event in
+                    if isHoliday {
+                        Circle()
+                            .fill(Holiday.tint)
+                            .frame(width: 5, height: 5)
+                    }
+                    ForEach(dayEvents.prefix(isHoliday ? 2 : 3)) { event in
                         Circle()
                             .fill(event.kind.tint)
                             .frame(width: 5, height: 5)
@@ -148,6 +170,7 @@ struct CalendarView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 7)
             .background(cellBackground(isSelected: isSelected, isToday: isToday))
+            .background(holidayBackground(day))
             .contentShape(RoundedRectangle(cornerRadius: 9))
         }
         .buttonStyle(.plain)
@@ -172,9 +195,49 @@ struct CalendarView: View {
         }
     }
 
+    /// Was die Punkte unter den Tagen bedeuten.
+    private var dotLegend: some View {
+        HStack(spacing: 14) {
+            legendItem(color: Holiday.tint, text: "Ferien")
+            legendItem(color: EventKind.exam.tint, text: "Termin")
+            legendItem(color: Color.secondary.opacity(0.55), text: "Hausaufgaben offen")
+            Spacer(minLength: 0)
+        }
+        .font(.caption2)
+        .foregroundStyle(.secondary)
+        .padding(.top, 2)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Die Punkte unter den Tagen: grün heißt Ferien, ein farbiger Punkt ein Termin, ein grauer offene Hausaufgaben")
+    }
+
+    private func legendItem(color: Color, text: String) -> some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(color)
+                .frame(width: 7, height: 7)
+            Text(text)
+        }
+    }
+
+    /// Ferientage bekommen eine ruhige Fläche – so sieht man den Zeitraum
+    /// am Stück, ohne dass es mit der Auswahl kollidiert.
+    @ViewBuilder
+    private func holidayBackground(_ day: Date) -> some View {
+        if store.holiday(on: day) != nil {
+            RoundedRectangle(cornerRadius: 9).fill(Holiday.fill)
+        } else {
+            Color.clear
+        }
+    }
+
     private func cellAccessibilityLabel(_ day: Date, events: Int, homework: Int) -> String {
         var text = "\(SchoolCalendar.weekdayName(SchoolCalendar.weekdayIndex(of: day))), \(SchoolCalendar.dayMonth(day))"
         if SchoolCalendar.isToday(day) { text += ", heute" }
+        if let ferien = store.holiday(on: day) {
+            text += ", \(ferien.displayName)"
+            if ferien.isStart(day) { text += ", erster Ferientag" }
+            if ferien.isEnd(day) { text += ", letzter Ferientag" }
+        }
         if events > 0 { text += ", \(events) \(events == 1 ? "Termin" : "Termine")" }
         if homework > 0 { text += ", \(homework) offene Hausaufgaben" }
         return text
@@ -236,6 +299,7 @@ struct CalendarView: View {
     private var dayCard: some View {
         VStack(alignment: .leading, spacing: 0) {
             dayHeader
+            dayHolidayNote
 
             if dayEvents.isEmpty {
                 emptyDayHint
@@ -265,6 +329,56 @@ struct CalendarView: View {
     }
 
     private var dayEvents: [CalendarEvent] { store.events(on: selectedDay) }
+
+    /// Steht der gewählte Tag in den Ferien?
+    @ViewBuilder
+    private var dayHolidayNote: some View {
+        if let ferien = store.holiday(on: selectedDay) {
+            Button {
+                editingHoliday = ferien
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "sun.max.fill")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(Holiday.tint)
+                        .frame(width: 30, height: 30)
+                        .background(Holiday.fill, in: RoundedRectangle(cornerRadius: 8))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(ferien.displayName)
+                            .font(.subheadline.weight(.semibold))
+                        Text(holidayDayText(ferien))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+                .padding(.horizontal, 14)
+                .padding(.bottom, 10)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func holidayDayText(_ ferien: Holiday) -> String {
+        if ferien.isStart(selectedDay) { return "Erster Ferientag · \(ferien.dayCount) Tage lang" }
+        if ferien.isEnd(selectedDay) {
+            if let danach = store.firstSchoolDay(after: ferien) {
+                return "Letzter Ferientag · wieder Schule am \(SchoolCalendar.weekdayName(SchoolCalendar.weekdayIndex(of: danach)))"
+            }
+            return "Letzter Ferientag"
+        }
+        if let nummer = ferien.dayNumber(of: selectedDay) {
+            return "Ferien · Tag \(nummer) von \(ferien.dayCount)"
+        }
+        return "Ferien"
+    }
 
     private var dayHeader: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -354,7 +468,8 @@ struct CalendarView: View {
 
     @ViewBuilder
     private var lessonSummary: some View {
-        if !daySubjects.isEmpty {
+        // In den Ferien fällt der Unterricht aus – dann wäre die Liste falsch.
+        if !daySubjects.isEmpty, store.holiday(on: selectedDay) == nil {
             Divider().padding(.leading, 52)
             VStack(alignment: .leading, spacing: 7) {
                 Text("Stunden an diesem Tag")
@@ -371,6 +486,98 @@ struct CalendarView: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
         }
+    }
+
+    // MARK: - Ferien
+
+    private var holidayCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 8) {
+                Text("Ferien")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 14)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+
+            if store.holidays.isEmpty {
+                Text("Noch keine Ferien eingetragen. Trag sie aus dem Ferienplan deiner Schule ein – dann siehst du im Kalender, wann sie anfangen und wann sie enden.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 14)
+                    .padding(.bottom, 12)
+            } else {
+                ForEach(store.sortedHolidays) { ferien in
+                    if ferien.id != store.sortedHolidays.first?.id {
+                        Divider().padding(.leading, 14)
+                    }
+                    Button {
+                        showHoliday(ferien)
+                    } label: {
+                        HolidayRow(holiday: ferien,
+                                   status: holidayStatus(ferien),
+                                   firstSchoolDay: store.firstSchoolDay(after: ferien))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            Divider().padding(.leading, 14)
+
+            Button(action: newHoliday) {
+                HStack(spacing: 10) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                    Text("Ferien eintragen")
+                        .font(.subheadline)
+                    Spacer(minLength: 0)
+                }
+                .foregroundStyle(.tint)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+        .background(Color(.secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+    }
+
+    /// „läuft gerade“, „in 23 Tagen“, „vorbei“
+    private func holidayStatus(_ ferien: Holiday) -> String? {
+        if ferien.isRunning() {
+            if let nummer = ferien.dayNumber(of: Date()) {
+                return "Tag \(nummer) von \(ferien.dayCount)"
+            }
+            return "läuft gerade"
+        }
+        if ferien.isOver() { return "vorbei" }
+        guard let tage = store.daysUntilStart(of: ferien) else { return nil }
+        switch tage {
+        case 0:  return "ab heute"
+        case 1:  return "ab morgen"
+        default: return "in \(tage) Tagen"
+        }
+    }
+
+    /// Zu den Ferien springen und sie zum Ändern öffnen.
+    private func showHoliday(_ ferien: Holiday) {
+        if let (start, _) = ferien.orderedDates {
+            withAnimation {
+                selectedDay = start
+                monthStart = SchoolCalendar.startOfMonth(start)
+            }
+        }
+        editingHoliday = ferien
+    }
+
+    private func newHoliday() {
+        Haptics.tap()
+        let key = SchoolCalendar.dayKey(selectedDay)
+        editingHoliday = Holiday(startDayKey: key, endDayKey: key)
     }
 
     // MARK: - Aktionen
@@ -462,5 +669,79 @@ struct EventRow: View {
             parts.append("🔔")
         }
         return parts.joined(separator: " · ")
+    }
+}
+
+/// Eine Zeile in der Ferienliste: Name, Anfang, Ende, Dauer.
+struct HolidayRow: View {
+    let holiday: Holiday
+    var status: String?
+    /// Der erste Tag, an dem wirklich wieder Schule ist.
+    var firstSchoolDay: Date?
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "sun.max.fill")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Holiday.tint)
+                .frame(width: 30, height: 30)
+                .background(Holiday.fill, in: RoundedRectangle(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 5) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(holiday.displayName)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+
+                    Spacer(minLength: 0)
+
+                    if let status {
+                        Text(status)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(holiday.isOver() ? Color.secondary : Holiday.tint)
+                    }
+                }
+
+                // Anfang und Ende jeweils mit Wochentag – darum geht es hier.
+                VStack(alignment: .leading, spacing: 2) {
+                    rangeLine(label: "Von", text: holiday.startText)
+                    rangeLine(label: "Bis", text: holiday.endText)
+                }
+
+                Text(footerText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(holiday.displayName), von \(holiday.startText) bis \(holiday.endText)")
+    }
+
+    private func rangeLine(label: String, text: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(label)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 26, alignment: .leading)
+            Text(text)
+                .font(.footnote)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var footerText: String {
+        var text = holiday.dayCount == 1 ? "1 Tag" : "\(holiday.dayCount) Tage"
+        if let firstSchoolDay {
+            text += " · wieder Schule am \(Holiday.longWeekdayText(firstSchoolDay))"
+        }
+        if !holiday.note.isEmpty {
+            text += "\n" + holiday.note
+        }
+        return text
     }
 }

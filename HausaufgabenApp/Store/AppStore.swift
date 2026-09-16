@@ -15,6 +15,8 @@ final class AppStore: ObservableObject {
     @Published private(set) var notes: [Note]
     /// Termine im Kalender.
     @Published private(set) var events: [CalendarEvent]
+    /// Ferien mit Anfang und Ende.
+    @Published private(set) var holidays: [Holiday]
     /// Die eigenen Angaben – frei änderbar, deshalb ohne private(set).
     @Published var profile: Profile {
         didSet {
@@ -66,6 +68,7 @@ final class AppStore: ObservableObject {
         self.noHomeworkSubjects = data.noHomeworkSubjects
         self.notes = data.notes
         self.events = data.events
+        self.holidays = data.holidays
         self.profile = data.profile
         self.settings = data.settings
         self.lock = data.lock
@@ -621,16 +624,109 @@ final class AppStore: ObservableObject {
         syncReminders()
     }
 
+    // MARK: - Ferien
+
+    /// Ferien, die nächsten zuerst – vorbei ist ganz unten.
+    var sortedHolidays: [Holiday] {
+        holidays.sorted { a, b in
+            let aVorbei = a.isOver(), bVorbei = b.isOver()
+            if aVorbei != bVorbei { return !aVorbei }
+            return a.startDayKey < b.startDayKey
+        }
+    }
+
+    /// In welchen Ferien liegt dieser Tag?
+    func holiday(on day: Date) -> Holiday? {
+        holidays.first { $0.contains(day) }
+    }
+
+    /// Die Ferien, die gerade laufen.
+    func currentHoliday(on reference: Date = Date()) -> Holiday? {
+        holiday(on: reference)
+    }
+
+    /// Die nächsten Ferien, die noch nicht angefangen haben.
+    func nextHoliday(from reference: Date = Date()) -> Holiday? {
+        let heute = SchoolCalendar.startOfDay(reference)
+        return holidays
+            .filter { ($0.orderedDates?.start ?? .distantPast) > heute }
+            .min { ($0.orderedDates?.start ?? .distantFuture) < ($1.orderedDates?.start ?? .distantFuture) }
+    }
+
+    /// Wie viele Tage es noch bis zum ersten Ferientag sind.
+    func daysUntilStart(of holiday: Holiday, from reference: Date = Date()) -> Int? {
+        guard let (start, _) = holiday.orderedDates else { return nil }
+        return SchoolCalendar.calendar.dateComponents(
+            [.day], from: SchoolCalendar.startOfDay(reference), to: start).day
+    }
+
+    /// Der erste Tag nach `day`, an dem wirklich Schule ist: Wochenenden
+    /// und andere Ferien werden übersprungen.
+    ///
+    /// `ignoring` lässt Ferien aus – gebraucht beim Bearbeiten, wo die alten
+    /// Angaben noch gespeichert sind.
+    func firstSchoolDay(after day: Date, ignoring holidayID: UUID? = nil) -> Date? {
+        let schultage = Set(settings.weekdays)
+        var kandidat = SchoolCalendar.startOfDay(day)
+
+        // Ein Jahr weit suchen; danach ist etwas anderes im Argen.
+        for _ in 0..<366 {
+            guard let naechster = SchoolCalendar.calendar.date(byAdding: .day, value: 1, to: kandidat) else {
+                return nil
+            }
+            kandidat = naechster
+            guard schultage.contains(SchoolCalendar.weekdayIndex(of: kandidat)) else { continue }
+            let inFerien = holidays.contains { $0.id != holidayID && $0.contains(kandidat) }
+            if inFerien { continue }
+            return kandidat
+        }
+        return nil
+    }
+
+    /// Der erste Schultag nach diesen Ferien.
+    func firstSchoolDay(after holiday: Holiday) -> Date? {
+        guard let (_, end) = holiday.orderedDates else { return nil }
+        return firstSchoolDay(after: end, ignoring: holiday.id)
+    }
+
+    func saveHoliday(_ holiday: Holiday) {
+        var holiday = holiday
+        holiday.updatedAt = Date()
+        // Vertauschte Angaben gleich geradeziehen.
+        if let (start, end) = holiday.orderedDates {
+            holiday.startDayKey = SchoolCalendar.dayKey(start)
+            holiday.endDayKey = SchoolCalendar.dayKey(end)
+        }
+
+        if let index = holidays.firstIndex(where: { $0.id == holiday.id }) {
+            holidays[index] = holiday
+        } else {
+            holidays.append(holiday)
+        }
+        scheduleSave()
+        syncReminders()
+    }
+
+    func deleteHoliday(id: UUID) {
+        holidays.removeAll { $0.id == id }
+        scheduleSave()
+        syncReminders()
+    }
+
+    // MARK: - Erinnerungen
+
     /// Übergibt iOS die anstehenden Erinnerungen – nach jeder Änderung
     /// und einmal beim Start, damit beides immer zusammenpasst.
     func syncReminders() {
-        let liste = events
         let namen = Dictionary(uniqueKeysWithValues: subjects.map { ($0.id, $0.displayName) })
+        var liste = events.compactMap { event in
+            event.reminderItem(subjectName: event.subjectID.flatMap { namen[$0] })
+        }
+        liste.append(contentsOf: holidays.compactMap(\.reminderItem))
+
         let erlaubt = settings.remindersEnabled
         Task {
-            await Reminders.reschedule(events: liste,
-                                       subjectName: { id in id.flatMap { namen[$0] } },
-                                       enabled: erlaubt)
+            await Reminders.reschedule(items: liste, enabled: erlaubt)
         }
     }
 
@@ -646,6 +742,7 @@ final class AppStore: ObservableObject {
         noHomeworkSubjects = data.noHomeworkSubjects
         notes = data.notes
         events = data.events
+        holidays = data.holidays
         profile = data.profile
         settings = data.settings
         // Die Anmeldung bleibt, wie sie auf diesem Gerät eingestellt ist:
@@ -676,6 +773,7 @@ final class AppStore: ObservableObject {
                 noHomeworkSubjects: noHomeworkSubjects,
                 notes: notes,
                 events: events,
+                holidays: holidays,
                 profile: profile,
                 settings: settings,
                 lock: lock)

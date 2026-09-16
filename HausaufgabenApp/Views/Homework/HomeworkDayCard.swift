@@ -127,7 +127,12 @@ struct HomeworkDayCard: View {
     /// Kurzfassung für den zugeklappten Zustand.
     @ViewBuilder
     private var collapsedSummary: some View {
-        if isMarkedFree {
+        if let ferien = store.holiday(on: day) {
+            // In den Ferien ist die Frage nach Hausaufgaben meist erledigt.
+            Label(ferien.displayName, systemImage: "sun.max.fill")
+                .font(.footnote)
+                .foregroundStyle(Holiday.tint)
+        } else if isMarkedFree {
             Label("Keine Hausaufgaben", systemImage: "checkmark.circle.fill")
                 .font(.footnote)
                 .foregroundStyle(.tint)

@@ -16,6 +16,8 @@ struct AppData: Codable {
     var notes: [Note]
     /// Termine im Kalender (Arbeiten, Abgaben, Ausflüge).
     var events: [CalendarEvent]
+    /// Ferien mit Anfang und Ende.
+    var holidays: [Holiday]
     /// Die eigenen Angaben (Name, Klasse, Telefon …).
     var profile: Profile
     var settings: AppSettings
@@ -32,6 +34,7 @@ struct AppData: Codable {
          noHomeworkSubjects: Set<String> = [],
          notes: [Note] = [],
          events: [CalendarEvent] = [],
+         holidays: [Holiday] = [],
          profile: Profile = Profile(),
          settings: AppSettings = AppSettings(),
          lock: LockSettings = LockSettings()) {
@@ -43,6 +46,7 @@ struct AppData: Codable {
         self.noHomeworkSubjects = noHomeworkSubjects
         self.notes = notes
         self.events = events
+        self.holidays = holidays
         self.profile = profile
         self.settings = settings
         self.lock = lock
@@ -58,6 +62,7 @@ struct AppData: Codable {
         noHomeworkSubjects = try container.decodeIfPresent(Set<String>.self, forKey: .noHomeworkSubjects) ?? []
         notes = try container.decodeIfPresent([Note].self, forKey: .notes) ?? []
         events = try container.decodeIfPresent([CalendarEvent].self, forKey: .events) ?? []
+        holidays = try container.decodeIfPresent([Holiday].self, forKey: .holidays) ?? []
         profile = try container.decodeIfPresent(Profile.self, forKey: .profile) ?? Profile()
         settings = try container.decodeIfPresent(AppSettings.self, forKey: .settings) ?? AppSettings()
         lock = try container.decodeIfPresent(LockSettings.self, forKey: .lock) ?? LockSettings()
@@ -110,6 +115,16 @@ struct AppData: Codable {
                 event.startMinutes = nil
             }
             return event
+        }
+
+        // Ferien ohne gültigen Zeitraum wären nur verwirrend.
+        holidays = holidays.compactMap { holiday in
+            var holiday = holiday
+            guard let (start, end) = holiday.orderedDates else { return nil }
+            // Vertauschte Angaben werden beim Laden geradegerückt.
+            holiday.startDayKey = SchoolCalendar.dayKey(start)
+            holiday.endDayKey = SchoolCalendar.dayKey(end)
+            return holiday
         }
     }
 }

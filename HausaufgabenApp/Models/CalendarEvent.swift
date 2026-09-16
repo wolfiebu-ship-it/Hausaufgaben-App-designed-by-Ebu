@@ -38,8 +38,9 @@ enum EventKind: String, Codable, Hashable, CaseIterable, Identifiable {
         case .exam:     return Color(lightHex: 0xC0392B, darkHex: 0xFF9E90)
         case .test:     return Color(lightHex: 0xB15A0E, darkHex: 0xFFBB72)
         case .deadline: return Color(lightHex: 0x7A3AC9, darkHex: 0xC8A2FB)
-        case .trip:     return Color(lightHex: 0x217A4B, darkHex: 0x74DFA2)
-        case .free:     return Color(lightHex: 0x0E7B72, darkHex: 0x5DDCCB)
+        case .trip:     return Color(lightHex: 0x8A5A2B, darkHex: 0xDFB183)
+        // Frei ist frei: dasselbe Grün wie bei den Ferien.
+        case .free:     return Holiday.tint
         case .other:    return Color(lightHex: 0x4A5A70, darkHex: 0xADBCD0)
         }
     }
@@ -49,8 +50,8 @@ enum EventKind: String, Codable, Hashable, CaseIterable, Identifiable {
         case .exam:     return Color(lightHex: 0xFDE7E3, darkHex: 0x42201C)
         case .test:     return Color(lightHex: 0xFDEDDA, darkHex: 0x3E2A13)
         case .deadline: return Color(lightHex: 0xF1E8FC, darkHex: 0x2C1B47)
-        case .trip:     return Color(lightHex: 0xE2F5E8, darkHex: 0x15301F)
-        case .free:     return Color(lightHex: 0xDDF3F0, darkHex: 0x0F2F2B)
+        case .trip:     return Color(lightHex: 0xF6EDE1, darkHex: 0x34261A)
+        case .free:     return Holiday.fill
         case .other:    return Color(lightHex: 0xEAEEF4, darkHex: 0x232B36)
         }
     }
