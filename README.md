@@ -37,7 +37,12 @@ Ein eigener Tab für alles, was an einem bestimmten Tag ansteht – Arbeiten, Te
 - **Der Monat auf einen Blick.** Unter jedem Tag stehen kleine Punkte: **grün** für einen Ferientag, je ein farbiger für einen Termin (die Farbe sagt, was für einer) und ein grauer, wenn an dem Tag noch Hausaufgaben offen sind. Was die Punkte bedeuten, steht als Legende direkt darunter. Der heutige Tag ist umrandet.
 - **Termin eintragen:** Titel, Art (Arbeit, Test, Abgabe, Ausflug, Schulfrei, Sonstiges), Fach, Tag, wahlweise eine Uhrzeit und eine Notiz für Einzelheiten. Jede Art hat ihre Farbe: rot Arbeit, orange Test, lila Abgabe, braun Ausflug, grün Schulfrei, grau Sonstiges.
 - **„Als Nächstes"** steht über dem Monat und zeigt die drei nächsten Termine mit „in 5 Tagen“, „morgen“, „heute“.
-- **Tippst du einen Tag an**, siehst du darunter alles zu diesem Tag: die Termine, die Hausaufgaben (zum Nachsehen – geändert werden sie im Hausaufgabenheft) und die Stunden aus dem Stundenplan.
+- **Tippst du einen Tag an**, steht direkt unter dem Monat, was für ein Tag das ist und was ansteht:
+  - ein **grüner Tag** sagt, warum er frei ist – „Herbstferien · Tag 4 von 12“, „Tag der Deutschen Einheit · Gesetzlicher Feiertag in Nordrhein-Westfalen“. Fällt ein Feiertag mitten in die Ferien, steht beides da („… · fällt in die Ferien“);
+  - ein **Samstag oder Sonntag** sagt „Wochenende · Kein Schultag“;
+  - darunter die Termine des Tages, die Hausaufgaben (zum Nachsehen – geändert werden sie im Hausaufgabenheft) und die Stunden aus dem Stundenplan.
+  
+  Im Kopf der Karte steht bei freien Tagen zusätzlich ein grünes **„Frei“**.
 
 #### Ferien
 
@@ -57,7 +62,7 @@ Ferien sind keine einzelnen Termine, sondern Zeiträume – dafür gibt es einen
 - **Direkt unter dem Monat steht, was die Punkte bedeuten:** grün = Ferien, farbig = ein Termin, grau = an dem Tag sind noch Hausaufgaben offen. Ausführlicher steht dasselbe in den Einstellungen unter „Die Punkte im Kalender“.
 - **Unter dem Monat** steht die Liste aller Ferien: Name, „Von Montag, 19. Oktober 2026“, „Bis Freitag, 30. Oktober 2026“, die Dauer und der erste Schultag danach. Rechts daneben ein Countdown: „in 33 Tagen“, „ab morgen“, „Tag 3 von 12“ oder „vorbei“.
 - **Der erste Schultag danach** wird richtig gerechnet: Wochenenden werden übersprungen (und der Samstag nur mitgezählt, wenn du ihn in den Einstellungen als Schultag hast), ebenso direkt anschließende weitere Ferien.
-- **Tippst du einen Ferientag an**, steht darunter „Erster Ferientag · 12 Tage lang“, „Ferien · Tag 3 von 12“ oder „Letzter Ferientag · wieder Schule am Montag“. An Ferientagen blendet der Kalender die Stunden aus dem Stundenplan aus, und im Hausaufgabenheft zeigt der zugeklappte Tag den Namen der Ferien.
+- **Tippst du einen Ferientag an**, steht darunter „Erster Ferientag · 12 Tage lang“, „Ferien · Tag 3 von 12“ oder „Letzter Ferientag · wieder Schule am Montag“ – ein Tipp darauf öffnet die Ferien zum Ändern. An Ferientagen blendet der Kalender die Stunden aus dem Stundenplan aus, und im Hausaufgabenheft zeigt der zugeklappte Tag den Namen der Ferien.
 - **Auch Ferien können erinnern** – voreingestellt am Abend vor dem ersten Ferientag.
 - Vertauschst du Anfang und Ende, rückt Homy es beim Sichern gerade.
 
@@ -70,6 +75,7 @@ In den Einstellungen lässt sich das **Bundesland** einstellen. Damit trägt Hom
 - Das geht **ohne Internet und ohne hinterlegte Listen**: Die festen Feiertage stehen im Kalender, die beweglichen hängen alle am Ostersonntag, und der lässt sich für jedes Jahr ausrechnen (gregorianische Osterformel). Deshalb stimmt es auch in den kommenden Jahren, ohne dass jemand etwas nachpflegen muss.
 - Berücksichtigt sind die neun bundesweiten Feiertage plus die des jeweiligen Landes: Heilige Drei Könige, Internationaler Frauentag, Ostersonntag und Pfingstsonntag (Brandenburg), Fronleichnam, Mariä Himmelfahrt, Weltkindertag, Reformationstag, Allerheiligen und der Buß- und Bettag in Sachsen.
 - In den Einstellungen stehen gleich **die nächsten vier Feiertage** mit Wochentag und Datum – so siehst du sofort, ob das Richtige eingestellt ist.
+- Tippst du im Kalender auf einen Feiertag, steht sein **Name** darunter, dazu „Gesetzlicher Feiertag in …“.
 - An Feiertagen blendet der Kalender die Stunden aus dem Stundenplan aus, und der erste Schultag nach den Ferien überspringt sie.
 
 > **Die Schulferien kann Homy nicht ausrechnen.** Die legt jedes Land für jedes Schuljahr neu fest; sie folgen keiner Formel. Erfundene Termine wären schlimmer als gar keine – darum trägst du die Ferien einmal aus dem Ferienplan deiner Schule ein (siehe oben). Ohne eingestelltes Bundesland zeigt Homy gar keine Feiertage, statt womöglich falsche.

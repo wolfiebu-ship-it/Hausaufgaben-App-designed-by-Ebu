@@ -20,8 +20,8 @@ struct CalendarView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     monthCard
-                    upcomingCard
                     dayCard
+                    upcomingCard
                     holidayCard
                 }
                 .padding(16)
@@ -303,9 +303,9 @@ struct CalendarView: View {
             dayHeader
             dayHolidayNote
 
-            if dayEvents.isEmpty {
+            if dayEvents.isEmpty, !hasDayBanner {
                 emptyDayHint
-            } else {
+            } else if !dayEvents.isEmpty {
                 ForEach(dayEvents) { event in
                     Divider().padding(.leading, 52)
                     Button {
@@ -332,20 +332,67 @@ struct CalendarView: View {
 
     private var dayEvents: [CalendarEvent] { store.events(on: selectedDay) }
 
-    /// Steht der gewählte Tag in den Ferien oder ist er ein Feiertag?
+    /// Was für ein Tag ist das? Ferien, Feiertag, Wochenende – hier steht es.
+    /// Fällt ein Feiertag in die Ferien, steht beides da.
     @ViewBuilder
     private var dayHolidayNote: some View {
-        if let feiertag = store.publicHoliday(on: selectedDay),
-           store.holiday(on: selectedDay) == nil {
-            freeDayBanner(title: feiertag.name,
-                          detail: feiertag.note.map { "Gesetzlicher Feiertag – \($0)" }
-                              ?? "Gesetzlicher Feiertag in \(store.settings.federalState.name)",
-                          action: nil)
-        } else if let ferien = store.holiday(on: selectedDay) {
+        if let ferien = store.holiday(on: selectedDay) {
             freeDayBanner(title: ferien.displayName,
                           detail: holidayDayText(ferien),
                           action: { editingHoliday = ferien })
         }
+
+        if let feiertag = store.publicHoliday(on: selectedDay) {
+            freeDayBanner(title: feiertag.name,
+                          detail: publicHolidayDetail(feiertag),
+                          action: nil)
+        }
+
+        // Kein freier Tag, aber auch kein Schultag: das Wochenende.
+        if !store.isSchoolFree(on: selectedDay), isWeekend {
+            weekendBanner
+        }
+    }
+
+    private func publicHolidayDetail(_ feiertag: PublicHoliday) -> String {
+        var text = "Gesetzlicher Feiertag"
+        if store.settings.federalState.isSet {
+            text += " in \(store.settings.federalState.name)"
+        }
+        if let note = feiertag.note {
+            text += " – \(note)"
+        }
+        if store.holiday(on: selectedDay) != nil {
+            text += " · fällt in die Ferien"
+        }
+        return text
+    }
+
+    /// Ist der gewählte Tag laut Einstellungen kein Schultag?
+    private var isWeekend: Bool {
+        !store.settings.weekdays.contains(SchoolCalendar.weekdayIndex(of: selectedDay))
+    }
+
+    private var weekendBanner: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "moon.zzz.fill")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 30, height: 30)
+                .background(Color(.tertiarySystemFill), in: RoundedRectangle(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Wochenende")
+                    .font(.subheadline.weight(.semibold))
+                Text("Kein Schultag")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 14)
+        .padding(.bottom, 10)
     }
 
     /// Der grüne Streifen über dem Tag – für Ferien und Feiertage gleich.
@@ -412,6 +459,15 @@ struct CalendarView: View {
 
             Spacer(minLength: 0)
 
+            if store.isSchoolFree(on: selectedDay) {
+                Text("Frei")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(Holiday.tint)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Holiday.fill, in: Capsule())
+            }
+
             if SchoolCalendar.isToday(selectedDay) {
                 Text("Heute")
                     .font(.caption2.weight(.bold))
@@ -424,6 +480,12 @@ struct CalendarView: View {
         .padding(.horizontal, 14)
         .padding(.top, 12)
         .padding(.bottom, 10)
+    }
+
+    /// Steht über dem Tag schon ein Hinweis (Ferien, Feiertag, Wochenende)?
+    /// Dann braucht es das „hier steht nichts“ nicht mehr.
+    private var hasDayBanner: Bool {
+        store.isSchoolFree(on: selectedDay) || isWeekend
     }
 
     private var emptyDayHint: some View {
