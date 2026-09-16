@@ -678,6 +678,7 @@ final class AppStore: ObservableObject {
             guard schultage.contains(SchoolCalendar.weekdayIndex(of: kandidat)) else { continue }
             let inFerien = holidays.contains { $0.id != holidayID && $0.contains(kandidat) }
             if inFerien { continue }
+            if publicHoliday(on: kandidat) != nil { continue }
             return kandidat
         }
         return nil
@@ -687,6 +688,34 @@ final class AppStore: ObservableObject {
     func firstSchoolDay(after holiday: Holiday) -> Date? {
         guard let (_, end) = holiday.orderedDates else { return nil }
         return firstSchoolDay(after: end, ignoring: holiday.id)
+    }
+
+    // MARK: - Gesetzliche Feiertage
+
+    /// Ist dieser Tag ein gesetzlicher Feiertag im eingestellten Bundesland?
+    ///
+    /// Diese Tage rechnet Homy selbst aus – eingetragen werden müssen nur
+    /// die Schulferien.
+    func publicHoliday(on day: Date) -> PublicHoliday? {
+        PublicHolidays.holiday(on: day, state: settings.federalState)
+    }
+
+    /// Die nächsten Feiertage – für die Vorschau in den Einstellungen.
+    func upcomingPublicHolidays(limit: Int = 4) -> [PublicHoliday] {
+        PublicHolidays.upcoming(state: settings.federalState, limit: limit)
+    }
+
+    /// Ist an diesem Tag schulfrei, und wie heißt der Tag?
+    /// Deckt Ferien und Feiertage ab – beides ist in Homy grün.
+    func freeDayName(on day: Date) -> String? {
+        if let ferien = holiday(on: day) { return ferien.displayName }
+        if let feiertag = publicHoliday(on: day) { return feiertag.name }
+        return nil
+    }
+
+    /// Ist an diesem Tag überhaupt Schule?
+    func isSchoolFree(on day: Date) -> Bool {
+        freeDayName(on: day) != nil
     }
 
     func saveHoliday(_ holiday: Holiday) {

@@ -63,6 +63,8 @@ struct AppSettings: Codable, Hashable {
     var showEmptySubjects: Bool
     /// Helles oder dunkles Erscheinungsbild der App.
     var appearance: AppearanceMode
+    /// Das Bundesland – davon hängen die gesetzlichen Feiertage ab.
+    var federalState: FederalState
     /// Erinnerungen an Kalendertermine verschicken.
     var remindersEnabled: Bool
     /// Welche Erinnerung ein neuer Termin von sich aus bekommt.
@@ -74,6 +76,7 @@ struct AppSettings: Codable, Hashable {
          showTimes: Bool = true,
          showEmptySubjects: Bool = true,
          appearance: AppearanceMode = .system,
+         federalState: FederalState = .none,
          remindersEnabled: Bool = true,
          defaultReminder: ReminderOffset = .eveningBefore,
          periodTimes: [PeriodTime]? = nil) {
@@ -82,6 +85,7 @@ struct AppSettings: Codable, Hashable {
         self.showTimes = showTimes
         self.showEmptySubjects = showEmptySubjects
         self.appearance = appearance
+        self.federalState = federalState
         self.remindersEnabled = remindersEnabled
         self.defaultReminder = defaultReminder
         self.periodTimes = periodTimes ?? PeriodTime.defaultTimes(count: periodCount)
@@ -120,6 +124,7 @@ struct AppSettings: Codable, Hashable {
         showTimes = try container.decodeIfPresent(Bool.self, forKey: .showTimes) ?? true
         showEmptySubjects = try container.decodeIfPresent(Bool.self, forKey: .showEmptySubjects) ?? true
         appearance = try container.decodeIfPresent(AppearanceMode.self, forKey: .appearance) ?? .system
+        federalState = try container.decodeIfPresent(FederalState.self, forKey: .federalState) ?? .none
         remindersEnabled = try container.decodeIfPresent(Bool.self, forKey: .remindersEnabled) ?? true
         defaultReminder = try container.decodeIfPresent(ReminderOffset.self, forKey: .defaultReminder)
             ?? .eveningBefore

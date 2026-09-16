@@ -63,6 +63,19 @@ Ferien sind keine einzelnen Termine, sondern Zeiträume – dafür gibt es einen
 
 > **Die Ferientermine bringt Homy nicht mit.** Sie sind in jedem Bundesland und jedem Schuljahr anders, und erfundene Daten wären schlimmer als gar keine – darum trägst du sie einmal aus dem Ferienplan deiner Schule ein. Für einen einzelnen freien Tag (beweglicher Ferientag, Feiertag) reicht auch ein normaler Termin mit der Art „Schulfrei“.
 
+#### Bundesland und Feiertage
+
+In den Einstellungen lässt sich das **Bundesland** einstellen. Damit trägt Homy die **gesetzlichen Feiertage** von selbst in den Kalender ein – grün wie die Ferien, mit Namen unter dem Tag.
+
+- Das geht **ohne Internet und ohne hinterlegte Listen**: Die festen Feiertage stehen im Kalender, die beweglichen hängen alle am Ostersonntag, und der lässt sich für jedes Jahr ausrechnen (gregorianische Osterformel). Deshalb stimmt es auch in den kommenden Jahren, ohne dass jemand etwas nachpflegen muss.
+- Berücksichtigt sind die neun bundesweiten Feiertage plus die des jeweiligen Landes: Heilige Drei Könige, Internationaler Frauentag, Ostersonntag und Pfingstsonntag (Brandenburg), Fronleichnam, Mariä Himmelfahrt, Weltkindertag, Reformationstag, Allerheiligen und der Buß- und Bettag in Sachsen.
+- In den Einstellungen stehen gleich **die nächsten vier Feiertage** mit Wochentag und Datum – so siehst du sofort, ob das Richtige eingestellt ist.
+- An Feiertagen blendet der Kalender die Stunden aus dem Stundenplan aus, und der erste Schultag nach den Ferien überspringt sie.
+
+> **Die Schulferien kann Homy nicht ausrechnen.** Die legt jedes Land für jedes Schuljahr neu fest; sie folgen keiner Formel. Erfundene Termine wären schlimmer als gar keine – darum trägst du die Ferien einmal aus dem Ferienplan deiner Schule ein (siehe oben). Ohne eingestelltes Bundesland zeigt Homy gar keine Feiertage, statt womöglich falsche.
+
+> Zwei Feinheiten, die Homy nicht kennen kann: In **Bayern** ist Mariä Himmelfahrt nur in überwiegend katholischen Gemeinden frei – das steht als Hinweis dabei. In einzelnen Gemeinden in **Sachsen und Thüringen** kann zusätzlich Fronleichnam frei sein; das ist nicht mit drin. Genauso wenig örtliche Feiertage wie das Augsburger Friedensfest.
+
 #### Die Erinnerung
 
 Trägst du einen Termin oder Ferien ein, meldet sich Homy von selbst rechtzeitig – auch wenn die App gar nicht offen ist.
@@ -143,12 +156,13 @@ Was dabei wichtig ist – ehrlich gesagt:
 - **Anmeldung** – Code einrichten, Schnellstart einschalten, sofort zusperren (siehe oben).
 - **Erinnerungen** – an Termine und Ferien erinnern lassen, Voreinstellung für neue Einträge.
 - **Fächer** – der zweite Weg zur Fächerliste (der erste ist im Stundenplan oben links).
+- **Bundesland** – bestimmt die gesetzlichen Feiertage im Kalender (siehe oben).
 - **Meine Daten** – ein eigener Bereich für die Angaben über dich: Vor- und Nachname, Klasse, Schule, Telefon, E-Mail, Adresse und ein freies Feld für alles Weitere (Spind-Nummer, Buslinie, Notfallkontakt). Alles freiwillig, nichts muss ausgefüllt werden.
 
   > Diese Angaben bleiben auf dem Gerät. Die App verschickt nichts und hat keine Verbindung ins Internet. Nur wenn du selbst eine Sicherung speicherst, stehen sie mit in dieser Datei – gib sie also nicht unbedacht weiter.
 
 - **Die Felder im Hausaufgabenheft** – erklärt, was das gelbe und das blaue Feld bedeuten.
-- **Die Punkte im Kalender** – erklärt den grünen, den farbigen und den grauen Punkt.
+- **Die Punkte im Kalender** – erklärt den grünen (schulfrei), den farbigen (Termin) und den grauen Punkt (offene Hausaufgaben).
 - **Hell oder dunkel:** ganz oben unter „Darstellung“ lässt sich die App fest auf hell oder dunkel stellen – oder auf „Automatisch“, dann folgt sie der Einstellung des Geräts.
 - Stunden pro Tag, Samstag, Uhrzeiten, Unterrichtszeiten.
 - **Sicherung speichern / wiederherstellen** als Datei (z. B. in iCloud Drive). Wichtig, denn die Daten liegen nur auf dem Gerät.
@@ -228,6 +242,7 @@ HausaufgabenApp/
 │   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Schnellstart
 │   ├── CalendarEvent.swift      Ein Termin samt Erinnerungszeitpunkt
 │   ├── Holiday.swift            Ferien: Zeitraum von … bis …
+│   ├── FederalState.swift       Die 16 Bundesländer
 │   └── AppData.swift            Alles zusammen (auch das Format der Sicherung)
 ├── Store/
 │   ├── AppStore.swift           Hält die Daten, speichert und lädt sie
@@ -239,6 +254,7 @@ HausaufgabenApp/
 │   ├── HomyLogo.swift           Das Zeichen von Homy, gezeichnet statt als Bild
 │   ├── BiometricAuth.swift      Face ID / Touch ID über LocalAuthentication
 │   ├── Reminders.swift          Benachrichtigungen bei iOS anmelden
+│   ├── PublicHolidays.swift     Feiertage ausrechnen (Osterformel je Land)
 │   ├── DoodleBackground.swift   Schulmotive blass hinter den Schreib-Seiten
 │   ├── TimetableRecognizer.swift  Texterkennung und Rasteranalyse für den Scan
 │   └── BackupDocument.swift     Sicherungsdatei

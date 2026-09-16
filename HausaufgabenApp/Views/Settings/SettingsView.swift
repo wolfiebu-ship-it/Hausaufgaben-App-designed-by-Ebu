@@ -31,6 +31,7 @@ struct SettingsView: View {
 
                 profileSection
                 subjectsSection
+                stateSection
                 remindersSection
                 lockSection
                 legendSection
@@ -109,6 +110,81 @@ struct SettingsView: View {
         } footer: {
             Text("Name, Kürzel, Farbe, Lehrkraft und Raum. Im Stundenplan oben links kommst du auch hierhin.")
         }
+    }
+
+    // MARK: - Bundesland
+
+    /// Das Bundesland: davon hängen die gesetzlichen Feiertage ab.
+    private var stateSection: some View {
+        Section {
+            Picker(selection: stateBinding) {
+                Text("Nicht angegeben").tag(FederalState.none)
+                ForEach(FederalState.allStates) { land in
+                    Text(land.name).tag(land)
+                }
+            } label: {
+                Label("Bundesland", systemImage: "map.fill")
+            }
+            .pickerStyle(.navigationLink)
+
+            if store.settings.federalState.isSet {
+                ForEach(store.upcomingPublicHolidays(limit: 4)) { feiertag in
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        Circle()
+                            .fill(Holiday.tint)
+                            .frame(width: 7, height: 7)
+                            .padding(.top, 5)
+
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(feiertag.name)
+                                .font(.subheadline)
+                            if let note = feiertag.note {
+                                Text(note)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+
+                        Spacer(minLength: 0)
+
+                        Text(Holiday.longWeekdayText(feiertag.date))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.trailing)
+                    }
+                }
+            }
+        } header: {
+            Text("Bundesland")
+        } footer: {
+            Text(stateFooter)
+        }
+    }
+
+    private var stateBinding: Binding<FederalState> {
+        Binding(get: { store.settings.federalState },
+                set: { neu in
+                    store.settings.federalState = neu
+                    Haptics.tap()
+                })
+    }
+
+    private var stateFooter: String {
+        let land = store.settings.federalState
+        guard land.isSet else {
+            return "Stell dein Bundesland ein, dann trägt Homy die gesetzlichen Feiertage von selbst in den Kalender ein – grün, wie die Ferien.\n\nDie Schulferien kann dir das nicht abnehmen: Die legt jedes Land für jedes Schuljahr neu fest, und erfundene Termine wären schlimmer als gar keine. Die trägst du einmal aus dem Ferienplan deiner Schule im Kalender ein."
+        }
+
+        var text = "Oben stehen die nächsten Feiertage in \(land.name). Homy rechnet sie selbst aus – auch für kommende Jahre, ohne Internet und ohne dass du etwas eintragen musst. Im Kalender sind sie grün wie die Ferien.\n\n"
+        text += "Die Schulferien stecken da nicht mit drin: Die legt jedes Land für jedes Schuljahr neu fest, sie lassen sich nicht ausrechnen. Trag sie einmal aus dem Ferienplan deiner Schule im Kalender ein – dann stehen sie."
+
+        if land == .bayern {
+            text += "\n\nIn Bayern ist Mariä Himmelfahrt nur in überwiegend katholischen Gemeinden frei."
+        }
+        if land == .sachsen || land == .thueringen {
+            text += "\n\nIn einzelnen Gemeinden kann zusätzlich Fronleichnam frei sein – das steht hier nicht mit drin."
+        }
+        return text
     }
 
     // MARK: - Erinnerungen
@@ -393,8 +469,8 @@ struct SettingsView: View {
     private var dotLegendSection: some View {
         Section {
             dotRow(color: Holiday.tint,
-                   title: "Grün: Ferien",
-                   text: "Jeder Ferientag bekommt einen grünen Punkt – der erste, der letzte und alle dazwischen. Die ganzen Ferien sind außerdem grün hinterlegt, so siehst du auf einen Blick, wo sie anfangen und wo sie aufhören.")
+                   title: "Grün: schulfrei",
+                   text: "Ferien und gesetzliche Feiertage. Jeder Ferientag bekommt einen grünen Punkt – der erste, der letzte und alle dazwischen; die ganzen Ferien sind zusätzlich grün hinterlegt. Die Feiertage kommen von allein, sobald oben dein Bundesland eingestellt ist.")
 
             dotRow(color: EventKind.exam.tint,
                    title: "Farbig: ein Termin",

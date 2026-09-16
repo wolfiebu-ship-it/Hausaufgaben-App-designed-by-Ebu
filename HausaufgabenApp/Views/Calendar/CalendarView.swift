@@ -133,7 +133,7 @@ struct CalendarView: View {
         let isToday = SchoolCalendar.isToday(day)
         let dayEvents = store.events(on: day)
         let openHomework = store.homeworkEntries(on: day).filter { !$0.isDone && $0.hasText }.count
-        let isHoliday = store.holiday(on: day) != nil
+        let isHoliday = store.isSchoolFree(on: day)
 
         return Button {
             Haptics.tap()
@@ -198,7 +198,7 @@ struct CalendarView: View {
     /// Was die Punkte unter den Tagen bedeuten.
     private var dotLegend: some View {
         HStack(spacing: 14) {
-            legendItem(color: Holiday.tint, text: "Ferien")
+            legendItem(color: Holiday.tint, text: "Ferien / Feiertag")
             legendItem(color: EventKind.exam.tint, text: "Termin")
             legendItem(color: Color.secondary.opacity(0.55), text: "Hausaufgaben offen")
             Spacer(minLength: 0)
@@ -207,7 +207,7 @@ struct CalendarView: View {
         .foregroundStyle(.secondary)
         .padding(.top, 2)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Die Punkte unter den Tagen: grün heißt Ferien, ein farbiger Punkt ein Termin, ein grauer offene Hausaufgaben")
+        .accessibilityLabel("Die Punkte unter den Tagen: grün heißt Ferien oder Feiertag, ein farbiger Punkt ein Termin, ein grauer offene Hausaufgaben")
     }
 
     private func legendItem(color: Color, text: String) -> some View {
@@ -223,7 +223,7 @@ struct CalendarView: View {
     /// am Stück, ohne dass es mit der Auswahl kollidiert.
     @ViewBuilder
     private func holidayBackground(_ day: Date) -> some View {
-        if store.holiday(on: day) != nil {
+        if store.isSchoolFree(on: day) {
             RoundedRectangle(cornerRadius: 9).fill(Holiday.fill)
         } else {
             Color.clear
@@ -237,6 +237,8 @@ struct CalendarView: View {
             text += ", \(ferien.displayName)"
             if ferien.isStart(day) { text += ", erster Ferientag" }
             if ferien.isEnd(day) { text += ", letzter Ferientag" }
+        } else if let feiertag = store.publicHoliday(on: day) {
+            text += ", \(feiertag.name), schulfrei"
         }
         if events > 0 { text += ", \(events) \(events == 1 ? "Termin" : "Termine")" }
         if homework > 0 { text += ", \(homework) offene Hausaufgaben" }
@@ -330,39 +332,59 @@ struct CalendarView: View {
 
     private var dayEvents: [CalendarEvent] { store.events(on: selectedDay) }
 
-    /// Steht der gewählte Tag in den Ferien?
+    /// Steht der gewählte Tag in den Ferien oder ist er ein Feiertag?
     @ViewBuilder
     private var dayHolidayNote: some View {
-        if let ferien = store.holiday(on: selectedDay) {
-            Button {
-                editingHoliday = ferien
-            } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: "sun.max.fill")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(Holiday.tint)
-                        .frame(width: 30, height: 30)
-                        .background(Holiday.fill, in: RoundedRectangle(cornerRadius: 8))
+        if let feiertag = store.publicHoliday(on: selectedDay),
+           store.holiday(on: selectedDay) == nil {
+            freeDayBanner(title: feiertag.name,
+                          detail: feiertag.note.map { "Gesetzlicher Feiertag – \($0)" }
+                              ?? "Gesetzlicher Feiertag in \(store.settings.federalState.name)",
+                          action: nil)
+        } else if let ferien = store.holiday(on: selectedDay) {
+            freeDayBanner(title: ferien.displayName,
+                          detail: holidayDayText(ferien),
+                          action: { editingHoliday = ferien })
+        }
+    }
 
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(ferien.displayName)
-                            .font(.subheadline.weight(.semibold))
-                        Text(holidayDayText(ferien))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+    /// Der grüne Streifen über dem Tag – für Ferien und Feiertage gleich.
+    @ViewBuilder
+    private func freeDayBanner(title: String, detail: String, action: (() -> Void)?) -> some View {
+        let inhalt = HStack(spacing: 10) {
+            Image(systemName: "sun.max.fill")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Holiday.tint)
+                .frame(width: 30, height: 30)
+                .background(Holiday.fill, in: RoundedRectangle(cornerRadius: 8))
 
-                    Spacer(minLength: 0)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
 
-                    Image(systemName: "chevron.right")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.tertiary)
-                }
-                .padding(.horizontal, 14)
-                .padding(.bottom, 10)
-                .contentShape(Rectangle())
+            Spacer(minLength: 0)
+
+            if action != nil {
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.bottom, 10)
+
+        if let action {
+            Button(action: action) {
+                inhalt.contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+        } else {
+            inhalt
         }
     }
 
@@ -468,8 +490,8 @@ struct CalendarView: View {
 
     @ViewBuilder
     private var lessonSummary: some View {
-        // In den Ferien fällt der Unterricht aus – dann wäre die Liste falsch.
-        if !daySubjects.isEmpty, store.holiday(on: selectedDay) == nil {
+        // An freien Tagen fällt der Unterricht aus – dann wäre die Liste falsch.
+        if !daySubjects.isEmpty, !store.isSchoolFree(on: selectedDay) {
             Divider().padding(.leading, 52)
             VStack(alignment: .leading, spacing: 7) {
                 Text("Stunden an diesem Tag")
@@ -527,6 +549,15 @@ struct CalendarView: View {
 
             Divider().padding(.leading, 14)
 
+            Text(holidayFooter)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+
+            Divider().padding(.leading, 14)
+
             Button(action: newHoliday) {
                 HStack(spacing: 10) {
                     Image(systemName: "plus.circle.fill")
@@ -544,6 +575,16 @@ struct CalendarView: View {
         }
         .background(Color(.secondarySystemGroupedBackground),
                     in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+    }
+
+    private var holidayFooter: String {
+        let land = store.settings.federalState
+        if land.isSet {
+            return "Die gesetzlichen Feiertage in \(land.name) rechnet Homy selbst aus und zeigt sie grün an. "
+                + "Die Schulferien legt jedes Land für jedes Schuljahr neu fest – die trägst du hier selbst ein."
+        }
+        return "Stell in den Einstellungen dein Bundesland ein, dann zeigt Homy die gesetzlichen Feiertage von selbst. "
+            + "Die Schulferien trägst du hier ein – die sind in jedem Land und jedem Schuljahr anders."
     }
 
     /// „läuft gerade“, „in 23 Tagen“, „vorbei“
