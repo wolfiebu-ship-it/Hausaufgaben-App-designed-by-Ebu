@@ -15,7 +15,8 @@ Geschrieben in Swift/SwiftUI als native App für iPhone **und** iPad. Alle Daten
 ### 1. Hausaufgaben eintragen
 
 - **Eine Seite pro Woche.** Ist die Woche voll, blätterst du einfach nach rechts zur nächsten Woche – mit einem Wisch oder über die Pfeile oben. Über den Titel („Diese Woche“) springst du per Kalender zu jeder beliebigen Woche.
-- **Tage zum Aufklappen.** Beim Öffnen sind alle Tage zugeklappt, sodass die ganze Woche auf einen Blick passt. Der zugeklappte Kopf zeigt schon, was ansteht: die Kürzel der Fächer mit Eintrag (Erledigtes blasser), die Anzahl offener Aufgaben, „Keine Hausaufgaben“ oder „Nichts eingetragen“. Ein Tipp auf den Tag klappt ihn zum Eintragen auf.
+- **Am Bildschirm mit Maus** (also am PC) stehen die Wochentage **untereinander und alle offen** – Montag, Dienstag, Mittwoch, Donnerstag, Freitag, jeder mit seinen Fächern zum Direkt-Hineinschreiben. Nichts klappt auf und zu, und der Inhalt läuft nicht über die ganze Bildschirmbreite auseinander. Erkannt wird das an `(min-width: 900px) and (hover: hover)`: Ein iPad im Querformat ist zwar breit, hat aber keinen Mauszeiger und bleibt darum bei der Tablet-Ansicht. *(Betrifft nur die Browser-Vorschau – die native App läuft auf iPhone und iPad.)*
+- **Tage zum Aufklappen** (auf iPhone und iPad). Beim Öffnen sind alle Tage zugeklappt, sodass die ganze Woche auf einen Blick passt. Der zugeklappte Kopf zeigt schon, was ansteht: die Kürzel der Fächer mit Eintrag (Erledigtes blasser), die Anzahl offener Aufgaben, „Keine Hausaufgaben“ oder „Nichts eingetragen“. Ein Tipp auf den Tag klappt ihn zum Eintragen auf.
 - **Die Kürzel stehen schon da.** Zu jedem Tag zeigt die App automatisch die Fächer, die du laut deinem Stundenplan an diesem Tag hast – als farbiges Kürzel links neben dem Eingabefeld. Du tippst nur noch die Aufgabe daneben.
 - Der heutige Tag ist farbig umrandet.
 - Erledigtes hakst du rechts mit einem Tipp ab.
