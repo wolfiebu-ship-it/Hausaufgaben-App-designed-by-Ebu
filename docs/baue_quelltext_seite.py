@@ -78,7 +78,9 @@ DIE FÜNF TABS
    Name (mit Vorschlägen), erster und letzter Ferientag – der letzte zählt mit.
    Das Formular zeigt in Worten Anfang, Ende, Dauer und den ersten Schultag danach;
    der überspringt Wochenenden und direkt anschließende Ferien und Feiertage.
-3. Stundenplan – Raster mit Wochentagen als Spalten und Stunden als Zeilen. Auf ein
+3. Stundenplan – die Seite heißt in der Überschrift "Stundenplan und Fächer", unten
+   in der Tab-Leiste steht sie zweizeilig als "Stundenplan &" / "Fächer".
+   Raster mit Wochentagen als Spalten und Stunden als Zeilen. Auf ein
    Feld tippen wählt das Fach; Raum und Lehrkraft lassen sich je Stunde abweichend
    setzen. Einstellbar: 1 bis 14 Stunden pro Tag, Samstag als sechster Schultag,
    Unterrichtszeiten je Stunde. Oben links führt ein Weg zu den Fächern, oben rechts
