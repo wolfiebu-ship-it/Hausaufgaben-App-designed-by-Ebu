@@ -20,13 +20,30 @@ struct PeriodTime: Codable, Hashable, Identifiable {
     /// Erzeugt einen üblichen Schultag: 45-Minuten-Stunden, 5 Minuten Wechselpause,
     /// nach der 2. und 4. Stunde eine große Pause.
     static func defaultTimes(count: Int) -> [PeriodTime] {
+        times(count: count)
+    }
+
+    /// Rechnet einen ganzen Schultag aus: ab wann, wie lange, wie viel Pause.
+    ///
+    /// Damit muss niemand vierzehn Stunden einzeln einstellen – einmal
+    /// „ab 8:00, 45 Minuten, 5 Minuten Pause“ angeben genügt.
+    static func times(count: Int,
+                      firstStartMinutes: Int = 8 * 60,
+                      lengthMinutes: Int = 45,
+                      breakMinutes: Int = 5,
+                      longBreakMinutes: Int = 15,
+                      longBreakAfter: Set<Int> = [2, 4]) -> [PeriodTime] {
         var result: [PeriodTime] = []
-        var start = 8 * 60 // 08:00 Uhr
-        for period in 1...max(1, count) {
-            let end = start + 45
+        var start = max(0, min(23 * 60, firstStartMinutes))
+        let länge = max(5, min(240, lengthMinutes))
+
+        for period in 1...max(1, min(14, count)) {
+            let end = min(24 * 60 - 1, start + länge)
             result.append(PeriodTime(period: period, startMinutes: start, endMinutes: end))
-            let isBigBreak = (period == 2 || period == 4)
-            start = end + (isBigBreak ? 15 : 5)
+            let pause = longBreakAfter.contains(period) ? longBreakMinutes : breakMinutes
+            start = end + max(0, pause)
+            // Über Mitternacht hinaus ergibt kein Schultag Sinn.
+            if start >= 24 * 60 - länge { break }
         }
         return result
     }

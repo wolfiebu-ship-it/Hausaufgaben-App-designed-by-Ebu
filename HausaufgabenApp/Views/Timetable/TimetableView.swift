@@ -6,6 +6,7 @@ struct TimetableView: View {
     @State private var editingSlot: LessonSlot?
     @State private var showScanner = false
     @State private var showSubjects = false
+    @State private var showEditor = false
 
     struct LessonSlot: Identifiable, Hashable {
         let weekday: Int
@@ -54,6 +55,19 @@ struct TimetableView: View {
                     }
                     .accessibilityLabel("Stundenplan scannen")
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showEditor = true
+                    } label: {
+                        Image(systemName: "slider.horizontal.3")
+                    }
+                    .accessibilityLabel("Stundenplan bearbeiten")
+                }
+            }
+            .sheet(isPresented: $showEditor) {
+                // Der Entwurf startet immer bei dem, was gerade gilt.
+                TimetableSettingsView(settings: store.settings)
+                    .environmentObject(store)
             }
             .sheet(isPresented: $showSubjects) {
                 SubjectsView(showsDoneButton: true)

@@ -1567,6 +1567,14 @@ function zeichneStundenplan() {
       </span>
       <span class="pfeil">&#8250;</span>
     </button>
+    <button class="banner" data-planbearbeiten="1">
+      <span class="sym"><svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg></span>
+      <span>
+        <span class="btitel">Stundenplan bearbeiten</span>
+        <div class="btext">Stunden pro Tag, Samstag und alle Unterrichtszeiten.</div>
+      </span>
+      <span class="pfeil">&#8250;</span>
+    </button>
     <button class="banner" data-scan="1">
       <span class="sym"><svg viewBox="0 0 24 24"><path d="M4 4h4V2H2v6h2V4zm16 0v4h2V2h-6v2h4zM4 20v-4H2v6h6v-2H4zm16 0h-4v2h6v-6h-2v4zM7 9h10v2H7V9zm0 4h7v2H7v-2z"/></svg></span>
       <span>
@@ -2072,34 +2080,6 @@ function zeichneEinstellungen() {
       </div>
     </div>
     <div class="fuss">${modusText}</div>
-
-    <div class="gruppentitel">Stundenplan</div>
-    <div class="gruppe">
-      <div class="eintrag">
-        <span class="haupt">Stunden pro Tag</span>
-        <span class="stepper">
-          <span class="wert">${e.stunden}</span>
-          <button class="knopf" data-stunden="-1" aria-label="Weniger Stunden">−</button>
-          <button class="knopf" data-stunden="1" aria-label="Mehr Stunden">+</button>
-        </span>
-      </div>
-      <div class="eintrag">
-        <span class="haupt">Samstag anzeigen</span>
-        <button class="schalter" role="switch" data-schalter="samstag" aria-checked="${e.samstag}" aria-label="Samstag anzeigen"></button>
-      </div>
-      <div class="eintrag">
-        <span class="haupt">Uhrzeiten anzeigen</span>
-        <button class="schalter" role="switch" data-schalter="zeiten" aria-checked="${e.zeiten}" aria-label="Uhrzeiten anzeigen"></button>
-      </div>
-      <button class="eintrag" data-zeiten="1">
-        <span>
-          <span class="haupt">Unterrichtszeiten</span>
-          <div class="neben">${(e.zeitenListe || []).length
-            ? "Eigene Zeiten eingestellt." : "45 Minuten je Stunde, große Pause nach der 2. und 4."}</div>
-        </span>
-        <span class="wert" style="color:var(--text3)">&#8250;</span>
-      </button>
-    </div>
 
     <div class="gruppentitel">Hausaufgaben</div>
     <div class="gruppe">
@@ -3026,53 +3006,240 @@ function fachBearbeiten(id) {
   };
 }
 
-/* --- Unterrichtszeiten --- */
-function zeitenBearbeiten() {
-  const liste = zeitenFuer(daten.einstellungen.stunden);
+/* --- Stundenplan bearbeiten ---------------------------------------
+   Anders als sonst in Homy wird hier nicht sofort gespeichert. Gearbeitet
+   wird an einem Entwurf; erst "Sichern" übernimmt ihn. */
+function stundenplanBearbeiten() {
+  const e = daten.einstellungen;
+  const entwurf = {
+    stunden: e.stunden,
+    samstag: !!e.samstag,
+    zeiten: !!e.zeiten,
+    liste: zeitenFuer(e.stunden).map(z => ({ stunde: z.stunde, von: z.von, bis: z.bis }))
+  };
+  const ausgangswert = JSON.stringify(entwurf);
 
-  const h = `<div class="gruppe">` + liste.map(z => `
-      <div class="feldzeile">
-        <label style="width:74px">${z.stunde}. Stunde</label>
-        <input type="time" data-zeitvon="${z.stunde}" value="${uhr(z.von)}" style="flex:0 0 auto">
-        <span style="color:var(--text2)">bis</span>
-        <input type="time" data-zeitbis="${z.stunde}" value="${uhr(z.bis)}" style="flex:0 0 auto">
-      </div>`).join("") + `</div>
-    <div class="fuss">Die Zeiten stehen im Stundenplan und in der Fächerliste.</div>
-    <div class="gruppe" style="margin-top:22px">
-      <button class="eintrag" data-zeitenzurueck="1">
-        <span class="haupt" style="color:var(--akzent)">Auf die üblichen Zeiten zurücksetzen</span>
-      </button>
-    </div>
-    <div class="fuss">45 Minuten je Stunde, 5 Minuten Wechsel, große Pause nach der 2. und 4. Stunde.</div>`;
-
-  blatt.innerHTML = `<div class="blattkopf"><span class="t">Unterrichtszeiten</span>
-      <button type="button" data-schliessen="1">Fertig</button></div>${h}`;
-  modal.hidden = false;
-  blatt.scrollTop = 0;
-
-  const merken = () => {
-    const neu = [];
-    liste.forEach(z => {
-      const von = blatt.querySelector(`[data-zeitvon="${z.stunde}"]`).value;
-      const bis = blatt.querySelector(`[data-zeitbis="${z.stunde}"]`).value;
-      if (!von || !bis) return;
-      const m = t => { const [h2, m2] = t.split(":").map(Number); return h2 * 60 + m2; };
-      neu.push({ stunde: z.stunde, von: m(von), bis: m(bis) });
-    });
-    daten.einstellungen.zeitenListe = neu;
-    sichern();
+  const erste = entwurf.liste[0];
+  const rechner = {
+    beginn: erste ? erste.von : 8 * 60,
+    laenge: erste ? Math.max(5, erste.bis - erste.von) : 45,
+    pause: 5, gross: 15, mitGross: true
   };
 
-  blatt.querySelectorAll("input[type=time]").forEach(x => x.addEventListener("change", merken));
+  const geaendert = () => JSON.stringify(entwurf) !== ausgangswert;
+
+  /* Die Liste folgt der Stundenzahl: neue Stunden bekommen Standardzeiten,
+     schon eingestellte behalten ihre. */
+  const listeAnpassen = () => {
+    entwurf.liste = standardZeiten(entwurf.stunden).map(s => {
+      const alt = entwurf.liste.find(z => z.stunde === s.stunde);
+      return alt ? { stunde: s.stunde, von: alt.von, bis: alt.bis } : s;
+    });
+  };
+
+  /* Rechnet den ganzen Tag durch – wie PeriodTime.times() in der App. */
+  const zeitenRechnen = () => {
+    const liste = [];
+    let start = rechner.beginn;
+    for (let s = 1; s <= entwurf.stunden; s++) {
+      const ende = Math.min(24 * 60 - 1, start + rechner.laenge);
+      liste.push({ stunde: s, von: start, bis: ende });
+      const p = (rechner.mitGross && (s === 2 || s === 4)) ? rechner.gross : rechner.pause;
+      start = ende + p;
+      if (start >= 24 * 60 - rechner.laenge) break;
+    }
+    entwurf.liste = liste;
+    entwurf.stunden = liste.length;
+  };
+
+  const zeichneBlatt = () => {
+    const letzte = entwurf.liste[entwurf.liste.length - 1];
+    const h = `
+      <div class="gruppentitel">Aufbau</div>
+      <div class="gruppe">
+        <div class="eintrag">
+          <span class="haupt">Stunden pro Tag</span>
+          <span class="stepper">
+            <span class="wert">${entwurf.stunden}</span>
+            <button class="knopf" data-eStunden="-1" aria-label="Weniger Stunden">&minus;</button>
+            <button class="knopf" data-eStunden="1" aria-label="Mehr Stunden">+</button>
+          </span>
+        </div>
+        <div class="eintrag">
+          <span class="haupt">Samstag ist ein Schultag</span>
+          <button class="schalter" role="switch" data-eSchalter="samstag"
+            aria-checked="${entwurf.samstag}" aria-label="Samstag ist ein Schultag"></button>
+        </div>
+        <div class="eintrag">
+          <span class="haupt">Uhrzeiten im Plan anzeigen</span>
+          <button class="schalter" role="switch" data-eSchalter="zeiten"
+            aria-checked="${entwurf.zeiten}" aria-label="Uhrzeiten im Plan anzeigen"></button>
+        </div>
+      </div>
+      <div class="fuss">Der Plan zeigt ${entwurf.stunden}
+        ${entwurf.stunden === 1 ? "Stunde" : "Stunden"} an
+        ${entwurf.samstag ? "sechs Tagen: Montag bis Samstag" : "fünf Tagen: Montag bis Freitag"}.</div>
+
+      <div class="gruppentitel">Alle Zeiten auf einmal</div>
+      <div class="gruppe">
+        <div class="feldzeile">
+          <label style="width:auto;white-space:nowrap">Erste Stunde ab</label>
+          <input type="time" lang="de-DE" data-eBeginn="1" value="${uhr(rechner.beginn)}" style="flex:0 0 auto">
+        </div>
+        <div class="eintrag">
+          <span class="haupt">Eine Stunde dauert</span>
+          <span class="stepper">
+            <span class="wert">${rechner.laenge} Min.</span>
+            <button class="knopf" data-eLaenge="-5" aria-label="Kürzer">&minus;</button>
+            <button class="knopf" data-eLaenge="5" aria-label="Länger">+</button>
+          </span>
+        </div>
+        <div class="eintrag">
+          <span class="haupt">Pause dazwischen</span>
+          <span class="stepper">
+            <span class="wert">${rechner.pause} Min.</span>
+            <button class="knopf" data-ePause="-5" aria-label="Kürzere Pause">&minus;</button>
+            <button class="knopf" data-ePause="5" aria-label="Längere Pause">+</button>
+          </span>
+        </div>
+        <div class="eintrag">
+          <span class="haupt">Große Pause nach der 2. und 4.</span>
+          <button class="schalter" role="switch" data-eSchalter="mitGross"
+            aria-checked="${rechner.mitGross}" aria-label="Große Pause nach der 2. und 4."></button>
+        </div>
+        ${rechner.mitGross ? `
+        <div class="eintrag">
+          <span class="haupt">Große Pause dauert</span>
+          <span class="stepper">
+            <span class="wert">${rechner.gross} Min.</span>
+            <button class="knopf" data-eGross="-5" aria-label="Kürzere große Pause">&minus;</button>
+            <button class="knopf" data-eGross="5" aria-label="Längere große Pause">+</button>
+          </span>
+        </div>` : ""}
+        <button class="eintrag" data-eRechnen="1">
+          <span class="haupt" style="color:var(--akzent)">Alle Zeiten so ausrechnen</span>
+        </button>
+      </div>
+      <div class="fuss">Rechnet den ganzen Tag durch, statt jede Stunde einzeln
+        einzustellen. Unten kannst du danach noch einzelne Stunden anpassen.</div>
+
+      <div class="gruppentitel">Unterrichtszeiten</div>
+      <div class="gruppe">${entwurf.liste.map(z => `
+        <div class="feldzeile">
+          <label style="width:74px">${z.stunde}. Stunde</label>
+          <input type="time" lang="de-DE" data-eVon="${z.stunde}" value="${uhr(z.von)}" style="flex:0 0 auto">
+          <span style="color:var(--text2)">bis</span>
+          <input type="time" lang="de-DE" data-eBis="${z.stunde}" value="${uhr(z.bis)}" style="flex:0 0 auto">
+        </div>`).join("")}</div>
+      <div class="fuss">${erste && letzte
+        ? `Schultag von ${uhr(entwurf.liste[0].von)} bis ${uhr(letzte.bis)}. `
+        : ""}Diese Zeiten stehen links im Stundenplan.</div>
+
+      <div class="gruppe" style="margin-top:22px">
+        <button class="eintrag" data-eZurueck="1">
+          <span class="haupt" style="color:#D93025">Standardzeiten wiederherstellen</span>
+        </button>
+      </div>
+      <div class="fuss">45 Minuten je Stunde ab 8:00 Uhr, 5 Minuten Wechsel,
+        große Pause nach der 2. und 4. Stunde.</div>`;
+
+    blatt.innerHTML = `<div class="blattkopf">
+        <button type="button" data-ePlanAb="1" style="margin-left:0">Abbrechen</button>
+        <span class="t" style="flex:1;text-align:center;white-space:nowrap">Stundenplan</span>
+        <button type="button" data-ePlanSichern="1" style="font-weight:600">Sichern</button>
+      </div>${h}`;
+
+    // Uhrzeit-Felder ändern nur den Entwurf – ohne neu zu zeichnen, sonst
+    // springt die Eingabe weg, während man sie noch bedient.
+    const alsMinuten = t => { const [a, b] = t.split(":").map(Number); return a * 60 + b; };
+    blatt.querySelectorAll("[data-eVon], [data-eBis]").forEach(feld => {
+      feld.addEventListener("change", () => {
+        if (!feld.value) return;
+        const nr = +(feld.dataset.evon || feld.dataset.ebis);
+        const z = entwurf.liste.find(x => x.stunde === nr);
+        if (!z) return;
+        if (feld.dataset.evon !== undefined) z.von = alsMinuten(feld.value);
+        else z.bis = alsMinuten(feld.value);
+      });
+    });
+    const beginnFeld = blatt.querySelector("[data-eBeginn]");
+    if (beginnFeld) beginnFeld.addEventListener("change", () => {
+      if (beginnFeld.value) rechner.beginn = alsMinuten(beginnFeld.value);
+    });
+  };
 
   blatt.onclick = ev => {
-    if (ev.target.closest("[data-zeitenzurueck]")) {
-      daten.einstellungen.zeitenListe = [];
-      sichern(); modal.hidden = true; zeichne();
+    const zu = s => ev.target.closest(s);
+
+    if (zu("[data-ePlanAb]")) {
+      if (geaendert() && !confirm("Was du hier eingestellt hast, ist noch nicht "
+        + "gespeichert. Änderungen verwerfen?")) return;
+      modal.hidden = true;
       return;
     }
-    if (ev.target.closest("[data-schliessen]")) { modal.hidden = true; zeichne(); }
+
+    if (zu("[data-ePlanSichern]")) {
+      daten.einstellungen.stunden = entwurf.stunden;
+      daten.einstellungen.samstag = entwurf.samstag;
+      daten.einstellungen.zeiten = entwurf.zeiten;
+      daten.einstellungen.zeitenListe = entwurf.liste.map(z =>
+        ({ stunde: z.stunde, von: z.von, bis: z.bis }));
+      sichern();
+      modal.hidden = true;
+      zeichne();
+      return;
+    }
+
+    const stufe = zu("[data-eStunden]");
+    if (stufe) {
+      entwurf.stunden = Math.max(1, Math.min(14, entwurf.stunden + (+stufe.dataset.estunden)));
+      listeAnpassen();
+      zeichneBlatt();
+      return;
+    }
+
+    const schalter = zu("[data-eSchalter]");
+    if (schalter) {
+      const welcher = schalter.dataset.eschalter;
+      if (welcher === "mitGross") rechner.mitGross = !rechner.mitGross;
+      else entwurf[welcher] = !entwurf[welcher];
+      zeichneBlatt();
+      return;
+    }
+
+    const laenge = zu("[data-eLaenge]");
+    if (laenge) {
+      rechner.laenge = Math.max(30, Math.min(120, rechner.laenge + (+laenge.dataset.elaenge)));
+      zeichneBlatt();
+      return;
+    }
+
+    const pause = zu("[data-ePause]");
+    if (pause) {
+      rechner.pause = Math.max(0, Math.min(30, rechner.pause + (+pause.dataset.epause)));
+      zeichneBlatt();
+      return;
+    }
+
+    const gross = zu("[data-eGross]");
+    if (gross) {
+      rechner.gross = Math.max(10, Math.min(45, rechner.gross + (+gross.dataset.egross)));
+      zeichneBlatt();
+      return;
+    }
+
+    if (zu("[data-eRechnen]")) { zeitenRechnen(); zeichneBlatt(); return; }
+
+    if (zu("[data-eZurueck]")) {
+      entwurf.liste = standardZeiten(entwurf.stunden);
+      zeichneBlatt();
+      return;
+    }
   };
+
+  zeichneBlatt();
+  modal.hidden = false;
+  blatt.scrollTop = 0;
 }
 
 /* --- Sicherung ---
@@ -3588,7 +3755,7 @@ el.addEventListener("click", ev => {
     });
     return;
   }
-  if (ev.target.closest("[data-zeiten]")) { zeitenBearbeiten(); return; }
+  if (ev.target.closest("[data-planbearbeiten]")) { stundenplanBearbeiten(); return; }
   if (ev.target.closest("[data-neuesfach]")) { fachBearbeiten(null); return; }
 
   const fachKnopf = ev.target.closest("[data-fach]");

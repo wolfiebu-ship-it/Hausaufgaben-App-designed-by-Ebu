@@ -37,7 +37,6 @@ struct SettingsView: View {
                 legendSection
                 dotLegendSection
                 appearanceSection
-                timetableSection
                 homeworkSection
                 dataSection
                 aboutSection
@@ -568,31 +567,6 @@ struct SettingsView: View {
         case .system: return "Die App richtet sich danach, ob dein Gerät gerade auf hell oder dunkel steht."
         case .light:  return "Die App bleibt immer hell – auch wenn das Gerät auf dunkel steht."
         case .dark:   return "Die App bleibt immer dunkel – auch wenn das Gerät auf hell steht."
-        }
-    }
-
-    private var timetableSection: some View {
-        Section {
-            Stepper(value: $store.settings.periodCount, in: 1...14) {
-                HStack {
-                    Text("Stunden pro Tag")
-                    Spacer()
-                    Text("\(store.settings.periodCount)")
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Toggle("Samstag anzeigen", isOn: $store.settings.includeSaturday)
-            Toggle("Uhrzeiten anzeigen", isOn: $store.settings.showTimes)
-
-            NavigationLink {
-                PeriodTimesView()
-                    .environmentObject(store)
-            } label: {
-                Text("Unterrichtszeiten")
-            }
-        } header: {
-            Text("Stundenplan")
         }
     }
 

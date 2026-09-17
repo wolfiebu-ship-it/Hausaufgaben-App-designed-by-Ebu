@@ -261,7 +261,7 @@
     </svg>
     <div>
       <div class="leistenname">Homy</div>
-      <div class="leistenzahl">55 Dateien · 9.890 Zeilen</div>
+      <div class="leistenzahl">55 Dateien · 10.076 Zeilen</div>
     </div>
     <input type="search" id="suche" class="suchfeld" placeholder="Datei suchen …"
            aria-label="Datei suchen">
@@ -277,7 +277,7 @@
        hinterher wieder auseinandernehmen kannst.</p>
     <div class="zahlen">
       <span><b>55</b> Dateien</span>
-      <span><b>9.890</b> Zeilen</span>
+      <span><b>10.076</b> Zeilen</span>
       <span><b>Swift 5</b> · SwiftUI</span>
       <span><b>iOS 17</b> · iPhone und iPad</span>
     </div>
@@ -926,7 +926,7 @@ struct AppData: Codable {
       <p class="pfad">HausaufgabenApp/Models/AppSettings.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 134 Zeilen</span>
+      <span class="marke">Swift · 151 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -953,13 +953,30 @@ struct PeriodTime: Codable, Hashable, Identifiable {
     /// Erzeugt einen üblichen Schultag: 45-Minuten-Stunden, 5 Minuten Wechselpause,
     /// nach der 2. und 4. Stunde eine große Pause.
     static func defaultTimes(count: Int) -&gt; [PeriodTime] {
+        times(count: count)
+    }
+
+    /// Rechnet einen ganzen Schultag aus: ab wann, wie lange, wie viel Pause.
+    ///
+    /// Damit muss niemand vierzehn Stunden einzeln einstellen – einmal
+    /// „ab 8:00, 45 Minuten, 5 Minuten Pause“ angeben genügt.
+    static func times(count: Int,
+                      firstStartMinutes: Int = 8 * 60,
+                      lengthMinutes: Int = 45,
+                      breakMinutes: Int = 5,
+                      longBreakMinutes: Int = 15,
+                      longBreakAfter: Set&lt;Int&gt; = [2, 4]) -&gt; [PeriodTime] {
         var result: [PeriodTime] = []
-        var start = 8 * 60 // 08:00 Uhr
-        for period in 1...max(1, count) {
-            let end = start + 45
+        var start = max(0, min(23 * 60, firstStartMinutes))
+        let länge = max(5, min(240, lengthMinutes))
+
+        for period in 1...max(1, min(14, count)) {
+            let end = min(24 * 60 - 1, start + länge)
             result.append(PeriodTime(period: period, startMinutes: start, endMinutes: end))
-            let isBigBreak = (period == 2 || period == 4)
-            start = end + (isBigBreak ? 15 : 5)
+            let pause = longBreakAfter.contains(period) ? longBreakMinutes : breakMinutes
+            start = end + max(0, pause)
+            // Über Mitternacht hinaus ergibt kein Schultag Sinn.
+            if start &gt;= 24 * 60 - länge { break }
         }
         return result
     }
@@ -8932,7 +8949,7 @@ private struct Tipp: View {
       <p class="pfad">HausaufgabenApp/Views/Timetable/TimetableView.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 298 Zeilen</span>
+      <span class="marke">Swift · 312 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -8945,6 +8962,7 @@ struct TimetableView: View {
     @State private var editingSlot: LessonSlot?
     @State private var showScanner = false
     @State private var showSubjects = false
+    @State private var showEditor = false
 
     struct LessonSlot: Identifiable, Hashable {
         let weekday: Int
@@ -8993,6 +9011,19 @@ struct TimetableView: View {
                     }
                     .accessibilityLabel(&quot;Stundenplan scannen&quot;)
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showEditor = true
+                    } label: {
+                        Image(systemName: &quot;slider.horizontal.3&quot;)
+                    }
+                    .accessibilityLabel(&quot;Stundenplan bearbeiten&quot;)
+                }
+            }
+            .sheet(isPresented: $showEditor) {
+                // Der Entwurf startet immer bei dem, was gerade gilt.
+                TimetableSettingsView(settings: store.settings)
+                    .environmentObject(store)
             }
             .sheet(isPresented: $showSubjects) {
                 SubjectsView(showsDoneButton: true)
@@ -9726,98 +9757,10 @@ struct SubjectRow: View {
   </div>
 </article>
 <h2 class="gruppe">Views/Settings – Einstellungen<span class="gruppenzahl">3</span></h2>
-<article class="datei" data-suche="hausaufgabenapp/views/settings/periodtimesview.swift">
-  <header class="dateikopf">
-    <div class="dateiname">
-      <span class="nummer">49</span>
-      <h3>PeriodTimesView.swift</h3>
-      <p class="pfad">HausaufgabenApp/Views/Settings/PeriodTimesView.swift</p>
-    </div>
-    <div class="dateitat">
-      <span class="marke">Swift · 71 Zeilen</span>
-      <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
-    </div>
-  </header>
-  <div class="codehuelle">
-    <pre class="code"><code>import SwiftUI
-
-/// Beginn und Ende jeder Unterrichtsstunde einstellen.
-struct PeriodTimesView: View {
-    @EnvironmentObject private var store: AppStore
-    @State private var showResetConfirmation = false
-
-    var body: some View {
-        Form {
-            Section {
-                ForEach($store.settings.periodTimes) { $time in
-                    HStack(spacing: 8) {
-                        Text(&quot;\(time.period).&quot;)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 26, alignment: .leading)
-
-                        DatePicker(&quot;Beginn&quot;,
-                                   selection: dateBinding($time.startMinutes),
-                                   displayedComponents: .hourAndMinute)
-                            .labelsHidden()
-
-                        Text(&quot;bis&quot;)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-
-                        DatePicker(&quot;Ende&quot;,
-                                   selection: dateBinding($time.endMinutes),
-                                   displayedComponents: .hourAndMinute)
-                            .labelsHidden()
-
-                        Spacer(minLength: 0)
-                    }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel(&quot;\(time.period). Stunde, \(time.startText) bis \(time.endText)&quot;)
-                }
-            } header: {
-                Text(&quot;Unterrichtszeiten&quot;)
-            } footer: {
-                Text(&quot;Diese Zeiten stehen links im Stundenplan.&quot;)
-            }
-
-            Section {
-                Button(role: .destructive) {
-                    showResetConfirmation = true
-                } label: {
-                    Label(&quot;Standardzeiten wiederherstellen&quot;, systemImage: &quot;arrow.counterclockwise&quot;)
-                }
-            }
-        }
-        .environment(\.locale, Locale(identifier: &quot;de_DE&quot;))
-        .navigationTitle(&quot;Unterrichtszeiten&quot;)
-        .navigationBarTitleDisplayMode(.inline)
-        .alert(&quot;Standardzeiten wiederherstellen?&quot;, isPresented: $showResetConfirmation) {
-            Button(&quot;Wiederherstellen&quot;, role: .destructive) {
-                store.settings.periodTimes = PeriodTime.defaultTimes(count: store.settings.periodCount)
-            }
-            Button(&quot;Abbrechen&quot;, role: .cancel) { }
-        } message: {
-            Text(&quot;Die Stunden beginnen dann wieder um 8:00 Uhr, dauern 45 Minuten und haben nach der 2. und 4. Stunde eine große Pause.&quot;)
-        }
-    }
-
-    /// Verbindet die gespeicherten Minuten mit dem Uhrzeit-Auswahlrad.
-    private func dateBinding(_ minutes: Binding&lt;Int&gt;) -&gt; Binding&lt;Date&gt; {
-        Binding(
-            get: { SchoolCalendar.date(fromMinutesSinceMidnight: minutes.wrappedValue) },
-            set: { minutes.wrappedValue = SchoolCalendar.minutesSinceMidnight(from: $0) }
-        )
-    }
-}
-</code></pre>
-    <button type="button" class="mehr" data-mehr>Ganz anzeigen</button>
-  </div>
-</article>
 <article class="datei" data-suche="hausaufgabenapp/views/settings/profileview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">50</span>
+      <span class="nummer">49</span>
       <h3>ProfileView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Settings/ProfileView.swift</p>
     </div>
@@ -9961,12 +9904,12 @@ struct LabeledField: View {
 <article class="datei" data-suche="hausaufgabenapp/views/settings/settingsview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">51</span>
+      <span class="nummer">50</span>
       <h3>SettingsView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Settings/SettingsView.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 715 Zeilen</span>
+      <span class="marke">Swift · 689 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -10010,7 +9953,6 @@ struct SettingsView: View {
                 legendSection
                 dotLegendSection
                 appearanceSection
-                timetableSection
                 homeworkSection
                 dataSection
                 aboutSection
@@ -10544,31 +10486,6 @@ struct SettingsView: View {
         }
     }
 
-    private var timetableSection: some View {
-        Section {
-            Stepper(value: $store.settings.periodCount, in: 1...14) {
-                HStack {
-                    Text(&quot;Stunden pro Tag&quot;)
-                    Spacer()
-                    Text(&quot;\(store.settings.periodCount)&quot;)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Toggle(&quot;Samstag anzeigen&quot;, isOn: $store.settings.includeSaturday)
-            Toggle(&quot;Uhrzeiten anzeigen&quot;, isOn: $store.settings.showTimes)
-
-            NavigationLink {
-                PeriodTimesView()
-                    .environmentObject(store)
-            } label: {
-                Text(&quot;Unterrichtszeiten&quot;)
-            }
-        } header: {
-            Text(&quot;Stundenplan&quot;)
-        }
-    }
-
     private var homeworkSection: some View {
         Section {
             Toggle(&quot;Alle Fächer des Tages zeigen&quot;, isOn: $store.settings.showEmptySubjects)
@@ -10684,6 +10601,275 @@ struct SettingsView: View {
                 infoMessage = &quot;Die Datei ist keine gültige Sicherung dieser App.&quot;
             }
         }
+    }
+}
+</code></pre>
+    <button type="button" class="mehr" data-mehr>Ganz anzeigen</button>
+  </div>
+</article>
+<article class="datei" data-suche="hausaufgabenapp/views/settings/timetablesettingsview.swift">
+  <header class="dateikopf">
+    <div class="dateiname">
+      <span class="nummer">51</span>
+      <h3>TimetableSettingsView.swift</h3>
+      <p class="pfad">HausaufgabenApp/Views/Settings/TimetableSettingsView.swift</p>
+    </div>
+    <div class="dateitat">
+      <span class="marke">Swift · 252 Zeilen</span>
+      <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
+    </div>
+  </header>
+  <div class="codehuelle">
+    <pre class="code"><code>import SwiftUI
+
+/// Der Bearbeiten-Modus für den Stundenplan: Stunden, Wochentage und alle
+/// Unterrichtszeiten an einer Stelle.
+///
+/// Anders als sonst in Homy wird hier *nicht* sofort gespeichert. Gearbeitet
+/// wird an einem Entwurf; erst „Sichern“ übernimmt ihn. „Abbrechen“ wirft ihn
+/// weg – und fragt vorher nach, wenn wirklich etwas geändert wurde.
+struct TimetableSettingsView: View {
+    @EnvironmentObject private var store: AppStore
+    @Environment(\.dismiss) private var dismiss
+
+    /// Die Arbeitskopie. Was hier steht, steht noch nirgendwo sonst.
+    @State private var entwurf: AppSettings
+
+    // Der Rechner oben: ab wann, wie lange, wie viel Pause.
+    @State private var beginn: Int
+    @State private var laenge: Int
+    @State private var pause: Int
+    @State private var grossePause: Int
+    @State private var mitGrosserPause: Bool
+
+    @State private var zeigeAbbruchFrage = false
+    @State private var zeigeZuruecksetzenFrage = false
+
+    init(settings: AppSettings) {
+        var kopie = settings
+        kopie.normalizeTimes()
+        _entwurf = State(initialValue: kopie)
+
+        let erste = kopie.periodTimes.first
+        _beginn = State(initialValue: erste?.startMinutes ?? 8 * 60)
+        _laenge = State(initialValue: max(5, (erste.map { $0.endMinutes - $0.startMinutes }) ?? 45))
+        _pause = State(initialValue: 5)
+        _grossePause = State(initialValue: 15)
+        _mitGrosserPause = State(initialValue: true)
+    }
+
+    private var hatAenderungen: Bool { entwurf != store.settings }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                aufbauSection
+                rechnerSection
+                zeitenSection
+                zuruecksetzenSection
+            }
+            .environment(\.locale, Locale(identifier: &quot;de_DE&quot;))
+            // Kurz, weil links „Abbrechen“ und rechts „Sichern“ stehen –
+            // für „Stundenplan bearbeiten“ ist dazwischen kein Platz.
+            .navigationTitle(&quot;Stundenplan&quot;)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(&quot;Abbrechen&quot;) {
+                        if hatAenderungen { zeigeAbbruchFrage = true } else { dismiss() }
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(&quot;Sichern&quot;) { sichern() }
+                        .font(.body.weight(.semibold))
+                        .disabled(!hatAenderungen)
+                }
+            }
+            .interactiveDismissDisabled(hatAenderungen)
+            .confirmationDialog(&quot;Änderungen verwerfen?&quot;,
+                                isPresented: $zeigeAbbruchFrage,
+                                titleVisibility: .visible) {
+                Button(&quot;Verwerfen&quot;, role: .destructive) { dismiss() }
+                Button(&quot;Weiter bearbeiten&quot;, role: .cancel) { }
+            } message: {
+                Text(&quot;Was du hier eingestellt hast, ist noch nicht gespeichert.&quot;)
+            }
+            .alert(&quot;Standardzeiten wiederherstellen?&quot;, isPresented: $zeigeZuruecksetzenFrage) {
+                Button(&quot;Wiederherstellen&quot;, role: .destructive) {
+                    entwurf.periodTimes = PeriodTime.defaultTimes(count: entwurf.periodCount)
+                }
+                Button(&quot;Abbrechen&quot;, role: .cancel) { }
+            } message: {
+                Text(&quot;Die Stunden beginnen dann wieder um 8:00 Uhr, dauern 45 Minuten und haben nach der 2. und 4. Stunde eine große Pause.&quot;)
+            }
+        }
+    }
+
+    // MARK: - Aufbau
+
+    private var aufbauSection: some View {
+        Section {
+            Stepper(value: $entwurf.periodCount, in: 1...14) {
+                HStack {
+                    Text(&quot;Stunden pro Tag&quot;)
+                    Spacer()
+                    Text(&quot;\(entwurf.periodCount)&quot;)
+                        .foregroundStyle(.secondary)
+                        .font(.body.monospacedDigit())
+                }
+            }
+            .onChange(of: entwurf.periodCount) { _, _ in
+                entwurf.normalizeTimes()
+            }
+
+            Toggle(&quot;Samstag ist ein Schultag&quot;, isOn: $entwurf.includeSaturday)
+            Toggle(&quot;Uhrzeiten im Plan anzeigen&quot;, isOn: $entwurf.showTimes)
+        } header: {
+            Text(&quot;Aufbau&quot;)
+        } footer: {
+            Text(&quot;Der Plan zeigt \(entwurf.periodCount) \(entwurf.periodCount == 1 ? &quot;Stunde&quot; : &quot;Stunden&quot;) an \(entwurf.includeSaturday ? &quot;sechs&quot; : &quot;fünf&quot;) Tagen: \(entwurf.includeSaturday ? &quot;Montag bis Samstag&quot; : &quot;Montag bis Freitag&quot;).&quot;)
+        }
+    }
+
+    // MARK: - Alle Zeiten auf einmal
+
+    private var rechnerSection: some View {
+        Section {
+            HStack {
+                Text(&quot;Erste Stunde ab&quot;)
+                Spacer()
+                DatePicker(&quot;Erste Stunde ab&quot;,
+                           selection: dateBinding($beginn),
+                           displayedComponents: .hourAndMinute)
+                    .labelsHidden()
+            }
+
+            Stepper(value: $laenge, in: 30...120, step: 5) {
+                HStack {
+                    Text(&quot;Eine Stunde dauert&quot;)
+                    Spacer()
+                    Text(&quot;\(laenge) Min.&quot;)
+                        .foregroundStyle(.secondary)
+                        .font(.body.monospacedDigit())
+                }
+            }
+
+            Stepper(value: $pause, in: 0...30, step: 5) {
+                HStack {
+                    Text(&quot;Pause dazwischen&quot;)
+                    Spacer()
+                    Text(&quot;\(pause) Min.&quot;)
+                        .foregroundStyle(.secondary)
+                        .font(.body.monospacedDigit())
+                }
+            }
+
+            Toggle(&quot;Große Pause nach der 2. und 4.&quot;, isOn: $mitGrosserPause)
+
+            if mitGrosserPause {
+                Stepper(value: $grossePause, in: 10...45, step: 5) {
+                    HStack {
+                        Text(&quot;Große Pause dauert&quot;)
+                        Spacer()
+                        Text(&quot;\(grossePause) Min.&quot;)
+                            .foregroundStyle(.secondary)
+                            .font(.body.monospacedDigit())
+                    }
+                }
+            }
+
+            Button {
+                entwurf.periodTimes = PeriodTime.times(
+                    count: entwurf.periodCount,
+                    firstStartMinutes: beginn,
+                    lengthMinutes: laenge,
+                    breakMinutes: pause,
+                    longBreakMinutes: mitGrosserPause ? grossePause : pause,
+                    longBreakAfter: mitGrosserPause ? [2, 4] : [])
+                entwurf.normalizeTimes()
+            } label: {
+                Label(&quot;Alle Zeiten so ausrechnen&quot;, systemImage: &quot;wand.and.stars&quot;)
+            }
+        } header: {
+            Text(&quot;Alle Zeiten auf einmal&quot;)
+        } footer: {
+            Text(&quot;Rechnet den ganzen Tag durch, statt jede Stunde einzeln einzustellen. Unten kannst du einzelne Stunden danach noch anpassen.&quot;)
+        }
+    }
+
+    // MARK: - Einzelne Stunden
+
+    private var zeitenSection: some View {
+        Section {
+            ForEach($entwurf.periodTimes) { $zeit in
+                HStack(spacing: 8) {
+                    Text(&quot;\(zeit.period).&quot;)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 26, alignment: .leading)
+
+                    DatePicker(&quot;Beginn&quot;,
+                               selection: dateBinding($zeit.startMinutes),
+                               displayedComponents: .hourAndMinute)
+                        .labelsHidden()
+
+                    Text(&quot;bis&quot;)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+
+                    DatePicker(&quot;Ende&quot;,
+                               selection: dateBinding($zeit.endMinutes),
+                               displayedComponents: .hourAndMinute)
+                        .labelsHidden()
+
+                    Spacer(minLength: 0)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(&quot;\(zeit.period). Stunde, \(zeit.startText) bis \(zeit.endText)&quot;)
+            }
+        } header: {
+            Text(&quot;Unterrichtszeiten&quot;)
+        } footer: {
+            Text(schultagText)
+        }
+    }
+
+    private var zuruecksetzenSection: some View {
+        Section {
+            Button(role: .destructive) {
+                zeigeZuruecksetzenFrage = true
+            } label: {
+                Label(&quot;Standardzeiten wiederherstellen&quot;, systemImage: &quot;arrow.counterclockwise&quot;)
+            }
+        }
+    }
+
+    /// „Schultag von 08:00 bis 15:45“ – zeigt im Entwurf, was dabei herauskommt.
+    private var schultagText: String {
+        guard let erste = entwurf.periodTimes.first,
+              let letzte = entwurf.periodTimes.last else {
+            return &quot;Diese Zeiten stehen links im Stundenplan.&quot;
+        }
+        return &quot;Schultag von \(erste.startText) bis \(letzte.endText). Diese Zeiten stehen links im Stundenplan.&quot;
+    }
+
+    // MARK: - Sichern
+
+    private func sichern() {
+        var fertig = entwurf
+        fertig.normalizeTimes()
+        store.settings = fertig
+        store.saveNow()
+        Haptics.success()
+        dismiss()
+    }
+
+    /// Verbindet die gespeicherten Minuten mit dem Uhrzeit-Auswahlrad.
+    private func dateBinding(_ minutes: Binding&lt;Int&gt;) -&gt; Binding&lt;Date&gt; {
+        Binding(
+            get: { SchoolCalendar.date(fromMinutesSinceMidnight: minutes.wrappedValue) },
+            set: { minutes.wrappedValue = SchoolCalendar.minutesSinceMidnight(from: $0) }
+        )
     }
 }
 </code></pre>
