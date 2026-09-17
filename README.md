@@ -117,6 +117,8 @@ Alles läuft auf dem Gerät – das Foto wird nicht hochgeladen und nirgends ges
 
 > Der Dokumentenscanner braucht eine echte Kamera und funktioniert deshalb **nicht im Simulator**. Zum Ausprobieren am Mac lässt sich stattdessen ein Foto aus der Mediathek wählen.
 
+> **In der Browser-Vorschau** gibt es das Foto und die Vorlage, aber keine automatische Texterkennung: Eine eingebettete Seite darf die dafür nötige Bibliothek nicht nachladen. Dort nimmst du das Foto auf, es bleibt über dem Raster stehen, und du tippst den Plan daneben ab.
+
 ### 5. Notizen
 
 Ein eigener Tab unten für alles, was man sich aufschreiben will – aufgebaut wie Apples Notizen-App.
@@ -276,6 +278,67 @@ HausaufgabenApp/
 │   └── Settings/                Einstellungen, Unterrichtszeiten
 └── Assets.xcassets              App-Symbol und Akzentfarbe
 ```
+
+---
+
+## Homy veröffentlichen
+
+Bis hierher läuft Homy auf deinen eigenen Geräten. In den App Store zu kommen ist ein eigener Schritt – hier ehrlich, was dafür nötig ist.
+
+### Was Apple verlangt
+
+| | |
+|---|---|
+| **Mac mit Xcode** | Ohne geht es nicht. Eine iOS-App lässt sich nur auf einem Mac bauen und hochladen. |
+| **Apple Developer Program** | 99 € im Jahr. Ohne diese Mitgliedschaft geht weder App Store noch TestFlight. |
+| **Volljährigkeit** | Apple vergibt Entwickler-Accounts nur an Volljährige. Als Schüler brauchst du dafür deine Eltern: Der Account läuft dann auf sie, und sie sind es auch, die die Vereinbarungen unterschreiben. Das ist keine Formalie, die man umgehen sollte – es ist ein Vertrag. |
+| **App Store Connect** | Dort legst du den Eintrag an: Name, Beschreibung, Schlüsselwörter, Altersfreigabe, Bildschirmfotos in mehreren Größen und ein 1024-px-Symbol (hast du). |
+| **Datenschutz-Angaben** | Bei Homy angenehm kurz: „Es werden keine Daten erfasst“. Homy hat keinen Server, keine Analyse, keine Werbung, keine Netzwerkzugriffe. Genau so kannst du es angeben. |
+| **Prüfung** | Apple sieht sich jede App an, das dauert meist ein paar Tage. Ablehnungen sind normal und kommen mit einer Begründung; danach bessert man nach und reicht erneut ein. |
+
+### Was Homy dafür schon mitbringt
+
+- Ein eigenes App-Symbol in 1024 px und einen eigenen Namen.
+- Keine fremden Bibliotheken – nichts, dessen Lizenz du angeben müsstest.
+- Keine Datenerfassung, also eine unkomplizierte Datenschutz-Auskunft.
+- Sinnvolle Texte für die Berechtigungen (Kamera, Fotos, Face ID) – die verlangt Apple, und sie stehen schon im Projekt.
+
+### Was du dafür noch brauchst
+
+- **Bildschirmfotos** aus dem Simulator in den von Apple verlangten Größen.
+- Einen **Beschreibungstext** und ein paar Schlüsselwörter.
+- Eine **Support-Adresse** (eine E-Mail reicht) – die verlangt Apple als Kontakt.
+- Eine **Datenschutzerklärung** im Netz. Auch wenn Homy nichts erfasst: Apple will eine erreichbare Adresse. Ein kurzer Text auf einer GitHub-Pages-Seite genügt.
+
+### Der kleinere Weg ohne Store
+
+Ohne Mitgliedschaft kannst du Homy weiterhin **mit Xcode auf deine eigenen Geräte laden** (siehe oben). Die Installation hält dann sieben Tage und wird mit einem Klick erneuert. Für dich und deine Familie reicht das völlig – und kostet nichts.
+
+---
+
+## Die Vorschau im Browser
+
+Unter `docs/vorschau.html` liegt eine vollständige Nachbildung der Oberfläche als einzelne HTML-Datei – zum Anschauen und Ausprobieren ohne Mac. Darin funktioniert alles, was ein Browser kann:
+
+| Funktioniert in der Vorschau | Nur in der gebauten App |
+|---|---|
+| Hausaufgaben eintragen, abhaken, „keine Hausaufgaben“ | |
+| Wochen blättern, Suche über alle Wochen | |
+| Kalender: Termine, Ferien, Feiertage je Bundesland | |
+| Notizen schreiben | |
+| Stundenplan ausfüllen, Fächer anlegen und ändern | |
+| Unterrichtszeiten einstellen | |
+| **Eigenen Code festlegen**, ändern, Anmeldung aus | Prüfwert statt Klartext (SHA-256) |
+| **Schnellstart** – versucht Face ID/Touch ID über WebAuthn, sonst merkt er sich den Browser | Immer echtes Face ID / Touch ID |
+| **Foto des Stundenplans** aufnehmen; es bleibt als Vorlage über dem Raster stehen | Automatische Texterkennung (Apple Vision) |
+| Sicherung herauskopieren und einspielen | Sicherung als Datei, z. B. in iCloud Drive |
+| Hell/dunkel, alle Erklärungen | Echte Benachrichtigungen von iOS |
+
+Drei Dinge kann ein Browser prinzipiell nicht, und die sind deshalb nachgestellt statt echt:
+
+- **Benachrichtigungen** – in der Vorschau erscheint zur Ansicht ein nachgebautes Banner. In der App schickt iOS sie wirklich, auch wenn Homy zu ist.
+- **Texterkennung beim Scannen** – die Bibliothek dafür müsste Dateien nachladen, was eine eingebettete Seite nicht darf.
+- **Herunterladen** – deshalb gibt es die Sicherung zum Kopieren statt als Datei.
 
 ---
 

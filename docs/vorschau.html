@@ -1,0 +1,3988 @@
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Homy</title>
+<style>
+  /* ---------------------------------------------------------------
+     Farben und Maße sind aus dem Xcode-Projekt übernommen
+     (AppTheme.swift, AccentColor.colorset), damit die Vorschau
+     dem entspricht, was die gebaute App zeigt.
+     --------------------------------------------------------------- */
+  :root {
+    --akzent: #1D4ED8;
+    --grund: #F2F2F7;
+    --karte: #FFFFFF;
+    --leiste: rgba(249,249,249,.94);
+    --trenner: rgba(60,60,67,.20);
+    --text: #000000;
+    --text2: rgba(60,60,67,.62);
+    --text3: rgba(60,60,67,.34);
+    --fuellung: rgba(118,118,128,.12);
+    --hinweis-grund: #EEF2FF;
+    --hinweis-rand: #C7D2FE;
+    --hinweis-text: #1E3A8A;
+
+    /* Je Fach ein kräftiger Ton (t) für Schrift und eine helle Fläche (b) */
+    --gelb: #D08700;
+    --ferien: #1E8E3E;
+    --ferien-b: #E2F5E8;
+    --t0:#C0392B; --b0:#FDE7E3;  --t1:#B15A0E; --b1:#FDEDDA;
+    --t2:#8A6304; --b2:#FBF2D4;  --t3:#217A4B; --b3:#E2F5E8;
+    --t4:#0E7B72; --b4:#DDF3F0;  --t5:#0A6FA8; --b5:#DFF0FB;
+    --t6:#2A56C6; --b6:#E6ECFD;  --t7:#5647C4; --b7:#EBE9FC;
+    --t8:#7A3AC9; --b8:#F1E8FC;  --t9:#B62A63; --b9:#FCE6EF;
+    --t10:#8A5A2B; --b10:#F6EDE1; --t11:#4A5A70; --b11:#EAEEF4;
+
+    --zelle-h: 58px;
+    --zeit-b: 52px;
+    --radius: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --akzent: #6092FA;
+      --grund: #000000;
+      --karte: #1C1C1E;
+      --leiste: rgba(28,28,30,.94);
+      --trenner: rgba(84,84,88,.65);
+      --text: #FFFFFF;
+      --text2: rgba(235,235,245,.62);
+      --text3: rgba(235,235,245,.32);
+      --fuellung: rgba(118,118,128,.24);
+      --hinweis-grund: #18213D;
+      --hinweis-rand: #2C3A66;
+      --hinweis-text: #C7D8FF;
+
+      --gelb: #F5C542;
+      --ferien: #74DFA2;
+      --ferien-b: #15301F;
+    --t0:#FF9E90; --b0:#42201C;  --t1:#FFBB72; --b1:#3E2A13;
+      --t2:#F5CE5E; --b2:#3A3012;  --t3:#74DFA2; --b3:#15301F;
+      --t4:#5DDCCB; --b4:#0F2F2B;  --t5:#79C8F0; --b5:#112C3D;
+      --t6:#9AB6FF; --b6:#1A2450;  --t7:#B3A8FF; --b7:#241F4C;
+      --t8:#C8A2FB; --b8:#2C1B47;  --t9:#FCA0C4; --b9:#3F1A2B;
+      --t10:#DFB183; --b10:#34261A; --t11:#ADBCD0; --b11:#232B36;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ferien: #74DFA2;
+    --ferien-b: #15301F;
+    --akzent: #6092FA;
+    --grund: #000000;
+    --karte: #1C1C1E;
+    --leiste: rgba(28,28,30,.94);
+    --trenner: rgba(84,84,88,.65);
+    --text: #FFFFFF;
+    --text2: rgba(235,235,245,.62);
+    --text3: rgba(235,235,245,.32);
+    --fuellung: rgba(118,118,128,.24);
+    --hinweis-grund: #18213D;
+    --hinweis-rand: #2C3A66;
+    --hinweis-text: #C7D8FF;
+
+    --t0:#FF9E90; --b0:#42201C;  --t1:#FFBB72; --b1:#3E2A13;
+    --t2:#F5CE5E; --b2:#3A3012;  --t3:#74DFA2; --b3:#15301F;
+    --t4:#5DDCCB; --b4:#0F2F2B;  --t5:#79C8F0; --b5:#112C3D;
+    --t6:#9AB6FF; --b6:#1A2450;  --t7:#B3A8FF; --b7:#241F4C;
+    --t8:#C8A2FB; --b8:#2C1B47;  --t9:#FCA0C4; --b9:#3F1A2B;
+    --t10:#DFB183; --b10:#34261A; --t11:#ADBCD0; --b11:#232B36;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  /* Beim Veröffentlichen liefert die Plattform diese Regel mit; lokal fehlt
+     sie, und dann gewinnt display:flex gegen das hidden-Attribut. */
+  [hidden] { display: none !important; }
+
+  body {
+    margin: 0;
+    background: var(--grund);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.35;
+    -webkit-text-size-adjust: 100%;
+    min-height: 100vh;
+  }
+
+  /* --- Vorschau-Hinweis (gehört nicht zur App) --- */
+  #hinweis {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: var(--hinweis-grund);
+    border-bottom: 1px solid var(--hinweis-rand);
+    color: var(--hinweis-text);
+    padding: 10px 16px;
+    font-size: 13px; line-height: 1.4;
+  }
+  #hinweis strong { font-weight: 600; }
+  #hinweis button {
+    margin-left: auto; flex: none;
+    background: none; border: 0; color: inherit;
+    font-size: 20px; line-height: 1; padding: 0 2px;
+    cursor: pointer; opacity: .6;
+  }
+  #hinweis button:hover { opacity: 1; }
+
+  /* --- App-Hülle --- */
+  .app { display: flex; flex-direction: column; min-height: 100vh; }
+
+  .navleiste {
+    position: sticky; top: 0; z-index: 20;
+    display: grid; grid-template-columns: 44px 1fr 44px 44px;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 8px;
+    background: var(--leiste);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: .5px solid var(--trenner);
+  }
+  /* Feste Spalten, damit der Titel mittig bleibt, wenn ein Knopf fehlt. */
+  #zurueck { grid-column: 1; }
+  .navtitel { grid-column: 2; }
+  #vor { grid-column: 3; }
+  #suche { grid-column: 4; }
+  .navtitel { text-align: center; min-width: 0; }
+  .navtitel .zeile1 { font-size: 17px; font-weight: 600; letter-spacing: -.02em; }
+  .navtitel .zeile2 { font-size: 12px; color: var(--text2); margin-top: 1px; }
+  .navknopf {
+    height: 36px; width: 36px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: 0; color: var(--akzent);
+    font-size: 20px; cursor: pointer; border-radius: 18px;
+  }
+  .navknopf:disabled { color: var(--text3); cursor: default; }
+  .navknopf:active:not(:disabled) { background: var(--fuellung); }
+
+  .inhalt { flex: 1; padding: 16px; padding-bottom: 24px; }
+
+  /* --- Tab-Leiste --- */
+  .tableiste {
+    position: sticky; bottom: 0; z-index: 20;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    background: var(--leiste);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-top: .5px solid var(--trenner);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: none; border: 0; cursor: pointer;
+    padding: 7px 4px 6px;
+    color: var(--text2);
+    font-size: 10px; font-weight: 500;
+    font-family: inherit;
+  }
+  .tab svg { width: 24px; height: 24px; fill: currentColor; }
+  .tab[aria-selected="true"] { color: var(--akzent); }
+
+  /* --- Tageskarten --- */
+  .wochengitter { display: grid; gap: 16px; align-items: start; }
+  /* Auf Tablets nebeneinander – da wird mit dem Finger bedient. */
+  @media (min-width: 760px) and (hover: none) { .wochengitter { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 1180px) and (hover: none) { .wochengitter { grid-template-columns: 1fr 1fr 1fr; } }
+
+  /* --- Am Bildschirm mit Maus: eine Spalte, Tage immer offen --- */
+  @media (min-width: 900px) and (hover: hover) {
+    /* Die Inhalte laufen sonst über die ganze Breite auseinander. */
+    .inhalt { max-width: 860px; margin: 0 auto; width: 100%; }
+    /* Leisten mittig zum Inhalt – links und rechts gleich viel. */
+    .navleiste, .tableiste {
+      padding-left: max(8px, calc((100vw - 860px) / 2));
+      padding-right: max(8px, calc((100vw - 860px) / 2));
+    }
+    .wochengitter { grid-template-columns: 1fr; }
+    /* Kein Auf- und Zuklappen: der Kopf ist nur noch eine Überschrift. */
+    .tagkopf { cursor: default; padding-bottom: 12px; }
+    .tagkopf .chevron { display: none; }
+    .tagkopf:focus-visible { outline: none; }
+  }
+
+  .tag {
+    background: var(--karte);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .tag.heute { box-shadow: inset 0 0 0 2px var(--akzent); }
+
+  .tagkopf {
+    display: flex; align-items: baseline; gap: 8px;
+    padding: 12px 14px;
+  }
+  .tagkopf .name { font-size: 17px; font-weight: 600; letter-spacing: -.02em; }
+  .tagkopf .datum { font-size: 15px; color: var(--text2); }
+  .tagkopf .marke {
+    margin-left: auto; flex: none;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 8px; border-radius: 20px;
+    background: var(--akzent); color: #fff;
+  }
+  .tagkopf .zahl {
+    margin-left: auto; flex: none;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 7px; border-radius: 20px;
+    background: var(--fuellung); color: var(--text2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .zeile {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 14px;
+    border-top: .5px solid var(--trenner);
+  }
+  .zeile:first-of-type { border-top: 0; }
+  .kuerzel {
+    flex: none;
+    width: 44px; padding: 6px 2px;
+    border-radius: 9px;
+    color: var(--text); font-size: 12px; font-weight: 700;
+    text-align: center; letter-spacing: .01em;
+    margin-top: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .zeile textarea {
+    flex: 1; min-width: 0;
+    border: 0; outline: 0; resize: none; overflow: hidden;
+    background: none; color: var(--text);
+    font: inherit; font-size: 16px;  /* nicht kleiner: sonst zoomt Safari */
+    padding: 2px 0; margin: 0;
+    line-height: 1.35;
+  }
+  .zeile textarea::placeholder { color: var(--text3); }
+  .zeile.erledigt textarea { color: var(--text2); }
+  .haken {
+    flex: none; background: none; border: 0; cursor: pointer;
+    padding: 0 2px; margin-top: 1px;
+    color: var(--text2); line-height: 0;
+  }
+  .haken svg { width: 24px; height: 24px; fill: currentColor; }
+  .haken.an { color: var(--akzent); }
+
+  .ergaenzen {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 11px 14px;
+    border: 0; border-top: .5px solid var(--trenner);
+    background: none; color: var(--akzent);
+    font: inherit; font-size: 15px; cursor: pointer; text-align: left;
+    font-family: inherit;
+  }
+  .leer { padding: 0 14px 14px; font-size: 13px; color: var(--text2); }
+
+  /* --- Stundenplan --- */
+  .planrahmen { overflow-x: auto; }
+  .plan { display: grid; gap: 4px; min-width: max-content; }
+  .plankopf, .planzeile { display: grid; gap: 4px; }
+  .planspalte {
+    text-align: center; font-size: 15px; font-weight: 600;
+    padding: 6px 0; border-radius: 8px;
+  }
+  .planspalte.heute { color: var(--akzent); background: color-mix(in srgb, var(--akzent) 12%, transparent); }
+  .planzeit {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: var(--zelle-h);
+  }
+  .planzeit .nr { font-size: 15px; font-weight: 600; color: var(--text2); }
+  .planzeit .uhr { font-size: 10px; color: var(--text3); font-variant-numeric: tabular-nums; }
+  .planzelle {
+    height: var(--zelle-h); border-radius: 10px;
+    display: flex; align-items: stretch; justify-content: center;
+    border: 0; cursor: pointer; padding: 0;
+    font-family: inherit; overflow: hidden;
+  }
+  .planzelle .streifen { width: 4px; flex: none; }
+  .planzelle .zellinhalt {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 2px;
+    padding: 2px 3px;
+  }
+  .planzelle .pk { font-size: 15px; font-weight: 700; }
+  .planzelle .pr { font-size: 10px; font-weight: 500; opacity: .78; }
+  .planzelle.frei {
+    background: var(--fuellung); color: var(--text3); font-size: 15px;
+    align-items: center;
+  }
+
+  /* --- Listen (Fächer, Einstellungen) --- */
+  .gruppe { background: var(--karte); border-radius: var(--radius); overflow: hidden; }
+  .gruppentitel {
+    font-size: 13px; color: var(--text2); text-transform: uppercase;
+    letter-spacing: .06em; font-weight: 500;
+    padding: 0 16px 6px; margin-top: 22px;
+  }
+  .gruppentitel:first-child { margin-top: 0; }
+  .fuss { font-size: 13px; color: var(--text2); padding: 7px 16px 0; }
+  .eintrag {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; padding: 11px 14px;
+    border: 0; border-top: .5px solid var(--trenner);
+    background: none; color: var(--text);
+    font: inherit; text-align: left; font-family: inherit;
+  }
+  .eintrag:first-child { border-top: 0; }
+  .eintrag .haupt { font-size: 17px; }
+  .eintrag .neben { font-size: 13px; color: var(--text2); margin-top: 1px; }
+  .eintrag .wert { margin-left: auto; color: var(--text2); font-size: 17px; font-variant-numeric: tabular-nums; }
+
+  .schalter {
+    margin-left: auto; flex: none;
+    width: 51px; height: 31px; border-radius: 16px;
+    background: var(--fuellung); border: 0; cursor: pointer;
+    position: relative; transition: background .2s;
+  }
+  .schalter::after {
+    content: ""; position: absolute; top: 2px; left: 2px;
+    width: 27px; height: 27px; border-radius: 50%;
+    background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.2);
+    transition: transform .2s;
+  }
+  .schalter[aria-checked="true"] { background: #34C759; }
+  .schalter[aria-checked="true"]::after { transform: translateX(20px); }
+
+  .stepper { margin-left: auto; display: flex; align-items: center; gap: 0; }
+  .stepper .wert { margin: 0 12px 0 0; }
+  .stepper .knopf {
+    width: 42px; height: 32px; border: 0; background: var(--fuellung);
+    color: var(--text); font-size: 19px; cursor: pointer; font-family: inherit;
+  }
+  .stepper .knopf:first-of-type { border-radius: 7px 0 0 7px; }
+  .stepper .knopf:last-of-type { border-radius: 0 7px 7px 0; margin-left: 1px; }
+
+  /* --- Modal für die Fachauswahl --- */
+  .schleier {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(0,0,0,.4);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0;
+  }
+  .schleier[hidden] { display: none !important; }
+  @media (min-width: 700px) { .schleier { align-items: center; padding: 24px; } }
+  .blatt {
+    background: var(--grund);
+    width: 100%; max-width: 520px;
+    max-height: 82vh; overflow-y: auto;
+    border-radius: 14px 14px 0 0;
+    padding: 0 16px 24px;
+  }
+  @media (min-width: 700px) { .blatt { border-radius: 14px; max-height: 76vh; } }
+  .blattkopf {
+    position: sticky; top: 0;
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 0 12px; margin-bottom: 4px;
+    background: var(--grund);
+    border-bottom: .5px solid var(--trenner);
+  }
+  .blattkopf .t { font-size: 17px; font-weight: 600; }
+  .blattkopf button {
+    margin-left: auto; background: none; border: 0;
+    color: var(--akzent); font: inherit; font-size: 17px; cursor: pointer;
+    font-family: inherit;
+  }
+
+  .hinweiskasten {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--karte); border-radius: var(--radius);
+    padding: 14px; margin-bottom: 16px;
+  }
+  .hinweiskasten .titel { font-size: 15px; font-weight: 600; }
+  .hinweiskasten .text { font-size: 13px; color: var(--text2); margin-top: 3px; }
+
+
+  /* --- Wochenüberblick --- */
+  .ueberblick {
+    background: var(--karte); border-radius: var(--radius);
+    padding: 14px; margin-bottom: 16px;
+  }
+  .ueberblick .kopf {
+    display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px;
+  }
+  .ueberblick .titel { font-size: 15px; font-weight: 600; }
+  .ueberblick .stand {
+    margin-left: auto; font-size: 13px; color: var(--text2);
+    font-variant-numeric: tabular-nums;
+  }
+  .ueberblick .balken {
+    height: 6px; border-radius: 3px; background: var(--fuellung); overflow: hidden;
+  }
+  .ueberblick .balken span {
+    display: block; height: 100%; border-radius: 3px;
+    background: var(--akzent); transition: width .3s;
+  }
+
+  /* Fächer ohne Eintrag treten zurück */
+  .zeile.offen .kuerzel { opacity: .55; }
+
+  /* --- Scan-Banner --- */
+  .banner {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    background: var(--karte); border: 0; border-radius: var(--radius);
+    padding: 14px; margin-bottom: 16px;
+    text-align: left; font-family: inherit; cursor: pointer; color: var(--text);
+  }
+  .banner .sym {
+    flex: none; width: 34px; height: 34px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, var(--akzent) 13%, transparent);
+    color: var(--akzent);
+  }
+  .banner .sym svg { width: 20px; height: 20px; fill: currentColor; }
+  .banner .btitel { font-size: 15px; font-weight: 600; }
+  .banner .btext { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .banner .pfeil { margin-left: auto; flex: none; color: var(--text3); font-size: 17px; }
+
+  .schritt {
+    display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;
+  }
+  .schritt .zahl {
+    flex: none; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--akzent); color: #fff;
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .schritt .stext { font-size: 15px; }
+
+
+  /* --- Umschalter hell/dunkel --- */
+  .segmente {
+    display: flex; width: 100%;
+    background: var(--fuellung);
+    border-radius: 9px; padding: 2px; gap: 2px;
+  }
+  .segmente button {
+    flex: 1; border: 0; background: none; cursor: pointer;
+    font-family: inherit; font-size: 14px; font-weight: 500;
+    color: var(--text);
+    padding: 7px 6px; border-radius: 7px;
+    transition: background .15s;
+  }
+  .segmente button[aria-selected="true"] {
+    background: var(--karte); font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0,0,0,.14);
+  }
+
+
+  /* --- Tage ohne Hausaufgaben --- */
+  .freizeile {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 11px 14px;
+    border: 0; border-top: .5px solid var(--trenner);
+    background: none; color: var(--text2);
+    font-family: inherit; font-size: 15px; cursor: pointer; text-align: left;
+  }
+  .freizeile svg { width: 22px; height: 22px; fill: currentColor; flex: none; }
+  .freimarke {
+    display: flex; align-items: flex-start; gap: 10px; width: 100%;
+    padding: 0 14px 14px;
+    border: 0; background: none; cursor: pointer; text-align: left;
+    font-family: inherit; color: var(--text);
+  }
+  .freimarke svg { width: 22px; height: 22px; fill: var(--akzent); flex: none; }
+  .freimarke .ft { font-size: 15px; font-weight: 600; }
+  .freimarke .fu { font-size: 12px; color: var(--text2); margin-top: 1px; }
+
+
+  /* --- Auf- und zuklappbare Tage --- */
+  .tagkopf {
+    display: block; width: 100%;
+    border: 0; background: none; cursor: pointer;
+    font-family: inherit; color: var(--text); text-align: left;
+    padding: 12px 14px 6px;
+  }
+  .tagkopf.auf { padding-bottom: 12px; }
+  .kopfzeile { display: flex; align-items: baseline; gap: 8px; }
+  .kopfzeile .fueller { flex: 1; min-width: 0; }
+  /* Der Füller übernimmt den Abstand – die alten auto-Ränder hier abschalten. */
+  .kopfzeile .marke,
+  .kopfzeile .zahl,
+  .kopfzeile .fertigmarke,
+  .kopfzeile .chevron { margin-left: 0; }
+  .fertigmarke { flex: none; line-height: 0; align-self: center; }
+  .fertigmarke svg { width: 17px; height: 17px; fill: #34C759; }
+  .chevron {
+    flex: none; align-self: center;
+    color: var(--text3); font-size: 17px; font-weight: 600;
+    transform: rotate(90deg); transition: transform .22s;
+  }
+  .tagkopf.auf .chevron { transform: rotate(-90deg); }
+  .kurz { display: block; margin-top: 8px; }
+  .kbadges { display: flex; flex-wrap: wrap; gap: 5px; }
+  .kuerzel.klein { width: 34px; padding: 5px 2px; font-size: 11px; margin-top: 0; }
+  .knichts { font-size: 13px; color: var(--text2); }
+  .kfrei {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--akzent);
+  }
+  .kfrei svg { width: 16px; height: 16px; fill: currentColor; }
+
+
+  /* --- Schulsachen ganz blass im Hintergrund --- */
+  .kritzel {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none; overflow: hidden;
+  }
+  .kritzel svg { position: absolute; opacity: .13; }
+  .app { position: relative; z-index: 1; }
+  .inhalt { position: relative; z-index: 1; }
+
+  /* --- Notizen --- */
+  .notiz {
+    display: flex; width: 100%; padding: 0; overflow: hidden;
+    background: var(--karte); border: 0; border-radius: var(--radius);
+    cursor: pointer; font-family: inherit; text-align: left;
+    color: var(--text); margin-bottom: 10px;
+  }
+  .notiz.fertig { opacity: .65; }
+  .notiz .streifen { width: 5px; flex: none; }
+  .notiz .ninhalt {
+    flex: 1; min-width: 0; display: flex; gap: 12px;
+    align-items: flex-start; padding: 14px;
+  }
+  .notiz .ntext { font-size: 17px; }
+  .notiz.fertig .ntext { color: var(--text2); text-decoration: line-through; }
+  .notiz .nmeta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+  .nchip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600;
+    padding: 3px 8px; border-radius: 20px;
+  }
+  .nchip svg { width: 12px; height: 12px; fill: currentColor; }
+  .nhaken {
+    flex: none; background: none; border: 0; cursor: pointer;
+    padding: 0 2px; color: var(--text2); line-height: 0;
+  }
+  .nhaken svg { width: 22px; height: 22px; fill: currentColor; }
+  .nhaken.an { color: var(--akzent); }
+
+  .leerseite {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 14px; text-align: center;
+    padding: 48px 24px; max-width: 460px; margin: 0 auto;
+  }
+  .leerseite .lsym { font-size: 44px; line-height: 1; }
+  .leerseite .ltitel { font-size: 17px; font-weight: 600; }
+  .leerseite .ltext { font-size: 15px; color: var(--text2); }
+  .knopf {
+    border: 0; border-radius: 11px; cursor: pointer;
+    font-family: inherit; font-size: 16px; font-weight: 600;
+    padding: 12px 18px; background: var(--akzent); color: #fff;
+  }
+
+
+  /* --- Notizliste im Stil der Notizen-App --- */
+  .nzeile {
+    display: flex; gap: 10px; width: 100%;
+    padding: 11px 14px;
+    border: 0; border-top: .5px solid var(--trenner);
+    background: none; color: var(--text);
+    font-family: inherit; text-align: left; cursor: pointer;
+  }
+  .nzeile:first-child { border-top: 0; }
+  .nzeile.fertig { opacity: .6; }
+  .nzeile .fstreifen { width: 4px; border-radius: 2px; flex: none; }
+  .nzeile .ntitel { font-size: 16px; font-weight: 600; }
+  .nzeile.fertig .ntitel { text-decoration: line-through; color: var(--text2); }
+  .nzeile .nunter {
+    font-size: 13px; color: var(--text2); margin-top: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .nzeile .nchips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+
+  /* --- Schreibblatt --- */
+  .notizblatt {
+    position: fixed; left: 0; right: 0; top: 0; bottom: 0;
+    z-index: 40; display: flex; flex-direction: column;
+    background: var(--karte);
+  }
+  .blattleiste {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px;
+    background: var(--leiste);
+    border-bottom: .5px solid var(--trenner);
+  }
+  .blattleiste button {
+    border: 0; background: none; cursor: pointer;
+    font-family: inherit; font-size: 17px; color: var(--akzent);
+    padding: 6px 8px; border-radius: 8px;
+  }
+  .blattleiste .weg { margin-left: auto; color: #D93025; line-height: 0; padding: 8px; }
+  .chipleiste {
+    display: flex; gap: 8px; padding: 8px 14px;
+    overflow-x: auto; background: var(--karte);
+  }
+  .chipleiste button {
+    flex: none; display: inline-flex; align-items: center; gap: 4px;
+    border: 0; border-radius: 20px; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    padding: 6px 11px;
+  }
+  .chipleiste svg { width: 12px; height: 12px; fill: currentColor; }
+  #blattext {
+    flex: 1; width: 100%; border: 0; outline: 0; resize: none;
+    background: none; color: var(--text);
+    font-family: inherit; font-size: 17px; line-height: 1.45;
+    padding: 6px 14px 20px;
+  }
+
+
+  /* --- Feld zum Antippen --- */
+  .neufeld {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 15px 14px; margin-bottom: 10px;
+    background: var(--karte); color: var(--text2);
+    border: 1.5px dashed color-mix(in srgb, var(--akzent) 35%, transparent);
+    border-radius: var(--radius);
+    font-family: inherit; font-size: 17px; text-align: left; cursor: pointer;
+  }
+  .neufeld svg { width: 21px; height: 21px; fill: var(--akzent); flex: none; }
+  .neuhinweis {
+    font-size: 13px; color: var(--text2); text-align: center;
+    padding: 18px 24px 0; max-width: 420px; margin: 0 auto;
+  }
+
+
+  /* --- Stunden des Tages im Fächer-Tab --- */
+  .stundenr {
+    flex: none; width: 38px;
+    display: flex; flex-direction: column; gap: 1px;
+  }
+  .stundenr .snr { font-size: 15px; font-weight: 600; color: var(--text2); }
+  .stundenr .szeit { font-size: 11px; color: var(--text3); font-variant-numeric: tabular-nums; }
+
+
+  /* --- "nichts auf" je Fach --- */
+  /* Zwei Felder je Zeile: gelb = keine Hausaufgaben, blau = fertig */
+  .feld {
+    flex: none; width: 30px; background: none; border: 0; cursor: pointer;
+    padding: 0; margin-top: 1px; line-height: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .feld svg { width: 24px; height: 24px; fill: currentColor; }
+  .feld.gelb { color: var(--gelb); opacity: .5; }
+  .feld.gelb.an { opacity: 1; }
+  .feld.haken { color: var(--akzent); opacity: .5; }
+  .feld.haken.an { opacity: 1; }
+
+  .legende {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    padding: 0 14px 8px;
+    font-size: 11px; color: var(--text2);
+  }
+  .legende span { display: inline-flex; align-items: center; gap: 5px; }
+  .legende .punkt {
+    width: 9px; height: 9px; border-radius: 50%; display: inline-block;
+  }
+  .legende .punkt.gelb { background: var(--gelb); }
+  .legende .punkt.blau { background: var(--akzent); }
+  .keineha {
+    flex: 1; min-width: 0; font-size: 15px;
+    color: var(--text2); padding: 3px 0;
+  }
+
+
+  .erklsym { flex: none; line-height: 0; margin-top: 1px; }
+  .erklsym svg { width: 26px; height: 26px; fill: currentColor; }
+  .eintrag .neben { white-space: normal; line-height: 1.35; }
+
+
+  .profilsym { flex: none; line-height: 0; color: var(--akzent); }
+  .profilsym svg { width: 36px; height: 36px; fill: currentColor; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+  button:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--akzent); outline-offset: 2px; border-radius: 4px;
+  }
+
+  /* ---- Logo und Anmeldebild ---- */
+  .homylogo { width: 100%; height: 100%; display: block; }
+
+  #sperre {
+    position: fixed; inset: 0; z-index: 60;
+    /* Deckend: Ein Anmeldebild darf nichts vom Inhalt durchscheinen lassen. */
+    background: var(--grund);
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 0; padding: 24px 20px;
+    overflow-y: auto;
+  }
+  #sperre[hidden] { display: none; }
+  .sperrlogo { width: 78px; height: 78px; flex: none;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,.18)); }
+  .sperrname {
+    font-size: 33px; font-weight: 700; letter-spacing: -.02em;
+    margin-top: 14px; color: var(--text);
+  }
+  .sperrgruss { font-size: 17px; font-weight: 600; color: var(--text2); margin-top: 12px; }
+  .punkte { display: flex; gap: 16px; margin-top: 26px; }
+  .punkte i {
+    width: 15px; height: 15px; border-radius: 50%;
+    border: 1.5px solid color-mix(in srgb, var(--text2) 55%, transparent);
+    background: transparent; transition: background .12s;
+  }
+  .punkte i.voll { background: var(--akzent); border-color: var(--akzent); }
+  .punkte.falsch { animation: wackeln .3s; }
+  @keyframes wackeln {
+    0%,100% { transform: translateX(0) }
+    25% { transform: translateX(-9px) }
+    75% { transform: translateX(9px) }
+  }
+  .sperrstatus { font-size: 13px; color: var(--text2); margin-top: 10px; min-height: 18px; }
+  .sperrstatus.rot { color: #D93025; }
+  .tasten {
+    display: grid; grid-template-columns: repeat(3, 74px);
+    gap: 18px; margin-top: 26px;
+  }
+  .taste {
+    width: 74px; height: 74px; border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--text) 6%, transparent);
+    background: var(--karte); color: var(--text);
+    font: inherit; font-size: 30px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .taste:active { background: var(--fuellung); }
+  .taste.leer { border: 0; background: none; cursor: default; }
+  .taste.still { background: none; border: 0; color: var(--akzent); }
+  .taste svg { width: 30px; height: 30px; fill: currentColor; }
+  .taste.loeschen svg { fill: var(--text2); width: 26px; height: 26px; }
+  .sperrfuss { margin-top: 18px; display: flex; flex-direction: column;
+    align-items: center; gap: 10px; }
+  .sperrlink {
+    background: none; border: 0; font: inherit; font-size: 13px;
+    color: var(--text2); cursor: pointer; text-decoration: underline;
+  }
+  .demohinweis {
+    font-size: 13px; color: var(--text2); background: var(--karte);
+    border: 1px dashed color-mix(in srgb, var(--akzent) 40%, transparent);
+    border-radius: 10px; padding: 9px 13px; text-align: center; max-width: 300px;
+  }
+  .ueberlogo { width: 54px; height: 54px; flex: none; }
+
+  /* ---- Kalender ---- */
+  .monatskarte {
+    background: var(--karte); border-radius: var(--radius);
+    padding: 14px; margin-bottom: 16px;
+  }
+  .monatskopf {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  }
+  .monatskopf .mtitel {
+    flex: 1; text-align: center; font-size: 17px; font-weight: 600;
+  }
+  .monatskopf button {
+    width: 34px; height: 34px; border: 0; background: none; cursor: pointer;
+    color: var(--akzent); font-size: 20px; border-radius: 17px;
+    font-family: inherit;
+  }
+  .monatskopf button:active { background: var(--fuellung); }
+  .wochenkopf, .monatsgitter {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  }
+  .wochenkopf div {
+    text-align: center; font-size: 11px; font-weight: 600;
+    color: var(--text2); padding-bottom: 4px;
+  }
+  .monatsgitter button {
+    border: 0; background: none; cursor: pointer; font-family: inherit;
+    padding: 7px 0 5px; border-radius: 9px; color: var(--text);
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  .monatsgitter button.fremd { opacity: .38; }
+  .monatsgitter .zahl { font-size: 16px; }
+  .monatsgitter button.heute { box-shadow: inset 0 0 0 1.5px var(--akzent); }
+  .monatsgitter button.heute .zahl { color: var(--akzent); font-weight: 700; }
+  .monatsgitter button.gewaehlt { background: var(--akzent); }
+  .monatsgitter button.gewaehlt .zahl { color: #fff; font-weight: 600; }
+  .punkte-reihe { display: flex; gap: 2.5px; height: 5px; align-items: center; }
+  .punkte-reihe i { width: 5px; height: 5px; border-radius: 50%; display: block; }
+  .monatsgitter button.gewaehlt .punkte-reihe i { background: rgba(255,255,255,.9) !important; }
+
+  .terminzeile {
+    display: flex; align-items: flex-start; gap: 10px; width: 100%;
+    padding: 11px 14px;
+    border: 0; border-top: .5px solid var(--trenner);
+    background: none; color: var(--text);
+    font-family: inherit; text-align: left; cursor: pointer;
+  }
+  .terminzeile:first-child { border-top: 0; }
+  .terminsym {
+    flex: none; width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .terminsym svg { width: 16px; height: 16px; fill: currentColor; }
+  .terminzeile .ttitel { font-size: 15px; font-weight: 600; }
+  .terminzeile .tneben { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .terminzeile .tbald { font-size: 12px; font-weight: 700; flex: none; margin-top: 3px; }
+  .tagblock { padding: 12px 14px; border-top: .5px solid var(--trenner); }
+  .tagblock .btitel {
+    font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 7px;
+  }
+  .tagblock .bzeile {
+    display: flex; align-items: flex-start; gap: 8px; margin-top: 6px;
+    font-size: 13px;
+  }
+  .tagblock .bzeile.fertig { color: var(--text2); text-decoration: line-through; }
+
+  /* ---- Nachgestellte iOS-Benachrichtigung ---- */
+  #mitteilung {
+    position: fixed; left: 50%; top: 12px; transform: translateX(-50%);
+    z-index: 70; width: min(94vw, 400px);
+    background: color-mix(in srgb, var(--karte) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-radius: 18px; box-shadow: 0 8px 28px rgba(0,0,0,.28);
+    padding: 12px 14px; display: flex; gap: 11px; align-items: flex-start;
+    animation: reinrutschen .35s cubic-bezier(.2,.9,.3,1);
+    cursor: pointer;
+  }
+  #mitteilung[hidden] { display: none; }
+  @keyframes reinrutschen {
+    from { transform: translate(-50%,-130%); opacity: 0 }
+    to   { transform: translate(-50%,0); opacity: 1 }
+  }
+  #mitteilung .msym { width: 34px; height: 34px; flex: none; }
+  #mitteilung .mtitel { font-size: 14px; font-weight: 600; }
+  #mitteilung .muntertitel { font-size: 13px; color: var(--text2); }
+  #mitteilung .mtext { font-size: 13px; margin-top: 1px; }
+  #mitteilung .mzeit {
+    margin-left: auto; flex: none; font-size: 12px; color: var(--text2);
+  }
+  #mitteilung .mdemo {
+    font-size: 11px; color: var(--text2); margin-top: 6px;
+    border-top: .5px solid var(--trenner); padding-top: 5px;
+  }
+
+  /* ---- Formular im Blatt ---- */
+  .feldzeile {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border-top: .5px solid var(--trenner);
+  }
+  .feldzeile:first-child { border-top: 0; }
+  .feldzeile > label { flex: none; width: 96px; font-size: 17px; }
+  .feldzeile input, .feldzeile select, .feldzeile textarea {
+    flex: 1; min-width: 0; border: 0; outline: 0; background: none;
+    color: var(--text); font: inherit; font-size: 16px; padding: 2px 0;
+  }
+  .feldzeile select { cursor: pointer; }
+
+  /* ---- Abfotografierter Stundenplan als Vorlage ---- */
+  .planfoto {
+    background: var(--karte); border-radius: var(--radius);
+    padding: 10px; margin-bottom: 16px;
+  }
+  .planfoto img {
+    width: 100%; max-height: 46vh; object-fit: contain;
+    border-radius: 9px; display: block; background: var(--fuellung);
+  }
+  .planfoto .leiste {
+    display: flex; align-items: center; gap: 10px; padding: 8px 4px 2px;
+    font-size: 13px; color: var(--text2);
+  }
+  .planfoto .leiste button {
+    margin-left: auto; border: 0; background: none; cursor: pointer;
+    font: inherit; font-size: 14px; color: var(--akzent); padding: 4px 6px;
+  }
+
+  /* ---- Farbwahl für Fächer ---- */
+  .farbwahl { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; }
+  .farbwahl button {
+    width: 36px; height: 36px; border-radius: 10px; cursor: pointer;
+    border: 2px solid transparent; font: inherit; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .farbwahl button[aria-pressed="true"] { border-color: var(--text); }
+
+  /* ---- Sicherung ---- */
+  .sicherungsfeld {
+    width: 100%; min-height: 120px; border: 0; outline: 0; resize: vertical;
+    background: none; color: var(--text);
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px;
+    line-height: 1.4;
+  }
+
+  /* ---- Ferien ---- */
+  .monatsgitter button.ferien { background: var(--ferien-b); }
+  .monatsgitter button.ferien.gewaehlt { background: var(--akzent); }
+  .ferienzeile {
+    display: flex; align-items: flex-start; gap: 10px; width: 100%;
+    padding: 11px 14px;
+    border: 0; border-top: .5px solid var(--trenner);
+    background: none; color: var(--text);
+    font-family: inherit; text-align: left; cursor: pointer;
+  }
+  .ferienzeile:first-child { border-top: 0; }
+  .feriensym {
+    flex: none; width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--ferien-b); color: var(--ferien);
+  }
+  .feriensym svg { width: 16px; height: 16px; fill: currentColor; }
+  .ferienkopf { display: flex; align-items: baseline; gap: 8px; }
+  .ferienkopf .fname { font-size: 15px; font-weight: 600; flex: 1; min-width: 0; }
+  .ferienkopf .fstatus { font-size: 12px; font-weight: 700; flex: none; }
+  .spanne { margin-top: 5px; }
+  .spanne div { display: flex; gap: 8px; font-size: 13px; margin-top: 2px; }
+  .spanne .wort {
+    flex: none; width: 26px; font-size: 12px; font-weight: 600; color: var(--text2);
+  }
+  .fdauer { font-size: 12px; color: var(--text2); margin-top: 5px; }
+  .punktlegende {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    margin-top: 10px; font-size: 11px; color: var(--text2);
+  }
+  .punktlegende span { display: inline-flex; align-items: center; gap: 5px; }
+  .punktlegende i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+</style>
+
+<div id="hinweis">
+  <div>
+    <strong>Homy – Vorschau im Browser.</strong> So sieht und bedient sich die App, die im Repository liegt.
+    Die echte App ist eine native iOS-App und wird mit Xcode aufs Gerät geladen; hier siehst du die Oberfläche
+    mit Beispieldaten. Deine Eingaben bleiben nur in diesem Browser.
+  </div>
+  <button type="button" onclick="this.parentElement.hidden=true;try{localStorage.setItem('hw_hinweis','1')}catch(e){}" aria-label="Hinweis ausblenden">&times;</button>
+</div>
+
+<div class="kritzel" id="kritzel" aria-hidden="true"></div>
+
+<div id="mitteilung" hidden role="status"></div>
+
+<div id="sperre" hidden>
+  <div class="sperrlogo"><svg class="homylogo" viewBox="0 0 100 100" aria-hidden="true">
+  <defs><linearGradient id="homyG" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#3B72FF"/><stop offset="1" stop-color="#7A5AF0"/>
+  </linearGradient></defs>
+  <rect width="100" height="100" rx="22.5" fill="url(#homyG)"/>
+  <path d="M 50 18 L 81 45.28 L 81 80 L 19 80 L 19 45.28 Z"
+        fill="none" stroke="#fff" stroke-width="7.5" stroke-linejoin="round"/>
+  <g transform="rotate(38 50 60)">
+    <path d="M 50 45 L 55.25 52.2 L 44.75 52.2 Z" fill="#4A3A22"/>
+    <path d="M 44.75 52.2 L 55.25 52.2 L 55.25 71.01 Q 55.25 75 51.26 75
+             L 48.74 75 Q 44.75 75 44.75 71.01 Z" fill="#FFC44D"/>
+    <rect x="44.75" y="54.6" width="10.5" height="2.1" fill="#F0A52E"/>
+  </g>
+</svg></div>
+  <div class="sperrname">Homy</div>
+  <div class="sperrgruss" id="sperrGruss">Willkommen zurück</div>
+  <div class="punkte" id="sperrPunkte"></div>
+  <div class="sperrstatus" id="sperrStatus">Code eingeben</div>
+  <div class="tasten" id="sperrTasten"></div>
+  <div class="sperrfuss">
+    <button class="sperrlink" id="sperrVergessen">Code vergessen?</button>
+    <div class="demohinweis" id="demohinweis"></div>
+  </div>
+</div>
+
+<div class="app">
+  <div class="navleiste">
+    <button class="navknopf" id="zurueck" aria-label="Vorherige Woche">&#8249;</button>
+    <div class="navtitel">
+      <div class="zeile1" id="navTitel">Hausaufgaben</div>
+      <div class="zeile2" id="navUnter"></div>
+    </div>
+    <button class="navknopf" id="vor" aria-label="Nächste Woche">&#8250;</button>
+    <button class="navknopf" id="suche" aria-label="Suchen">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 1 0-.7.7l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/></svg>
+    </button>
+  </div>
+
+  <div class="inhalt" id="inhalt"></div>
+
+  <div class="tableiste" role="tablist">
+    <button class="tab" role="tab" data-tab="hausaufgaben" aria-selected="true">
+      <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+      Hausaufgaben
+    </button>
+    <button class="tab" role="tab" data-tab="kalender" aria-selected="false">
+      <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/></svg>
+      Kalender
+    </button>
+    <button class="tab" role="tab" data-tab="stundenplan" aria-selected="false">
+      <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3V3zm2 6v3h4V9H5zm6 0v3h4V9h-4zm6 0v3h2V9h-2zM5 14v3h4v-3H5zm6 0v3h4v-3h-4zm6 0v3h2v-3h-2zM5 5v2h14V5H5z"/></svg>
+      Stundenplan
+    </button>
+    <button class="tab" role="tab" data-tab="notizen" aria-selected="false">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z"/></svg>
+      Notizen
+    </button>
+    <button class="tab" role="tab" data-tab="einstellungen" aria-selected="false">
+      <svg viewBox="0 0 24 24"><path d="M19.14 12.94a7.07 7.07 0 0 0 0-1.88l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.58.24-1.12.55-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.67 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.07 7.07 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.39.3.6.22l2.39-.96c.5.39 1.04.7 1.62.94l.36 2.54c.04.24.25.42.5.42h3.84c.25 0 .46-.18.5-.42l.36-2.54c.58-.24 1.12-.55 1.62-.94l2.39.96c.22.08.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>
+      Einstellungen
+    </button>
+  </div>
+</div>
+
+<div class="schleier" id="modal" hidden>
+  <div class="blatt" id="blatt"></div>
+</div>
+
+<script>
+"use strict";
+
+/* =====================================================================
+   Daten – dieselbe Struktur wie im Xcode-Projekt (AppData.swift)
+   ===================================================================== */
+
+/* Jedes Fach hat zwei Töne: kräftig für Schrift, hell für die Fläche. */
+const nr   = i => ((i % 12) + 12) % 12;
+const tint = i => `var(--t${nr(i)})`;
+const fill = i => `var(--b${nr(i)})`;
+
+const TAGE      = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+const TAGE_KURZ = ["Mo","Di","Mi","Do","Fr","Sa"];
+/* Für den Kalender: die volle Woche einschließlich Sonntag. */
+const TAGE_WOCHE      = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
+const TAGE_WOCHE_KURZ = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+const MONATE    = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+
+const BEISPIEL = {
+  faecher: [
+    { id:"d",   name:"Deutsch",     kuerzel:"D",   f:0,  lehrer:"Fr. Brandt",  raum:"204" },
+    { id:"m",   name:"Mathematik",  kuerzel:"M",   f:6,  lehrer:"Hr. Keller",  raum:"112" },
+    { id:"e",   name:"Englisch",    kuerzel:"E",   f:3,  lehrer:"Fr. Osei",    raum:"207" },
+    { id:"bio", name:"Biologie",    kuerzel:"BIO", f:4,  lehrer:"Fr. Lindner", raum:"B1"  },
+    { id:"ch",  name:"Chemie",      kuerzel:"CH",  f:5,  lehrer:"Hr. Vogt",    raum:"C2"  },
+    { id:"ph",  name:"Physik",      kuerzel:"PH",  f:7,  lehrer:"Hr. Vogt",    raum:"P1"  },
+    { id:"ge",  name:"Geschichte",  kuerzel:"GE",  f:10, lehrer:"Fr. Ahrens",  raum:"301" },
+    { id:"ek",  name:"Erdkunde",    kuerzel:"EK",  f:8,  lehrer:"Fr. Ahrens",  raum:"301" },
+    { id:"sp",  name:"Sport",       kuerzel:"SP",  f:1,  lehrer:"Hr. Roth",    raum:"Halle" },
+    { id:"ku",  name:"Kunst",       kuerzel:"KU",  f:9,  lehrer:"Fr. Mai",     raum:"K1"  },
+    { id:"mu",  name:"Musik",       kuerzel:"MU",  f:2,  lehrer:"Hr. Sand",    raum:"M1"  },
+    { id:"inf", name:"Informatik",  kuerzel:"INF", f:11, lehrer:"Hr. Keller",  raum:"115" }
+  ],
+  /* stunden[wochentag 1-6][stunde 1-9] = fachId */
+  stunden: {
+    1: { 1:"m",  2:"d",   3:"e",  4:"bio", 5:"sp",  6:"sp" },
+    2: { 1:"d",  2:"m",   3:"ph", 4:"ge",  5:"ku",  6:"ku" },
+    3: { 1:"e",  2:"e",   3:"m",  4:"ch",  5:"ek",  6:"mu" },
+    4: { 1:"bio",2:"d",   3:"m",  4:"ph",  5:"inf", 6:"inf" },
+    5: { 1:"ge", 2:"ch",  3:"e",  4:"d",   5:"ek" }
+  },
+  einstellungen: { stunden: 9, samstag: false, zeiten: true, alleFaecher: true,
+                   darstellung: "system", erinnerungen: true, standardErinnerung: "abend",
+                   bundesland: "", zeitenListe: [] },
+  anmeldung: { an: true, code: "1234", istBeispielCode: true, merkzettel: "",
+               schnellstart: true, gemerkt: true, webauthnId: "", wann: "immer" }
+};
+
+/* Unterrichtszeiten wie PeriodTime.defaultTimes(): 45 Minuten,
+   5 Minuten Wechsel, große Pause nach der 2. und 4. Stunde. */
+/* Die Zeiten für die Anzeige: Standard, überschrieben durch eigene. */
+function zeitenFuer(anzahl) {
+  const eigene = daten.einstellungen.zeitenListe || [];
+  return standardZeiten(anzahl).map(z => {
+    const treffer = eigene.find(x => x.stunde === z.stunde);
+    return treffer ? { stunde: z.stunde, von: treffer.von, bis: treffer.bis } : z;
+  });
+}
+
+function standardZeiten(anzahl) {
+  const liste = []; let start = 8 * 60;
+  for (let s = 1; s <= anzahl; s++) {
+    const ende = start + 45;
+    liste.push({ stunde: s, von: start, bis: ende });
+    start = ende + (s === 2 || s === 4 ? 15 : 5);
+  }
+  return liste;
+}
+const uhr = m => String(Math.floor(m/60)).padStart(2,"0") + ":" + String(m%60).padStart(2,"0");
+
+/* =====================================================================
+   Datum – Woche ab Montag, wie SchoolCalendar.swift
+   ===================================================================== */
+
+/* Am PC (breites Fenster, Mauszeiger) stehen die Tage untereinander und
+   sind immer offen. Auf dem Handy und dem Tablet bleibt alles wie gehabt. */
+const amPC = () => window.matchMedia("(min-width: 900px) and (hover: hover)").matches;
+
+const tagStart = d => { const k = new Date(d); k.setHours(0,0,0,0); return k; };
+const wochentag = d => (d.getDay() + 6) % 7 + 1;             // 1 = Montag
+function wochenStart(d) {
+  const k = tagStart(d);
+  k.setDate(k.getDate() - (wochentag(k) - 1));
+  return k;
+}
+function plusTage(d, n) { const k = new Date(d); k.setDate(k.getDate() + n); return k; }
+function schluessel(d) {
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+function kalenderwoche(d) {
+  const k = tagStart(d);
+  k.setDate(k.getDate() + 3 - ((k.getDay() + 6) % 7));
+  const jahresstart = new Date(k.getFullYear(), 0, 4);
+  return 1 + Math.round(((k - jahresstart) / 86400000 - 3 + ((jahresstart.getDay() + 6) % 7)) / 7);
+}
+const istHeute = d => schluessel(d) === schluessel(new Date());
+
+/* =====================================================================
+   Zustand
+   ===================================================================== */
+
+const SPEICHER = "hausaufgaben_vorschau_v1";
+let daten, tab = "hausaufgaben", wochenVersatz = 0;
+
+function laden() {
+  try {
+    const roh = localStorage.getItem(SPEICHER);
+    if (roh) {
+      const g = JSON.parse(roh);
+      daten = {
+        faecher: g.faecher || BEISPIEL.faecher,
+        stunden: g.stunden || BEISPIEL.stunden,
+        aufgaben: g.aufgaben || {},
+        freieTage: g.freieTage || {},
+        freieFaecher: g.freieFaecher || {},
+        notizen: g.notizen || [],
+        profil: Object.assign({vorname:"",nachname:"",klasse:"",schule:"",telefon:"",email:"",adresse:"",weiteres:""}, g.profil || {}),
+        einstellungen: Object.assign({}, BEISPIEL.einstellungen, g.einstellungen || {}),
+        anmeldung: Object.assign({}, BEISPIEL.anmeldung, g.anmeldung || {}),
+        termine: g.termine || [],
+        ferien: g.ferien || []
+      };
+      return;
+    }
+  } catch (e) { /* Speicher nicht verfügbar – dann eben mit Beispieldaten */ }
+
+  daten = {
+    faecher: BEISPIEL.faecher,
+    stunden: BEISPIEL.stunden,
+    aufgaben: beispielAufgaben(),
+    freieTage: {},
+    freieFaecher: {},
+    notizen: [],
+    profil: { vorname:"", nachname:"", klasse:"", schule:"", telefon:"", email:"", adresse:"", weiteres:"" },
+    einstellungen: Object.assign({}, BEISPIEL.einstellungen),
+    anmeldung: Object.assign({}, BEISPIEL.anmeldung),
+    termine: beispielTermine(),
+    ferien: beispielFerien()
+  };
+}
+
+/* Ein paar eingetragene Aufgaben in der laufenden Woche, damit beim
+   Öffnen sofort zu sehen ist, wie ein gefülltes Blatt aussieht. */
+function beispielAufgaben() {
+  const mo = wochenStart(new Date());
+  const a = {};
+  const setz = (tagVersatz, fach, text, fertig) => {
+    a[schluessel(plusTage(mo, tagVersatz)) + "|" + fach] = { text, fertig: !!fertig };
+  };
+  setz(0, "m",   "S. 84 Nr. 3a–c, Wurzelgleichungen", true);
+  setz(0, "d",   "Gedichtanalyse fertig schreiben");
+  setz(0, "bio", "Arbeitsblatt Zellatmung");
+  setz(1, "ph",  "Versuchsprotokoll abgeben", true);
+  setz(1, "ge",  "Kapitel 4 lesen, 3 Fragen notieren");
+  setz(2, "e",   "Vokabeln Unit 6 lernen (Test Freitag)");
+  setz(2, "m",   "S. 86 Nr. 7, 8");
+  setz(3, "inf", "Schleifen-Aufgabe zu Ende programmieren");
+  return a;
+}
+
+/* Zwei Termine, damit der Kalender beim Öffnen nicht leer ist. */
+function beispielTermine() {
+  const heute = tagStart(new Date());
+  return [
+    { id: "t1", tag: schluessel(plusTage(heute, 5)), titel: "Mathe-Arbeit: Wurzeln",
+      notiz: "Kapitel 3 und 4, Taschenrechner mitbringen", zeit: 8 * 60,
+      art: "arbeit", fach: "m", erinnerung: "abend" },
+    { id: "t2", tag: schluessel(plusTage(heute, 9)), titel: "Referat Geschichte abgeben",
+      notiz: "", zeit: null, art: "abgabe", fach: "ge", erinnerung: "zweiTage" }
+  ];
+}
+
+/* Ein Ferienzeitraum als Beispiel. Echte Termine stehen im Ferienplan
+   der eigenen Schule – die trägt man selbst ein. */
+function beispielFerien() {
+  const heute = tagStart(new Date());
+  return [{
+    id: "f1", name: "Herbstferien",
+    von: schluessel(plusTage(heute, 33)),
+    bis: schluessel(plusTage(heute, 44)),
+    notiz: "", erinnerung: "abend"
+  }];
+}
+
+function sichern() {
+  try { localStorage.setItem(SPEICHER, JSON.stringify(daten)); } catch (e) { /* egal */ }
+}
+
+const fachVon    = id => daten.faecher.find(f => f.id === id) || null;
+const wochentage = () => daten.einstellungen.samstag ? [1,2,3,4,5,6] : [1,2,3,4,5];
+
+function setzeAufgabe(d, fachId, text, fertig) {
+  const k = schluessel(d) + "|" + fachId;
+  const sauber = (text || "").trim();
+  if (!sauber) { delete daten.aufgaben[k]; }
+  else { daten.aufgaben[k] = { text, fertig: !!fertig }; }
+  sichern();
+}
+
+/* Fächer eines Tages: aus dem Stundenplan, dazu bereits Eingetragenes. */
+function faecherAmTag(d) {
+  const wt = wochentag(d);
+  const plan = daten.stunden[wt] || {};
+  const reihe = [], gesehen = new Set();
+  Object.keys(plan).map(Number).sort((a,b) => a-b).forEach(st => {
+    const id = plan[st];
+    if (id && !gesehen.has(id) && fachVon(id)) { gesehen.add(id); reihe.push(id); }
+  });
+  const praefix = schluessel(d) + "|";
+  Object.keys(daten.aufgaben).forEach(k => {
+    if (!k.startsWith(praefix)) return;
+    const id = k.slice(praefix.length);
+    if (!gesehen.has(id) && fachVon(id)) { gesehen.add(id); reihe.push(id); }
+  });
+  if (!daten.einstellungen.alleFaecher) {
+    return reihe.filter(id => daten.aufgaben[praefix + id] || (zusatz[schluessel(d)] || []).includes(id));
+  }
+  return reihe;
+}
+
+/* Von Hand ergänzte Fächer, nur für diese Sitzung – wie @State im DayCard */
+const zusatz = {};
+
+/* Welche Tage sind aufgeklappt? Beim Blättern startet jede Woche zugeklappt. */
+let aufgeklappt = {};
+
+/* Geöffnete Notiz (Schreibblatt) */
+let notizOffen = null;
+
+
+/* =====================================================================
+   Schulsachen im Hintergrund – feste Anordnung, damit nichts springt
+   ===================================================================== */
+
+const KRITZEL = [
+  { d:"M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z", x:8,  y:5,  s:46, r:-18, c:6 },
+  { d:"M7 5h10v2H7zm0 4h10v2H7zm0 4h7v2H7zM5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z", x:88, y:10, s:38, r:12,  c:7 },
+  { d:"M20 2l-8 8-2-2 8-8 2 2zM9 11l-6 6 4 4 6-6-4-4z", x:72, y:21, s:40, r:24, c:9 },
+  { d:"M4 4a2 2 0 0 1 2-2h12v20H6a2 2 0 0 1-2-2V4zm4 2v2h8V6H8z", x:16, y:27, s:42, r:10, c:0 },
+  { d:"M2 8h20v8H2V8zm3 0v4h1V8h2v3h1V8h2v4h1V8h2v3h1V8h2v4h1V8", x:93, y:36, s:44, r:-32, c:4 },
+  { d:"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2c1.9 0 3.6.7 5 1.8L14 9l-3-1-2 3 2 3-3 2-3-3a8 8 0 0 1 7-9z", x:6, y:45, s:40, r:6, c:3 },
+  { d:"M12 3v10.6A4 4 0 1 0 14 17V7h4V3h-6z", x:79, y:52, s:34, r:-12, c:2 },
+  { d:"M9 2h6v2h-1v5.2l4.8 9.3A2 2 0 0 1 17 21H7a2 2 0 0 1-1.8-2.5L10 9.2V4H9V2z", x:24, y:59, s:38, r:16, c:5 },
+  { d:"M12 2a10 10 0 0 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1.1.9-2 2-2h2.4A6.6 6.6 0 0 0 22 10c0-4.4-4.5-8-10-8zM6.5 12a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3.5 3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z", x:90, y:67, s:40, r:-8, c:1 },
+  { d:"M4 17h2.6l.8-2h3.2l.8 2H14L10.4 7H8L4 17zm4.1-4L9 10.4l.9 2.6H8.1zM16 17h4v-2h-2v-1.5h2v-2h-2V10h2V8h-4v9z", x:11, y:72, s:42, r:-14, c:8 },
+  { d:"M12 3L1 9l11 6 9-4.9V17h2V9L12 3zM5 13.2V17l7 4 7-4v-3.8l-7 3.8-7-3.8z", x:68, y:80, s:40, r:18, c:11 },
+  { d:"M9 2h6a3 3 0 0 1 3 3H6a3 3 0 0 1 3-3zM5 7h14a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-9a3 3 0 0 1 3-3zm3 4v3h8v-3H8z", x:30, y:88, s:42, r:-6, c:10 },
+  { d:"M12 10.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM12 2C7 2 3 6.5 3 12s4 10 9 10 9-4.5 9-10-4-10-9-10zm0 2c1.4 0 2.8 1 3.8 2.8C14.7 6.3 13.4 6 12 6s-2.7.3-3.8.8C9.2 5 10.6 4 12 4z", x:85, y:93, s:36, r:22, c:4 },
+  { d:"M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z", x:50, y:36, s:38, r:-22, c:3 },
+  { d:"M9.6 9.5L7.8 7.7a3 3 0 1 0-1.4 1.4l1.8 1.8 1.4-1.4zM5 7a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm14-5l-7 7 1.4 1.4L21 3.4V2h-2zM9.6 14.5l-1.4-1.4-1.8 1.8a3 3 0 1 0 1.4 1.4l1.8-1.8zM5 19a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm7-7l9 9v1.4h-2l-8.4-8.4L12 12z", x:44, y:66, s:34, r:30, c:0 },
+  { d:"M12 1l2.6 2.6L18 3l.8 3.4L22 8l-1.6 3.2L22 14l-3.2 1.6L18 19l-3.4-.6L12 21l-2.6-2.6L6 19l-.8-3.4L2 14l1.6-2.8L2 8l3.2-1.4L6 3l3.4.6L12 1zm-1 13.4l5-5-1.4-1.4L11 11.6 9.4 10 8 11.4l3 3z", x:55, y:9, s:32, r:8, c:5 }
+];
+
+function zeichneKritzel() {
+  const el = document.getElementById("kritzel");
+  if (!el) return;
+  el.innerHTML = KRITZEL.map(k =>
+    `<svg viewBox="0 0 24 24" width="${k.s}" height="${k.s}" fill="${tint(k.c)}"
+          style="left:${k.x}%;top:${k.y}%;transform:translate(-50%,-50%) rotate(${k.r}deg)">
+       <path d="${k.d}"></path></svg>`).join("");
+}
+
+/* =====================================================================
+   Zeichnen
+   ===================================================================== */
+
+const el = document.getElementById("inhalt");
+const navTitel = document.getElementById("navTitel");
+const navUnter = document.getElementById("navUnter");
+const knopfZurueck = document.getElementById("zurueck");
+const knopfVor = document.getElementById("vor");
+
+function sicher(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+}
+
+function zeichne() {
+  document.querySelectorAll(".tab").forEach(b =>
+    b.setAttribute("aria-selected", String(
+      b.dataset.tab === tab || (tab === "faecher" && b.dataset.tab === "stundenplan"))));
+
+  const istHA = tab === "hausaufgaben";
+  const istNotizen = tab === "notizen";
+  knopfZurueck.hidden = !istHA;
+  knopfVor.hidden = !istHA && !istNotizen;
+  document.getElementById("suche").hidden = !istHA;
+
+  // Bei den Notizen sitzt rechts oben das Plus – wie in der gebauten App.
+  knopfVor.dataset.rolle = istNotizen ? "neu" : "vor";
+  knopfVor.innerHTML = istNotizen
+    ? '<svg viewBox="0 0 24 24" width="21" height="21" fill="currentColor"><path d="M20.7 3.3a1 1 0 0 0-1.4 0l-1.6 1.6 2.4 2.4 1.6-1.6a1 1 0 0 0 0-1.4l-1-1zM16.3 6.2L4 18.5V21h2.5L18.8 8.6l-2.5-2.4z"/></svg>'
+    : "&#8250;";
+  knopfVor.style.fontSize = "20px";
+  knopfVor.setAttribute("aria-label", istNotizen ? "Notiz hinzufügen" : "Nächste Woche");
+
+  if (tab !== "notizen") entferneNotizblatt();
+
+  if (istHA) zeichneWoche();
+  else if (tab === "kalender") zeichneKalender();
+  else if (tab === "notizen") zeichneNotizen();
+  else if (tab === "stundenplan") zeichneStundenplan();
+  else if (tab === "faecher") zeichneFaecher();
+  else zeichneEinstellungen();
+}
+
+/* --- Hausaufgabenheft --- */
+function zeichneWoche() {
+  const mo = plusTage(wochenStart(new Date()), wochenVersatz * 7);
+  const tage = wochentage().map(wt => plusTage(mo, wt - 1));
+  const letzter = tage[tage.length - 1];
+
+  navTitel.textContent =
+    wochenVersatz === 0 ? "Diese Woche" :
+    wochenVersatz === 1 ? "Nächste Woche" :
+    wochenVersatz === -1 ? "Letzte Woche" : "KW " + kalenderwoche(mo);
+  navUnter.textContent =
+    `${mo.getDate()}.${mo.getMonth()+1}. – ${letzter.getDate()}. ${MONATE[letzter.getMonth()]} ${letzter.getFullYear()}`;
+
+  // Überblick: wie viel steht diese Woche noch an?
+  let offenGesamt = 0, fertigGesamt = 0;
+  tage.forEach(d => {
+    const pf = schluessel(d) + "|";
+    Object.keys(daten.aufgaben).forEach(k => {
+      if (!k.startsWith(pf)) return;
+      const a = daten.aufgaben[k];
+      if (!a.text.trim()) return;
+      if (a.fertig) fertigGesamt++; else offenGesamt++;
+    });
+  });
+  const gesamt = offenGesamt + fertigGesamt;
+
+  let html = "";
+  if (gesamt > 0) {
+    const anteil = Math.round((fertigGesamt / gesamt) * 100);
+    html += `<div class="ueberblick">
+      <div class="kopf">
+        <span class="titel">${offenGesamt === 0 ? "Alles erledigt 🎉"
+          : offenGesamt === 1 ? "Noch 1 Aufgabe offen"
+          : "Noch " + offenGesamt + " Aufgaben offen"}</span>
+        <span class="stand">${fertigGesamt} von ${gesamt} erledigt</span>
+      </div>
+      <div class="balken"><span style="width:${anteil}%"></span></div>
+    </div>`;
+  }
+  html += '<div class="wochengitter">';
+  tage.forEach(d => {
+    const sk = schluessel(d);
+    const liste = faecherAmTag(d).concat((zusatz[sk] || []).filter(id => !faecherAmTag(d).includes(id)));
+    const offen = liste.filter(id => {
+      const a = daten.aufgaben[sk + "|" + id];
+      return a && a.text.trim() && !a.fertig;
+    }).length;
+
+    const frei = !!daten.freieTage[sk];
+    const hatEintrag = liste.some(id => {
+      const a = daten.aufgaben[sk + "|" + id];
+      return a && (a.text.trim() || a.fertig);
+    });
+    const auf = amPC() ? true : !!aufgeklappt[sk];
+
+    // Zugeklappt zeigt der Kopf, was an dem Tag ansteht.
+    let kurz = "";
+    const freierName = freierTagName(sk);
+    if (freierName) {
+      kurz = `<span class="kfrei" style="color:var(--ferien)">
+        <svg viewBox="0 0 24 24"><path d="${FERIEN_SVG}"/></svg>
+        ${sicher(freierName)}</span>`;
+    } else if (frei) {
+      kurz = `<span class="kfrei">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        Keine Hausaufgaben</span>`;
+    } else if (hatEintrag) {
+      kurz = '<span class="kbadges">' + liste.filter(id => {
+        const a = daten.aufgaben[sk + "|" + id];
+        return a && a.text.trim();
+      }).map(id => {
+        const f = fachVon(id);
+        const a = daten.aufgaben[sk + "|" + id];
+        const blass = a && a.fertig ? ";opacity:.55" : "";
+        return `<span class="kuerzel klein" style="background:${fill(f.f)};color:${tint(f.f)}${blass}">${sicher(f.kuerzel)}</span>`;
+      }).join("") + '</span>';
+    } else if (!liste.length) {
+      kurz = '<span class="knichts">Keine Stunden an diesem Tag</span>';
+    } else if (liste.every(id => {
+        const a = daten.aufgaben[sk + "|" + id];
+        return (a && a.text.trim()) || daten.freieFaecher[sk + "|" + id];
+      })) {
+      // In jedem Fach steht etwas oder "nichts auf".
+      kurz = `<span class="kfrei">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        Keine Hausaufgaben</span>`;
+    } else {
+      kurz = '<span class="knichts">Nichts eingetragen</span>';
+    }
+
+    html += `<div class="tag${istHeute(d) ? " heute" : ""}">
+      <${amPC() ? "div" : "button"} class="tagkopf${auf ? " auf" : ""}"
+        ${amPC() ? "" : `data-klapp="${sk}" aria-expanded="${auf}"`}>
+        <span class="kopfzeile">
+          <span class="name">${TAGE[wochentag(d)-1]}</span>
+          <span class="datum">${d.getDate()}. ${MONATE[d.getMonth()]}</span>
+          <span class="fueller"></span>
+          ${istHeute(d) ? '<span class="marke">Heute</span>' : ""}
+          ${offen ? `<span class="zahl">${offen}</span>`
+                  : (hatEintrag ? '<span class="fertigmarke"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></span>' : "")}
+          <span class="chevron">&#8250;</span>
+        </span>
+        ${auf ? "" : '<span class="kurz">' + kurz + '</span>'}
+      </${amPC() ? "div" : "button"}>`;
+
+    if (!auf) { html += "</div>"; return; }
+
+    if (frei) {
+      html += `<button class="freimarke" data-frei="${sk}" data-an="0">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        <span>
+          <span class="ft">Keine Hausaufgaben</span>
+          <div class="fu">Antippen, um doch etwas einzutragen</div>
+        </span>
+      </button>`;
+    } else if (!liste.length) {
+      html += '<div class="leer">Keine Stunden an diesem Tag.</div>';
+    } else {
+      html += `<div class="legende">
+        <span><i class="punkt gelb"></i> keine Hausaufgaben</span>
+        <span><i class="punkt blau"></i> fertig</span>
+      </div>`;
+
+      liste.forEach(id => {
+        const f = fachVon(id);
+        const a = daten.aufgaben[sk + "|" + id] || { text:"", fertig:false };
+        const hatText = !!a.text.trim();
+        const fachFrei = !!daten.freieFaecher[sk + "|" + id];
+
+        // Beide Felder stehen an jeder Zeile – bei jedem Fach.
+        const voll = '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>';
+        const leer = '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>';
+
+        const rechts =
+          `<button class="feld gelb${fachFrei ? " an" : ""}"
+                   data-fachfrei="${sk}|${id}" data-an="${fachFrei ? 0 : 1}"
+                   aria-label="${fachFrei
+                     ? "„Keine Hausaufgaben“ für " + sicher(f.name) + " aufheben"
+                     : "Ankreuzen: in " + sicher(f.name) + " ist nichts aufgegeben"}">
+             ${fachFrei ? voll : leer}
+           </button>
+           <button class="feld haken${a.fertig ? " an" : ""}"
+                   aria-label="${a.fertig ? "Als offen markieren" : "Als erledigt markieren"}">
+             ${a.fertig ? voll : leer}
+           </button>`;
+
+        const mitte = fachFrei
+          ? '<span class="keineha">Keine Hausaufgaben</span>'
+          : `<textarea rows="1" placeholder="${a.fertig ? "Erledigt" : "Hausaufgabe eintragen …"}"
+                 aria-label="${sicher(f.name)} am ${d.getDate()}. ${MONATE[d.getMonth()]}">${sicher(a.text)}</textarea>`;
+
+        html += `<div class="zeile${a.fertig ? " erledigt" : ""}${hatText || fachFrei ? "" : " offen"}"
+                      data-tag="${sk}" data-fach="${id}">
+          <span class="kuerzel" style="background:${fill(f.f)};color:${tint(f.f)}">${sicher(f.kuerzel)}</span>
+          ${mitte}
+          ${rechts}
+        </div>`;
+      });
+    }
+
+    if (!frei && !hatEintrag && liste.length) {
+      html += `<button class="freizeile" data-frei="${sk}" data-an="1">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>
+        Keine Hausaufgaben</button>`;
+    }
+
+    const rest = frei ? [] : daten.faecher.filter(f => !liste.includes(f.id));
+    if (rest.length) {
+      html += `<button class="ergaenzen" data-ergaenzen="${sk}">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        Fach ergänzen</button>`;
+    }
+    html += "</div>";
+  });
+  html += "</div>";
+  el.innerHTML = html;
+
+  el.querySelectorAll("textarea").forEach(t => { hoeheAnpassen(t); });
+}
+
+function hoeheAnpassen(t) {
+  t.style.height = "auto";
+  t.style.height = t.scrollHeight + "px";
+}
+
+/* --- Stundenplan --- */
+function zeichneStundenplan() {
+  navTitel.textContent = "Stundenplan";
+  navUnter.textContent = "";
+
+  const tage = wochentage();
+  const zeiten = zeitenFuer(daten.einstellungen.stunden);
+  const heute = wochentag(new Date());
+  const zeitB = daten.einstellungen.zeiten ? "var(--zeit-b)" : "32px";
+  const spalten = `${zeitB} repeat(${tage.length}, minmax(64px, 1fr))`;
+
+  let html = "";
+  if (planFoto) {
+    html += `<div class="planfoto">
+      <img src="${planFoto}" alt="Abfotografierter Stundenplan">
+      <div class="leiste">
+        <span>Tipp die Felder unten an und übertrag deinen Plan.</span>
+        <button type="button" data-fotoweg="1">Foto entfernen</button>
+      </div>
+    </div>`;
+  }
+
+  html += `<button class="banner" data-zufaecher="1" style="margin-bottom:10px">
+      <span class="sym"><svg viewBox="0 0 24 24"><path d="M4 3h3v18H4zM8.5 3h3v18h-3zM13 3.5l2.9-.8 4.6 17.4-2.9.8z"/></svg></span>
+      <span>
+        <span class="btitel">Fächer</span>
+        <div class="btext">Name, Kürzel, Farbe, Lehrkraft und Raum.</div>
+      </span>
+      <span class="pfeil">&#8250;</span>
+    </button>
+    <button class="banner" data-scan="1">
+      <span class="sym"><svg viewBox="0 0 24 24"><path d="M4 4h4V2H2v6h2V4zm16 0v4h2V2h-6v2h4zM4 20v-4H2v6h6v-2H4zm16 0h-4v2h6v-6h-2v4zM7 9h10v2H7V9zm0 4h7v2H7v-2z"/></svg></span>
+      <span>
+        <span class="btitel">${planFoto ? "Anderes Foto aufnehmen" : "Stundenplan abfotografieren"}</span>
+        <div class="btext">${planFoto
+          ? "Das Foto steht oben als Vorlage, während du die Felder ausfüllst."
+          : "Foto aufnehmen oder auswählen – es bleibt beim Ausfüllen als Vorlage stehen."}</div>
+      </span>
+      <span class="pfeil">&#8250;</span>
+    </button>
+    <div class="planrahmen"><div class="plan">
+    <div class="plankopf" style="grid-template-columns:${spalten}"><div></div>`;
+  tage.forEach(wt => {
+    html += `<div class="planspalte${wt === heute ? " heute" : ""}">${TAGE_KURZ[wt-1]}</div>`;
+  });
+  html += "</div>";
+
+  zeiten.forEach(z => {
+    html += `<div class="planzeile" style="grid-template-columns:${spalten}">
+      <div class="planzeit"><span class="nr">${z.stunde}.</span>`;
+    if (daten.einstellungen.zeiten) {
+      html += `<span class="uhr">${uhr(z.von)}</span><span class="uhr">${uhr(z.bis)}</span>`;
+    }
+    html += "</div>";
+
+    tage.forEach(wt => {
+      const id = (daten.stunden[wt] || {})[z.stunde];
+      const f = id ? fachVon(id) : null;
+      html += f
+        ? `<button class="planzelle" style="background:${fill(f.f)}" data-wt="${wt}" data-st="${z.stunde}"
+                   aria-label="${sicher(f.name)}, ${TAGE[wt-1]} ${z.stunde}. Stunde">
+             <span class="streifen" style="background:${tint(f.f)}"></span>
+             <span class="zellinhalt">
+               <span class="pk" style="color:${tint(f.f)}">${sicher(f.kuerzel)}</span>
+               ${f.raum ? `<span class="pr" style="color:${tint(f.f)}">${sicher(f.raum)}</span>` : ""}
+             </span>
+           </button>`
+        : `<button class="planzelle frei" data-wt="${wt}" data-st="${z.stunde}"
+                   aria-label="Freie Stunde, ${TAGE[wt-1]} ${z.stunde}. Stunde">+</button>`;
+    });
+    html += "</div>";
+  });
+
+  html += `</div></div>
+    <div class="fuss" style="padding-top:14px">Auf ein Feld tippen, um das Fach zu ändern.
+    ${planFoto ? "Das Foto oben bleibt stehen, bis du es entfernst." :
+      "In der gebauten iOS-App liest Apples Texterkennung die Kürzel zusätzlich automatisch aus dem Foto."}</div>`;
+  el.innerHTML = html;
+}
+
+/* --- Notizen --- */
+function tageBis(sk) {
+  if (!sk) return null;
+  const ziel = new Date(sk + "T00:00:00");
+  const heute = tagStart(new Date());
+  return Math.round((ziel - heute) / 86400000);
+}
+
+function terminText(sk) {
+  if (!sk) return null;
+  const d = new Date(sk + "T00:00:00");
+  const datum = TAGE_KURZ[wochentag(d)-1] + ", " + d.getDate() + "." + (d.getMonth()+1) + ".";
+  const t = tageBis(sk);
+  if (t === 0) return datum + " · heute";
+  if (t === 1) return datum + " · morgen";
+  if (t > 1 && t <= 7) return datum + " · in " + t + " Tagen";
+  if (t < 0) return datum + " · vorbei";
+  return datum;
+}
+
+function sortierteNotizen() {
+  return daten.notizen.slice().sort((a, b) => {
+    if (a.fertig !== b.fertig) return a.fertig ? 1 : -1;
+    if (a.termin && b.termin && a.termin !== b.termin) return a.termin < b.termin ? -1 : 1;
+    if (a.termin && !b.termin) return -1;
+    if (!a.termin && b.termin) return 1;
+    return (b.erstellt || 0) - (a.erstellt || 0);
+  });
+}
+
+function zeichneNotizen() {
+  if (notizOffen) { zeichneNotizblatt(); return; }
+  entferneNotizblatt();
+
+  navTitel.textContent = "Notizen";
+  navUnter.textContent = "";
+
+  const liste = daten.notizen.slice().sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0));
+
+  // Oben das Feld zum Antippen – darunter, was man selbst geschrieben hat.
+  let html = `<button class="neufeld" data-neuenotiz="1">
+      <svg viewBox="0 0 24 24"><path d="M20.7 3.3a1 1 0 0 0-1.4 0l-1.6 1.6 2.4 2.4 1.6-1.6a1 1 0 0 0 0-1.4l-1-1zM16.3 6.2L4 18.5V21h2.5L18.8 8.6l-2.5-2.4z"/></svg>
+      <span>Notiz schreiben …</span>
+    </button>`;
+
+  html += liste.map(notizZeile).join("");
+
+  if (!liste.length) {
+    html += `<div class="neuhinweis">Tippe oben auf das Feld und schreib los.
+      Alles, was du hier notierst, findest du beim nächsten Öffnen wieder.</div>`;
+  }
+  el.innerHTML = html;
+}
+
+function notizZeile(n) {
+  const zeilen = (n.text || "").split("\n").map(z => z.trim()).filter(Boolean);
+  const titel = zeilen[0] || "Neue Notiz";
+  const vorschau = zeilen.slice(1).join(" ");
+  return `<button class="nzeile" data-notiz="${n.id}">
+    <span style="flex:1;min-width:0">
+      <span class="ntitel">${sicher(titel)}</span>
+      <div class="nunter">${sicher(zeitstempel(n.geaendert))}${vorschau ? "  " + sicher(vorschau) : ""}</div>
+    </span>
+  </button>`;
+}
+
+/* Heute die Uhrzeit, gestern "Gestern", sonst das Datum. */
+function zeitstempel(ms) {
+  const d = ms ? new Date(ms) : new Date();
+  if (istHeute(d)) {
+    return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+  }
+  const gestern = plusTage(tagStart(new Date()), -1);
+  if (schluessel(d) === schluessel(gestern)) return "Gestern";
+  return d.getDate() + "." + (d.getMonth()+1) + ".";
+}
+
+/* --- Das Schreibblatt: einfach lostippen, es speichert sich selbst --- */
+function zeichneNotizblatt() {
+  const n = daten.notizen.find(x => x.id === notizOffen);
+  if (!n) { notizOffen = null; zeichneNotizen(); return; }
+
+  let blattEl = document.getElementById("notizblatt");
+  if (!blattEl) {
+    blattEl = document.createElement("div");
+    blattEl.id = "notizblatt";
+    blattEl.className = "notizblatt";
+    document.body.appendChild(blattEl);
+  }
+
+  blattEl.innerHTML = `
+    <div class="blattleiste">
+      <button data-blattzurueck="1">&#8249; Notizen</button>
+      <button class="weg" data-blattloeschen="1" aria-label="Notiz löschen">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+      </button>
+    </div>
+    <textarea id="blattext" placeholder="Notiz schreiben …">${sicher(n.text || "")}</textarea>`;
+
+  const ta = document.getElementById("blattext");
+  // Tippen schreibt direkt in die Daten – ohne neu zu zeichnen,
+  // sonst würde der Cursor springen.
+  ta.addEventListener("input", () => {
+    n.text = ta.value;
+    n.geaendert = Date.now();
+    sichern();
+  });
+  ta.focus();
+  const l = ta.value.length;
+  ta.setSelectionRange(l, l);
+}
+
+function entferneNotizblatt() {
+  const b = document.getElementById("notizblatt");
+  if (b) b.remove();
+}
+
+function blattSchliessen() {
+  const n = daten.notizen.find(x => x.id === notizOffen);
+  // Eine Notiz, in der nie etwas stand, wird nicht behalten.
+  if (n && !(n.text || "").trim()) {
+    daten.notizen = daten.notizen.filter(x => x.id !== n.id);
+    sichern();
+  }
+  notizOffen = null;
+  entferneNotizblatt();
+  zeichne();
+}
+
+/* --- Fächer --- */
+
+/* Heute, wenn heute Unterricht ist – sonst der nächste Schultag. */
+function aktuellerSchultag() {
+  const start = tagStart(new Date());
+  for (let i = 0; i < 7; i++) {
+    const d = plusTage(start, i);
+    const wt = wochentag(d);
+    if (!wochentage().includes(wt)) continue;
+    const plan = daten.stunden[wt] || {};
+    if (Object.keys(plan).some(st => plan[st])) return d;
+  }
+  return null;
+}
+
+function zeichneFaecher() {
+  navTitel.textContent = "Fächer";
+  navUnter.textContent = "";
+
+  let html = `<button class="ergaenzen" data-zurueckplan="1"
+      style="border-top:0;padding-left:0;margin-bottom:6px">&#8249; Stundenplan</button>`;
+
+  // Was an diesem Tag ansteht – stellt sich jeden Tag von allein um.
+  const tag = aktuellerSchultag();
+  if (tag) {
+    const wt = wochentag(tag);
+    const plan = daten.stunden[wt] || {};
+    const zeiten = zeitenFuer(daten.einstellungen.stunden);
+    const stunden = Object.keys(plan).map(Number).sort((a, b) => a - b)
+      .filter(st => plan[st] && fachVon(plan[st]));
+
+    if (stunden.length) {
+      const name = TAGE[wt - 1];
+      let titel = name;
+      if (istHeute(tag)) titel = "Heute · " + name;
+      else if (schluessel(tag) === schluessel(plusTage(tagStart(new Date()), 1))) titel = "Morgen · " + name;
+
+      html += `<div class="gruppentitel">${sicher(titel)}</div><div class="gruppe">` +
+        stunden.map(st => {
+          const f = fachVon(plan[st]);
+          const z = zeiten.find(x => x.stunde === st);
+          return `<div class="eintrag">
+            <span class="stundenr">
+              <span class="snr">${st}.</span>
+              ${daten.einstellungen.zeiten && z ? `<span class="szeit">${uhr(z.von)}</span>` : ""}
+            </span>
+            <span class="kuerzel" style="background:${fill(f.f)};color:${tint(f.f)};margin-top:0;width:44px">${sicher(f.kuerzel)}</span>
+            <span class="haupt">${sicher(f.name)}</span>
+            ${f.raum ? `<span class="wert" style="font-size:13px">${sicher(f.raum)}</span>` : ""}
+          </div>`;
+        }).join("") + "</div>" +
+        `<div class="fuss">Diese Stunden hast du an dem Tag – die Liste stellt sich jeden Tag von allein um.</div>`;
+    }
+  }
+
+  html += `<div class="gruppentitel">${tag ? "Alle Fächer" : ""}</div><div class="gruppe">`;
+  daten.faecher.slice().sort((a,b) => a.name.localeCompare(b.name,"de")).forEach(f => {
+    let anzahl = 0;
+    Object.keys(daten.stunden).forEach(wt =>
+      Object.values(daten.stunden[wt]).forEach(id => { if (id === f.id) anzahl++; }));
+    const teile = [f.lehrer, f.raum ? "Raum " + f.raum : "",
+                   anzahl ? (anzahl === 1 ? "1 Stunde/Woche" : anzahl + " Stunden/Woche") : ""].filter(Boolean);
+    html += `<button class="eintrag" data-fach="${f.id}">
+      <span class="kuerzel" style="background:${fill(f.f)};color:${tint(f.f)};margin-top:0;width:46px">${sicher(f.kuerzel)}</span>
+      <span style="flex:1;min-width:0">
+        <span class="haupt">${sicher(f.name)}</span>
+        <div class="neben">${sicher(teile.join(" · "))}</div>
+      </span>
+      <span class="wert" style="color:var(--text3)">&#8250;</span>
+    </button>`;
+  });
+  html += `<button class="ergaenzen" data-neuesfach="1">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+      Fach anlegen</button>`;
+  html += `</div><div class="fuss">Das Kürzel steht im Stundenplan und links neben dem
+    Hausaufgabenfeld. Tipp ein Fach an, um Name, Kürzel, Farbe, Lehrkraft und Raum zu ändern.</div>`;
+
+  el.innerHTML = html;
+}
+
+/* --- Einstellungen --- */
+function zeichneEinstellungen() {
+  navTitel.textContent = "Einstellungen";
+  navUnter.textContent = "";
+  const e = daten.einstellungen;
+
+  const modus = e.darstellung || "system";
+  const modusText = {
+    system: "Die App richtet sich danach, ob dein Gerät gerade auf hell oder dunkel steht.",
+    light:  "Die App bleibt immer hell – auch wenn das Gerät auf dunkel steht.",
+    dark:   "Die App bleibt immer dunkel – auch wenn das Gerät auf hell steht."
+  }[modus];
+
+  const pr = daten.profil;
+  const prName = [pr.vorname, pr.nachname].filter(x => x && x.trim()).join(" ").trim();
+  const prLeer = !Object.keys(pr).some(k => (pr[k] || "").trim());
+  const prZeile = prLeer ? "Meine Daten"
+    : (prName && pr.klasse ? prName + " · " + pr.klasse : (prName || pr.klasse));
+
+  el.innerHTML = `
+    <div class="gruppentitel">Über mich</div>
+    <div class="gruppe">
+      <button class="eintrag" data-profil="1">
+        <span class="profilsym">
+          <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>
+        </span>
+        <span>
+          <span class="haupt" style="font-weight:600">${sicher(prZeile)}</span>
+          <div class="neben">${prLeer ? "Name, Klasse, Telefon, Adresse eintragen" : "Angaben ansehen und ändern"}</div>
+        </span>
+        <span class="wert" style="color:var(--text3)">&#8250;</span>
+      </button>
+    </div>
+
+    <div class="gruppentitel">Erinnerungen</div>
+    <div class="gruppe">
+      <div class="eintrag">
+        <span>
+          <span class="haupt">An Termine erinnern</span>
+          <div class="neben">Homy meldet sich, bevor eine Arbeit oder Abgabe ansteht.</div>
+        </span>
+        <button class="schalter" role="switch" data-schalter="erinnerungen"
+          aria-checked="${e.erinnerungen}" aria-label="An Termine erinnern"></button>
+      </div>
+      ${e.erinnerungen ? `
+      <div class="eintrag">
+        <span>
+          <span class="haupt">Neue Termine erinnern</span>
+          <div class="neben">${ERINNERUNGEN[e.standardErinnerung].text}</div>
+        </span>
+        <span class="wert" style="white-space:nowrap;font-size:15px">${ERINNERUNGEN[e.standardErinnerung].name}</span>
+      </div>` : ``}
+    </div>
+    <div class="fuss">${e.erinnerungen
+      ? "Bei jedem Termin lässt sich die Erinnerung auch einzeln einstellen. Die Benachrichtigung schickt iOS – sie kommt auch, wenn Homy geschlossen ist, und nichts davon geht ins Internet."
+      : "Aus. Eingetragene Termine bleiben im Kalender stehen, es kommt nur keine Benachrichtigung mehr."}</div>
+
+    <div class="gruppentitel">Anmeldung</div>
+    <div class="gruppe">
+      <div class="eintrag">
+        <span>
+          <span class="haupt">Anmeldung verlangen</span>
+          <div class="neben">Ohne Code kommt niemand an deine Hausaufgaben und Notizen.</div>
+        </span>
+        <button class="schalter" role="switch" data-anmeldung="an"
+          aria-checked="${daten.anmeldung.an}" aria-label="Anmeldung verlangen"></button>
+      </div>
+      ${daten.anmeldung.an ? `
+      <button class="eintrag" data-codeaendern="1">
+        <span>
+          <span class="haupt" style="color:var(--akzent)">${
+            daten.anmeldung.istBeispielCode ? "Eigenen Code festlegen" : "Code ändern"}</span>
+          <div class="neben">${daten.anmeldung.istBeispielCode
+            ? "Noch ist der Beispielcode 1234 eingestellt."
+            : daten.anmeldung.code.length + "-stelliger Code"}</div>
+        </span>
+        <span class="wert" style="color:var(--text3)">&#8250;</span>
+      </button>
+      <div class="eintrag">
+        <span>
+          <span class="haupt">Schnellstart für mich</span>
+          <div class="neben">${daten.anmeldung.schnellstart
+            ? sicher(schnellstartName()) + " – öffnet ohne Code."
+            : "Öffnen ohne Code zu tippen. Homy versucht Face ID bzw. Touch ID; geht das im Browser nicht, merkt es sich diesen Browser."}</div>
+        </span>
+        <button class="schalter" role="switch" data-schnellstart="1"
+          aria-checked="${daten.anmeldung.schnellstart}" aria-label="Schnellstart"></button>
+      </div>
+      ${daten.anmeldung.schnellstart && !daten.anmeldung.webauthnId ? `
+      <button class="eintrag" data-biometrie="1">
+        <span>
+          <span class="haupt" style="color:var(--akzent)">Mit Face ID / Touch ID öffnen</span>
+          <div class="neben">Statt nur diesen Browser zu merken. Klappt nur, wenn dein Gerät
+            das anbietet und diese eingebettete Seite es zulässt.</div>
+        </span>
+        <span class="wert" style="color:var(--text3)">&#8250;</span>
+      </button>` : ``}
+      <div class="feldzeile">
+        <label for="wannWahl">Code abfragen</label>
+        <select id="wannWahl" data-wannwahl="1">
+          ${Object.keys(WANN_NAME).map(k =>
+            `<option value="${k}"${k === daten.anmeldung.wann ? " selected" : ""}>${WANN_NAME[k]}</option>`).join("")}
+        </select>
+      </div>
+      <div class="fuss" style="padding:0 14px 10px">${WANN_TEXT[daten.anmeldung.wann]}</div>
+      <button class="eintrag" data-sperren="1">
+        <span class="haupt" style="color:var(--akzent)">Homy jetzt zusperren</span>
+      </button>
+      <button class="eintrag" data-anmeldungaus="1">
+        <span class="haupt" style="color:#D93025">Anmeldung ausschalten</span>
+      </button>` : ``}
+    </div>
+    <div class="fuss">Der Code gilt für alle, die das Gerät in die Hand nehmen.
+      Nur du stellst dir den Schnellstart ein und musst dann so gut wie nie etwas eintippen.
+      In der gebauten App wird der Code nicht im Klartext gespeichert, sondern nur ein Prüfwert –
+      und er steht auch nicht in den Sicherungsdateien.</div>
+
+    <div class="gruppentitel">Die Felder im Hausaufgabenheft</div>
+    <div class="gruppe">
+      <div class="eintrag" style="align-items:flex-start">
+        <span class="erklsym" style="color:var(--gelb)">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></span>
+        <span>
+          <span class="haupt" style="font-size:15px;font-weight:600">Keine Hausaufgaben</span>
+          <div class="neben">Kreuze das gelbe Feld an, wenn in dem Fach nichts aufgegeben
+            wurde. Die Zeile zeigt dann „Keine Hausaufgaben“.</div>
+        </span>
+      </div>
+      <div class="eintrag" style="align-items:flex-start">
+        <span class="erklsym" style="color:var(--akzent)">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></span>
+        <span>
+          <span class="haupt" style="font-size:15px;font-weight:600">Erledigt</span>
+          <div class="neben">Kreuze das blaue Feld an, wenn du die Hausaufgabe gemacht hast.
+            Aufschreiben kannst du sie im Feld daneben.</div>
+        </span>
+      </div>
+    </div>
+    <div class="fuss">Beide lassen sich bei jedem Fach ankreuzen. Sie schließen einander aus:
+      Kreuzt du „Keine Hausaufgaben“ an, wird ein schon eingetragener Text verworfen.</div>
+
+    <div class="gruppentitel">Bundesland</div>
+    <div class="gruppe">
+      <div class="feldzeile">
+        <label for="landWahl">Bundesland</label>
+        <select id="landWahl" data-landwahl="1">
+          <option value=""${!e.bundesland ? " selected" : ""}>Nicht angegeben</option>
+          ${Object.keys(LAENDER).sort((a, b) => LAENDER[a].localeCompare(LAENDER[b], "de"))
+            .map(k => `<option value="${k}"${k === e.bundesland ? " selected" : ""}>${LAENDER[k]}</option>`).join("")}
+        </select>
+      </div>
+      ${naechsteFeiertage(4).map(f => `
+        <div class="eintrag" style="align-items:flex-start">
+          <span style="flex:none;width:14px;padding-top:7px">
+            <i style="display:block;width:7px;height:7px;border-radius:50%;background:var(--ferien)"></i></span>
+          <span style="flex:1;min-width:0">
+            <span class="haupt" style="font-size:15px">${sicher(f.name)}</span>
+            ${f.hinweis ? `<div class="neben" style="font-size:11px">${sicher(f.hinweis)}</div>` : ""}
+          </span>
+          <span class="wert" style="font-size:13px;text-align:right">${sicher(langesDatum(f.tag))}</span>
+        </div>`).join("")}
+    </div>
+    <div class="fuss">${e.bundesland
+      ? `Oben stehen die nächsten Feiertage in ${sicher(LAENDER[e.bundesland])}. Homy rechnet sie
+         selbst aus – auch für kommende Jahre, ohne Internet und ohne dass du etwas eintragen musst.
+         Im Kalender sind sie grün wie die Ferien.<br><br>
+         Die Schulferien stecken da nicht mit drin: Die legt jedes Land für jedes Schuljahr neu fest,
+         sie lassen sich nicht ausrechnen. Trag sie einmal aus dem Ferienplan deiner Schule im
+         Kalender ein – dann stehen sie.${
+           e.bundesland === "BY" ? "<br><br>In Bayern ist Mariä Himmelfahrt nur in überwiegend katholischen Gemeinden frei." : ""}${
+           (e.bundesland === "SN" || e.bundesland === "TH") ? "<br><br>In einzelnen Gemeinden kann zusätzlich Fronleichnam frei sein – das steht hier nicht mit drin." : ""}`
+      : `Stell dein Bundesland ein, dann trägt Homy die gesetzlichen Feiertage von selbst in den
+         Kalender ein – grün, wie die Ferien.<br><br>
+         Die Schulferien kann dir das nicht abnehmen: Die legt jedes Land für jedes Schuljahr neu
+         fest, und erfundene Termine wären schlimmer als gar keine. Die trägst du einmal aus dem
+         Ferienplan deiner Schule im Kalender ein.`}</div>
+
+    <div class="gruppentitel">Die Punkte im Kalender</div>
+    <div class="gruppe">
+      <div class="eintrag" style="align-items:flex-start">
+        <span style="flex:none;width:26px;padding-top:6px">
+          <i style="display:block;width:12px;height:12px;border-radius:50%;background:var(--ferien)"></i></span>
+        <span>
+          <span class="haupt" style="font-size:15px;font-weight:600">Grün: schulfrei</span>
+          <div class="neben">Ferien und gesetzliche Feiertage. Jeder Ferientag bekommt einen
+            grünen Punkt – der erste, der letzte und alle dazwischen; die ganzen Ferien sind
+            zusätzlich grün hinterlegt. Die Feiertage kommen von allein, sobald oben dein
+            Bundesland eingestellt ist.</div>
+        </span>
+      </div>
+      <div class="eintrag" style="align-items:flex-start">
+        <span style="flex:none;width:26px;padding-top:6px">
+          <i style="display:block;width:12px;height:12px;border-radius:50%;background:${tint(0)}"></i></span>
+        <span>
+          <span class="haupt" style="font-size:15px;font-weight:600">Farbig: ein Termin</span>
+          <div class="neben">Je Termin ein Punkt. Die Farbe sagt, was für einer: rot Arbeit,
+            orange Test, lila Abgabe, braun Ausflug, grau Sonstiges.</div>
+        </span>
+      </div>
+      <div class="eintrag" style="align-items:flex-start">
+        <span style="flex:none;width:26px;padding-top:6px">
+          <i style="display:block;width:12px;height:12px;border-radius:50%;background:var(--text3)"></i></span>
+        <span>
+          <span class="haupt" style="font-size:15px;font-weight:600">Grau: offene Hausaufgaben</span>
+          <div class="neben">An diesem Tag ist noch etwas aufgeschrieben, das du nicht
+            abgehakt hast.</div>
+        </span>
+      </div>
+    </div>
+    <div class="fuss">Dieselbe Erklärung steht auch klein unter dem Monat im Kalender.</div>
+
+    <div class="gruppentitel">Darstellung</div>
+    <div class="gruppe">
+      <div class="eintrag" style="display:block;padding:12px 14px">
+        <div class="segmente" role="group" aria-label="Erscheinungsbild">
+          <button data-darstellung="system" aria-selected="${modus === "system"}">Automatisch</button>
+          <button data-darstellung="light"  aria-selected="${modus === "light"}">Hell</button>
+          <button data-darstellung="dark"   aria-selected="${modus === "dark"}">Dunkel</button>
+        </div>
+      </div>
+    </div>
+    <div class="fuss">${modusText}</div>
+
+    <div class="gruppentitel">Stundenplan</div>
+    <div class="gruppe">
+      <div class="eintrag">
+        <span class="haupt">Stunden pro Tag</span>
+        <span class="stepper">
+          <span class="wert">${e.stunden}</span>
+          <button class="knopf" data-stunden="-1" aria-label="Weniger Stunden">−</button>
+          <button class="knopf" data-stunden="1" aria-label="Mehr Stunden">+</button>
+        </span>
+      </div>
+      <div class="eintrag">
+        <span class="haupt">Samstag anzeigen</span>
+        <button class="schalter" role="switch" data-schalter="samstag" aria-checked="${e.samstag}" aria-label="Samstag anzeigen"></button>
+      </div>
+      <div class="eintrag">
+        <span class="haupt">Uhrzeiten anzeigen</span>
+        <button class="schalter" role="switch" data-schalter="zeiten" aria-checked="${e.zeiten}" aria-label="Uhrzeiten anzeigen"></button>
+      </div>
+      <button class="eintrag" data-zeiten="1">
+        <span>
+          <span class="haupt">Unterrichtszeiten</span>
+          <div class="neben">${(e.zeitenListe || []).length
+            ? "Eigene Zeiten eingestellt." : "45 Minuten je Stunde, große Pause nach der 2. und 4."}</div>
+        </span>
+        <span class="wert" style="color:var(--text3)">&#8250;</span>
+      </button>
+    </div>
+
+    <div class="gruppentitel">Hausaufgaben</div>
+    <div class="gruppe">
+      <div class="eintrag">
+        <span class="haupt">Alle Fächer des Tages zeigen</span>
+        <button class="schalter" role="switch" data-schalter="alleFaecher" aria-checked="${e.alleFaecher}" aria-label="Alle Fächer des Tages zeigen"></button>
+      </div>
+    </div>
+    <div class="fuss">${e.alleFaecher
+      ? "Jeder Tag zeigt alle Fächer aus dem Stundenplan – bereit zum Eintragen."
+      : "Jeder Tag zeigt nur Fächer, zu denen schon etwas eingetragen ist."}</div>
+
+    <div class="gruppentitel">Daten</div>
+    <div class="gruppe">
+      <button class="eintrag" data-sicherung="1">
+        <span>
+          <span class="haupt">Sicherung</span>
+          <div class="neben">Alles herauskopieren oder eine Sicherung einspielen.</div>
+        </span>
+        <span class="wert" style="color:var(--text3)">&#8250;</span>
+      </button>
+      <button class="eintrag" data-zuruecksetzen="1">
+        <span class="haupt" style="color:#D93025">Beispieldaten wiederherstellen</span>
+      </button>
+    </div>
+    <div class="fuss">Die gebaute App speichert die Sicherung als Datei, etwa in deiner
+      iCloud Drive. Diese eingebettete Seite darf nichts herunterladen – dafür gibt es
+      hier Kopieren und Einfügen.</div>
+
+    <div class="gruppentitel">Über die App</div>
+    <div class="gruppe">
+      <div class="eintrag">
+        <span class="ueberlogo"><svg class="homylogo" viewBox="0 0 100 100" aria-hidden="true">
+  <defs><linearGradient id="homyG" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#3B72FF"/><stop offset="1" stop-color="#7A5AF0"/>
+  </linearGradient></defs>
+  <rect width="100" height="100" rx="22.5" fill="url(#homyG)"/>
+  <path d="M 50 18 L 81 45.28 L 81 80 L 19 80 L 19 45.28 Z"
+        fill="none" stroke="#fff" stroke-width="7.5" stroke-linejoin="round"/>
+  <g transform="rotate(38 50 60)">
+    <path d="M 50 45 L 55.25 52.2 L 44.75 52.2 Z" fill="#4A3A22"/>
+    <path d="M 44.75 52.2 L 55.25 52.2 L 55.25 71.01 Q 55.25 75 51.26 75
+             L 48.74 75 Q 44.75 75 44.75 71.01 Z" fill="#FFC44D"/>
+    <rect x="44.75" y="54.6" width="10.5" height="2.1" fill="#F0A52E"/>
+  </g>
+</svg></span>
+        <span>
+          <span class="haupt" style="font-size:20px;font-weight:700">Homy</span>
+          <div class="neben">Dein Hausaufgabenheft</div>
+        </span>
+      </div>
+    </div>
+    <div class="fuss">Alles bleibt auf dem Gerät: kein Konto, keine Anmeldung im Internet,
+      keine Werbung.</div>
+
+    <div class="hinweiskasten" style="margin-top:22px">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="var(--akzent)" style="flex:none;margin-top:1px"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      <div>
+        <div class="titel">Das hier ist die Vorschau</div>
+        <div class="text">Die native App im Repository speichert alles in einer Datei auf dem Gerät,
+          funktioniert ohne Internet und lässt sich als Sicherung exportieren.
+          Diese Seite merkt sich Eingaben nur in diesem Browser.</div>
+      </div>
+    </div>`;
+}
+
+/* =====================================================================
+   Kalender
+   ===================================================================== */
+
+/* Das Homy-Zeichen für die nachgestellte Benachrichtigung. */
+const HOMY_SVG = `<svg viewBox="0 0 100 100" style="width:100%;height:100%;border-radius:8px;display:block">
+  <defs><linearGradient id="homyG2" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#3B72FF"/><stop offset="1" stop-color="#7A5AF0"/></linearGradient></defs>
+  <rect width="100" height="100" rx="22.5" fill="url(#homyG2)"/>
+  <path d="M 50 18 L 81 45.28 L 81 80 L 19 80 L 19 45.28 Z" fill="none" stroke="#fff"
+        stroke-width="7.5" stroke-linejoin="round"/>
+  <g transform="rotate(38 50 60)">
+    <path d="M 50 45 L 55.25 52.2 L 44.75 52.2 Z" fill="#4A3A22"/>
+    <path d="M 44.75 52.2 L 55.25 52.2 L 55.25 71.01 Q 55.25 75 51.26 75 L 48.74 75
+             Q 44.75 75 44.75 71.01 Z" fill="#FFC44D"/>
+    <rect x="44.75" y="54.6" width="10.5" height="2.1" fill="#F0A52E"/>
+  </g></svg>`;
+
+const ARTEN = {
+  arbeit:    { name: "Arbeit",    f: 0,  d: "M6 2h9l5 5v15H6V2zm8 1.5V8h4.5L14 3.5zM8 12h8v2H8v-2zm0 4h8v2H8v-2z" },
+  test:      { name: "Test",      f: 1,  d: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-2h2v2zm1.6-6.2l-.9.92c-.72.73-1.17 1.33-1.17 2.78h-2v-.5c0-1.06.43-2.03 1.17-2.77l1.24-1.26A1.96 1.96 0 0 0 12 8a2 2 0 0 0-2 2H8a4 4 0 1 1 8 0c0 .88-.36 1.68-.94 2.26z" },
+  abgabe:    { name: "Abgabe",    f: 8,  d: "M12 3l5 5h-3v6h-4V8H7l5-5zM5 18h14v2H5v-2z" },
+  ausflug:   { name: "Ausflug",   f: 10,  d: "M13.5 5.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3A7 7 0 0 0 19 13v-2a5 5 0 0 1-4.2-2.4l-1-1.6c-.4-.6-1-1-1.8-1-.3 0-.5 0-.8.2L6 8.3V13h2V9.6l1.8-.7z" },
+  frei:      { name: "Schulfrei", f: 3,  d: "M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0-5v3h0V2zm0 17v3h0v-3zM4.2 5.6l2.1 2.1-2.1-2.1zM2 11h3v2H2v-2zm17 0h3v2h-3v-2zM12 1h0v3h0V1zm-1 0h2v4h-2V1zm0 18h2v4h-2v-4zM3.5 4.9l1.4-1.4 2.1 2.1-1.4 1.4-2.1-2.1zm13.5 13.5l1.4-1.4 2.1 2.1-1.4 1.4-2.1-2.1zM16.9 5.6l2.1-2.1 1.4 1.4-2.1 2.1-1.4-1.4zM3.5 19.1l2.1-2.1 1.4 1.4-2.1 2.1-1.4-1.4z" },
+  sonstiges: { name: "Sonstiges", f: 11, d: "M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z" }
+};
+
+const ERINNERUNGEN = {
+  keine:    { name: "Keine Erinnerung", text: "Homy sagt zu diesem Termin nichts." },
+  start:    { name: "Wenn es losgeht",  text: "Zur Uhrzeit des Termins. Ohne Uhrzeit: am Morgen um 7:30 Uhr." },
+  stunde:   { name: "1 Stunde vorher",  text: "Eine Stunde vorher. Ohne Uhrzeit: am Morgen um 7:30 Uhr." },
+  abend:    { name: "Am Abend davor",   text: "Am Abend vorher um 18:00 Uhr – wenn noch Zeit zum Lernen ist." },
+  zweiTage: { name: "2 Tage vorher",    text: "Zwei Tage vorher um 18:00 Uhr." },
+  woche:    { name: "1 Woche vorher",   text: "Eine Woche vorher um 18:00 Uhr." }
+};
+
+let monatsStart = ersterDesMonats(new Date());
+let gewaehlterTag = tagStart(new Date());
+
+function ersterDesMonats(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
+
+/* Volle Wochen von Montag bis Sonntag, damit das Raster nicht springt. */
+function monatsTage(start) {
+  const davor = wochentag(start) - 1;
+  const anzahl = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
+  const gesamt = Math.ceil((davor + anzahl) / 7) * 7;
+  const erster = plusTage(start, -davor);
+  return Array.from({ length: gesamt }, (_, i) => plusTage(erster, i));
+}
+
+function termineAm(sk) {
+  return daten.termine
+    .filter(t => t.tag === sk)
+    .sort((a, b) => (a.zeit === null ? -1 : b.zeit === null ? 1 : a.zeit - b.zeit));
+}
+
+function naechsteTermine(anzahl) {
+  const heute = schluessel(tagStart(new Date()));
+  return daten.termine
+    .filter(t => t.tag >= heute)
+    .sort((a, b) => a.tag === b.tag ? (a.zeit || -1) - (b.zeit || -1) : (a.tag < b.tag ? -1 : 1))
+    .slice(0, anzahl);
+}
+
+/* Wann die Erinnerung käme – dieselbe Rechnung wie in CalendarEvent.swift. */
+function erinnerungsZeitpunkt(t) {
+  if (!t.erinnerung || t.erinnerung === "keine") return null;
+  const tag = new Date(t.tag + "T00:00:00");
+  const start = new Date(tag);
+  if (t.zeit === null || t.zeit === undefined) start.setHours(7, 30, 0, 0);
+  else start.setHours(Math.floor(t.zeit / 60), t.zeit % 60, 0, 0);
+
+  if (t.erinnerung === "start") return start;
+  if (t.erinnerung === "stunde") {
+    if (t.zeit === null || t.zeit === undefined) return start;
+    return new Date(start.getTime() - 3600000);
+  }
+  const tageVorher = { abend: 1, zweiTage: 2, woche: 7 }[t.erinnerung];
+  const d = plusTage(tag, -tageVorher);
+  d.setHours(18, 0, 0, 0);
+  return d;
+}
+
+function tageBisTermin(t) {
+  return Math.round((new Date(t.tag + "T00:00:00") - tagStart(new Date())) / 86400000);
+}
+
+function baldText(t) {
+  const n = tageBisTermin(t);
+  if (n < 0) return null;
+  if (n === 0) return "heute";
+  if (n === 1) return "morgen";
+  if (n === 2) return "übermorgen";
+  return "in " + n + " Tagen";
+}
+
+const FERIEN_SVG = 'M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0-6h0zM11 1h2v3.5h-2V1zm0 18.5h2V23h-2v-3.5zM1 11h3.5v2H1v-2zm18.5 0H23v2h-3.5v-2zM3.5 4.9l1.4-1.4 2.5 2.5-1.4 1.4-2.5-2.5zm13.1 13.1l1.4-1.4 2.5 2.5-1.4 1.4-2.5-2.5zM16.6 6l2.5-2.5 1.4 1.4L18 7.4 16.6 6zM3.5 19.1L6 16.6 7.4 18l-2.5 2.5-1.4-1.4z';
+
+/* =====================================================================
+   Gesetzliche Feiertage – ausgerechnet, nicht hinterlegt
+   ===================================================================== */
+
+const LAENDER = {
+  BW: "Baden-Württemberg", BY: "Bayern", BE: "Berlin", BB: "Brandenburg",
+  HB: "Bremen", HH: "Hamburg", HE: "Hessen", MV: "Mecklenburg-Vorpommern",
+  NI: "Niedersachsen", NW: "Nordrhein-Westfalen", RP: "Rheinland-Pfalz",
+  SL: "Saarland", SN: "Sachsen", ST: "Sachsen-Anhalt",
+  SH: "Schleswig-Holstein", TH: "Thüringen"
+};
+
+/* Ostersonntag nach der gregorianischen Osterformel. */
+function ostersonntag(jahr) {
+  const a = jahr % 19, b = Math.floor(jahr / 100), c = jahr % 100;
+  const d = Math.floor(b / 4), e = b % 4;
+  const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const monat = Math.floor((h + l - 7 * m + 114) / 31);
+  const tag = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(jahr, monat - 1, tag);
+}
+
+/* Buß- und Bettag: der Mittwoch vor dem 23. November. */
+function bussUndBettag(jahr) {
+  let d = new Date(jahr, 10, 23);
+  for (let i = 0; i < 7; i++) {
+    d = plusTage(d, -1);
+    if (d.getDay() === 3) return d;
+  }
+  return null;
+}
+
+const feiertagsSpeicher = {};
+
+function feiertageImJahr(jahr, land) {
+  if (!land) return [];
+  const merk = jahr + "-" + land;
+  if (feiertagsSpeicher[merk]) return feiertagsSpeicher[merk];
+
+  const o = ostersonntag(jahr);
+  const liste = [];
+  const fest = (m, t, name, hinweis) =>
+    liste.push({ datum: new Date(jahr, m - 1, t), name, hinweis: hinweis || null });
+  const umOstern = (n, name) => liste.push({ datum: plusTage(o, n), name, hinweis: null });
+
+  // In ganz Deutschland
+  fest(1, 1, "Neujahr");
+  umOstern(-2, "Karfreitag");
+  umOstern(1, "Ostermontag");
+  fest(5, 1, "Tag der Arbeit");
+  umOstern(39, "Christi Himmelfahrt");
+  umOstern(50, "Pfingstmontag");
+  fest(10, 3, "Tag der Deutschen Einheit");
+  fest(12, 25, "1. Weihnachtstag");
+  fest(12, 26, "2. Weihnachtstag");
+
+  // Nur in bestimmten Ländern
+  if (["BW", "BY", "ST"].includes(land)) fest(1, 6, "Heilige Drei Könige");
+  if (["BE", "MV"].includes(land)) fest(3, 8, "Internationaler Frauentag");
+  if (land === "BB") { umOstern(0, "Ostersonntag"); umOstern(49, "Pfingstsonntag"); }
+  if (["BW", "BY", "HE", "NW", "RP", "SL"].includes(land)) umOstern(60, "Fronleichnam");
+  if (land === "SL") fest(8, 15, "Mariä Himmelfahrt");
+  if (land === "BY") fest(8, 15, "Mariä Himmelfahrt", "nur in überwiegend katholischen Gemeinden");
+  if (land === "TH") fest(9, 20, "Weltkindertag");
+  if (["BB", "HB", "HH", "MV", "NI", "SN", "ST", "SH", "TH"].includes(land))
+    fest(10, 31, "Reformationstag");
+  if (["BW", "BY", "NW", "RP", "SL"].includes(land)) fest(11, 1, "Allerheiligen");
+  if (land === "SN") {
+    const b = bussUndBettag(jahr);
+    if (b) liste.push({ datum: b, name: "Buß- und Bettag", hinweis: null });
+  }
+
+  liste.sort((a, b) => a.datum - b.datum);
+  liste.forEach(f => { f.tag = schluessel(f.datum); });
+  feiertagsSpeicher[merk] = liste;
+  return liste;
+}
+
+function feiertagAm(sk) {
+  const land = daten.einstellungen.bundesland;
+  if (!land) return null;
+  const jahr = Number(sk.slice(0, 4));
+  return feiertageImJahr(jahr, land).find(f => f.tag === sk) || null;
+}
+
+function naechsteFeiertage(anzahl) {
+  const land = daten.einstellungen.bundesland;
+  if (!land) return [];
+  const heute = schluessel(tagStart(new Date()));
+  const jahr = new Date().getFullYear();
+  return feiertageImJahr(jahr, land)
+    .concat(feiertageImJahr(jahr + 1, land))
+    .filter(f => f.tag >= heute)
+    .slice(0, anzahl);
+}
+
+/* Ferien oder Feiertag – beides ist in Homy grün. */
+function freierTagName(sk) {
+  const f = ferienAm(sk);
+  if (f) return f.name || "Ferien";
+  const ft = feiertagAm(sk);
+  return ft ? ft.name : null;
+}
+
+/* --- Ferien --- */
+function ferienSortiert() {
+  return daten.ferien.slice().sort((a, b) => {
+    const av = ferienVorbei(a), bv = ferienVorbei(b);
+    if (av !== bv) return av ? 1 : -1;
+    return a.von < b.von ? -1 : a.von > b.von ? 1 : 0;
+  });
+}
+
+function ferienAm(sk) {
+  return daten.ferien.find(f => sk >= f.von && sk <= f.bis) || null;
+}
+
+function ferienTage(f) {
+  return Math.round((new Date(f.bis + "T00:00:00") - new Date(f.von + "T00:00:00")) / 86400000) + 1;
+}
+
+function ferienVorbei(f) {
+  return schluessel(tagStart(new Date())) > f.bis;
+}
+
+function ferienLaeuft(f) {
+  const heute = schluessel(tagStart(new Date()));
+  return heute >= f.von && heute <= f.bis;
+}
+
+function tageBisFerien(f) {
+  return Math.round((new Date(f.von + "T00:00:00") - tagStart(new Date())) / 86400000);
+}
+
+/* "Montag, 19. Oktober 2026" */
+function langesDatum(sk) {
+  const d = new Date(sk + "T00:00:00");
+  return `${TAGE_WOCHE[wochentag(d)-1]}, ${d.getDate()}. ${MONATE[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/* Der erste Tag, an dem wirklich wieder Schule ist: Wochenenden und
+   andere Ferien werden übersprungen. */
+function ersterSchultagNach(f) {
+  const schultage = wochentage();
+  let d = new Date(f.bis + "T00:00:00");
+  for (let i = 0; i < 366; i++) {
+    d = plusTage(d, 1);
+    const sk = schluessel(d);
+    if (!schultage.includes(wochentag(d))) continue;
+    if (daten.ferien.some(x => x.id !== f.id && sk >= x.von && sk <= x.bis)) continue;
+    if (feiertagAm(sk)) continue;
+    return sk;
+  }
+  return schluessel(plusTage(new Date(f.bis + "T00:00:00"), 1));
+}
+
+function ferienStatus(f) {
+  if (ferienLaeuft(f)) {
+    const nummer = Math.round((tagStart(new Date()) - new Date(f.von + "T00:00:00")) / 86400000) + 1;
+    return `Tag ${nummer} von ${ferienTage(f)}`;
+  }
+  if (ferienVorbei(f)) return "vorbei";
+  const n = tageBisFerien(f);
+  if (n === 0) return "ab heute";
+  if (n === 1) return "ab morgen";
+  return "in " + n + " Tagen";
+}
+
+function ferienZeile(f) {
+  return `<button class="ferienzeile" data-ferien="${f.id}">
+    <span class="feriensym"><svg viewBox="0 0 24 24"><path d="${FERIEN_SVG}"></path></svg></span>
+    <span style="flex:1;min-width:0">
+      <span class="ferienkopf">
+        <span class="fname">${sicher(f.name || "Ferien")}</span>
+        <span class="fstatus" style="color:${ferienVorbei(f) ? "var(--text2)" : "var(--ferien)"}">${ferienStatus(f)}</span>
+      </span>
+      <span class="spanne">
+        <div><span class="wort">Von</span><span>${sicher(langesDatum(f.von))}</span></div>
+        <div><span class="wort">Bis</span><span>${sicher(langesDatum(f.bis))}</span></div>
+      </span>
+      <div class="fdauer">${ferienTage(f)} Tage · wieder Schule am ${sicher(langesDatum(ersterSchultagNach(f)))}${
+        f.notiz ? "<br>" + sicher(f.notiz) : ""}</div>
+    </span>
+  </button>`;
+}
+
+function zeichneKalender() {
+  navTitel.textContent = "Kalender";
+  navUnter.textContent = "";
+
+  const tage = monatsTage(monatsStart);
+  const heuteSk = schluessel(tagStart(new Date()));
+  const gewaehltSk = schluessel(gewaehlterTag);
+
+  let html = `<div class="monatskarte">
+    <div class="monatskopf">
+      <button data-monat="-1" aria-label="Voriger Monat">&#8249;</button>
+      <span class="mtitel">${MONATE[monatsStart.getMonth()]} ${monatsStart.getFullYear()}</span>
+      <button data-monat="1" aria-label="Nächster Monat">&#8250;</button>
+    </div>
+    <div class="wochenkopf">${TAGE_WOCHE_KURZ.map(t => `<div>${t}</div>`).join("")}</div>
+    <div class="monatsgitter">`;
+
+  tage.forEach(d => {
+    const sk = schluessel(d);
+    const fremd = d.getMonth() !== monatsStart.getMonth();
+    const offen = Object.keys(daten.aufgaben).filter(k =>
+      k.startsWith(sk + "|") && daten.aufgaben[k].text.trim() && !daten.aufgaben[k].fertig).length;
+    const istFerien = !!freierTagName(sk);
+    const punkte = (istFerien ? '<i style="background:var(--ferien)"></i>' : "")
+      + termineAm(sk).slice(0, istFerien ? 2 : 3)
+          .map(t => `<i style="background:${tint(ARTEN[t.art].f)}"></i>`).join("")
+      + (offen ? '<i style="background:var(--text3)"></i>' : "");
+
+    html += `<button data-tag2="${sk}"
+        class="${fremd ? "fremd " : ""}${istFerien ? "ferien " : ""}${sk === heuteSk ? "heute " : ""}${sk === gewaehltSk ? "gewaehlt" : ""}"
+        aria-label="${TAGE_WOCHE[wochentag(d)-1]}, ${d.getDate()}. ${MONATE[d.getMonth()]}">
+      <span class="zahl">${d.getDate()}</span>
+      <span class="punkte-reihe">${punkte}</span>
+    </button>`;
+  });
+  html += `</div>
+    <div class="punktlegende">
+      <span><i style="background:var(--ferien)"></i> Ferien / Feiertag</span>
+      <span><i style="background:${tint(0)}"></i> Termin</span>
+      <span><i style="background:var(--text3)"></i> Hausaufgaben offen</span>
+    </div>
+  </div>`;
+
+  // Der gewählte Tag
+  const d = gewaehlterTag;
+  html += `<div class="gruppentitel" style="margin-top:22px">
+      ${TAGE_WOCHE[wochentag(d)-1]}, ${d.getDate()}. ${MONATE[d.getMonth()]}${
+        freierTagName(gewaehltSk) ? " · frei" : ""}${gewaehltSk === heuteSk ? " · heute" : ""}
+    </div><div class="gruppe">`;
+
+  const feiertagHeute = feiertagAm(gewaehltSk);
+  const ferienHeute = ferienAm(gewaehltSk);
+  const istWochenende = !wochentage().includes(wochentag(d));
+  if (ferienHeute) {
+    const nummer = Math.round((new Date(gewaehltSk + "T00:00:00") - new Date(ferienHeute.von + "T00:00:00")) / 86400000) + 1;
+    const zusatz = gewaehltSk === ferienHeute.von
+      ? `Erster Ferientag · ${ferienTage(ferienHeute)} Tage lang`
+      : gewaehltSk === ferienHeute.bis
+        ? `Letzter Ferientag · wieder Schule am ${TAGE_WOCHE[wochentag(new Date(ersterSchultagNach(ferienHeute) + "T00:00:00"))-1]}`
+        : `Ferien · Tag ${nummer} von ${ferienTage(ferienHeute)}`;
+    html += `<button class="ferienzeile" data-ferien="${ferienHeute.id}">
+      <span class="feriensym"><svg viewBox="0 0 24 24"><path d="${FERIEN_SVG}"></path></svg></span>
+      <span style="flex:1;min-width:0">
+        <span class="fname" style="font-size:15px;font-weight:600">${sicher(ferienHeute.name || "Ferien")}</span>
+        <div class="fdauer" style="margin-top:2px">${sicher(zusatz)}</div>
+      </span>
+    </button>`;
+  }
+
+  // Ein Feiertag kann in die Ferien fallen – dann steht beides da.
+  if (feiertagHeute) {
+    let unten = "Gesetzlicher Feiertag";
+    if (daten.einstellungen.bundesland) unten += " in " + LAENDER[daten.einstellungen.bundesland];
+    if (feiertagHeute.hinweis) unten += " – " + feiertagHeute.hinweis;
+    if (ferienHeute) unten += " · fällt in die Ferien";
+    html += `<div class="ferienzeile" style="cursor:default">
+      <span class="feriensym"><svg viewBox="0 0 24 24"><path d="${FERIEN_SVG}"></path></svg></span>
+      <span style="flex:1;min-width:0">
+        <span class="fname" style="font-size:15px;font-weight:600">${sicher(feiertagHeute.name)}</span>
+        <div class="fdauer" style="margin-top:2px">${sicher(unten)}</div>
+      </span>
+    </div>`;
+  }
+
+  // Kein freier Tag, aber auch kein Schultag: das Wochenende.
+  if (!ferienHeute && !feiertagHeute && istWochenende) {
+    html += `<div class="ferienzeile" style="cursor:default">
+      <span class="feriensym" style="background:var(--fuellung);color:var(--text2)">
+        <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36A5.4 5.4 0 0 1 12 3z"/></svg></span>
+      <span style="flex:1;min-width:0">
+        <span class="fname" style="font-size:15px;font-weight:600">Wochenende</span>
+        <div class="fdauer" style="margin-top:2px">Kein Schultag</div>
+      </span>
+    </div>`;
+  }
+
+  const heutigeTermine = termineAm(gewaehltSk);
+  const hatHinweis = !!ferienHeute || !!feiertagHeute || istWochenende;
+  if (heutigeTermine.length) {
+    html += heutigeTermine.map(t => terminZeile(t, false)).join("");
+  } else if (!hatHinweis) {
+    html += `<div class="eintrag"><span class="neben">An diesem Tag steht nichts im Kalender.</span></div>`;
+  }
+
+  html += `<button class="ergaenzen" data-neuertermin="1">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+      Termin eintragen</button>`;
+
+  // Die Hausaufgaben des Tages – zum Nachsehen
+  const hausaufgaben = Object.keys(daten.aufgaben)
+    .filter(k => k.startsWith(gewaehltSk + "|") && daten.aufgaben[k].text.trim());
+  if (hausaufgaben.length) {
+    html += `<div class="tagblock"><div class="btitel">Hausaufgaben an diesem Tag</div>`
+      + hausaufgaben.map(k => {
+          const a = daten.aufgaben[k];
+          const f = fachVon(k.split("|")[1]);
+          return `<div class="bzeile${a.fertig ? " fertig" : ""}">
+            ${f ? `<span class="kuerzel klein" style="background:${fill(f.f)};color:${tint(f.f)}">${sicher(f.kuerzel)}</span>` : ""}
+            <span>${sicher(a.text)}</span></div>`;
+        }).join("") + "</div>";
+  }
+
+  // Die Stunden des Tages
+  const plan = daten.stunden[wochentag(d)] || {};
+  const faecherHeute = [];
+  Object.keys(plan).map(Number).sort((a, b) => a - b).forEach(st => {
+    if (plan[st] && !faecherHeute.includes(plan[st])) faecherHeute.push(plan[st]);
+  });
+  if (faecherHeute.length && !ferienHeute && !feiertagHeute) {
+    html += `<div class="tagblock"><div class="btitel">Stunden an diesem Tag</div>
+      <div class="kbadges">` + faecherHeute.map(id => {
+        const f = fachVon(id);
+        return f ? `<span class="kuerzel klein" style="background:${fill(f.f)};color:${tint(f.f)}">${sicher(f.kuerzel)}</span>` : "";
+      }).join("") + "</div></div>";
+  }
+
+  html += "</div>";
+
+  // Was als Nächstes ansteht
+  const naechste = naechsteTermine(3);
+  if (naechste.length) {
+    html += `<div class="gruppentitel" style="margin-top:22px">Als Nächstes</div><div class="gruppe">`
+      + naechste.map(t => terminZeile(t, true)).join("") + "</div>";
+  }
+
+  // Alle Ferien mit Anfang und Ende
+  html += `<div class="gruppentitel" style="margin-top:22px">Ferien</div><div class="gruppe">`;
+  html += daten.ferien.length
+    ? ferienSortiert().map(ferienZeile).join("")
+    : `<div class="eintrag"><span class="neben">Noch keine Ferien eingetragen.
+         Trag sie aus dem Ferienplan deiner Schule ein – dann siehst du im Kalender,
+         wann sie anfangen und wann sie enden.</span></div>`;
+  const land = daten.einstellungen.bundesland;
+  html += `<div class="tagblock" style="font-size:12px;color:var(--text2)">${land
+    ? `Die gesetzlichen Feiertage in ${sicher(LAENDER[land])} rechnet Homy selbst aus und
+       zeigt sie grün an. Die Schulferien legt jedes Land für jedes Schuljahr neu fest –
+       die trägst du hier selbst ein.`
+    : `Stell in den Einstellungen dein Bundesland ein, dann zeigt Homy die gesetzlichen
+       Feiertage von selbst. Die Schulferien trägst du hier ein – die sind in jedem Land
+       und jedem Schuljahr anders.`}</div>`;
+  html += `<button class="ergaenzen" data-neueferien="1">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+      Ferien eintragen</button></div>`;
+
+  el.innerHTML = html;
+}
+
+function terminZeile(t, mitDatum) {
+  const art = ARTEN[t.art] || ARTEN.sonstiges;
+  const f = t.fach ? fachVon(t.fach) : null;
+  const d = new Date(t.tag + "T00:00:00");
+
+  const teile = [];
+  if ((t.titel || "").trim()) teile.push(art.name);
+  if (f) teile.push(f.name);
+  if (t.zeit !== null && t.zeit !== undefined) teile.push(uhr(t.zeit) + " Uhr");
+  if (mitDatum) teile.push(d.getDate() + "." + (d.getMonth() + 1) + ".");
+  if (t.erinnerung && t.erinnerung !== "keine") teile.push("🔔");
+
+  const bald = mitDatum ? baldText(t) : null;
+
+  return `<button class="terminzeile" data-termin="${t.id}">
+    <span class="terminsym" style="background:${fill(art.f)};color:${tint(art.f)}">
+      <svg viewBox="0 0 24 24"><path d="${art.d}"></path></svg></span>
+    <span style="flex:1;min-width:0">
+      <span class="ttitel">${sicher((t.titel || "").trim() || art.name)}</span>
+      <div class="tneben">${sicher(teile.join(" · "))}</div>
+    </span>
+    ${bald ? `<span class="tbald" style="color:${tint(art.f)}">${bald}</span>` : ""}
+  </button>`;
+}
+
+/* --- Termin eintragen oder ändern --- */
+function terminBearbeiten(id) {
+  const vorhanden = daten.termine.find(t => t.id === id);
+  const t = vorhanden
+    ? Object.assign({}, vorhanden)
+    : { id: "t" + Date.now(), tag: schluessel(gewaehlterTag), titel: "", notiz: "",
+        zeit: null, art: "arbeit", fach: "",
+        erinnerung: daten.einstellungen.standardErinnerung };
+
+  const h = `
+    <div class="gruppentitel">Termin</div>
+    <div class="gruppe">
+      <div class="feldzeile"><label for="tTitel">Titel</label>
+        <input id="tTitel" type="text" value="${sicher(t.titel)}" placeholder="Worum geht es?"></div>
+      <div class="feldzeile"><label for="tArt">Art</label>
+        <select id="tArt">${Object.keys(ARTEN).map(k =>
+          `<option value="${k}"${k === t.art ? " selected" : ""}>${ARTEN[k].name}</option>`).join("")}</select></div>
+      <div class="feldzeile"><label for="tFach">Fach</label>
+        <select id="tFach"><option value="">Kein Fach</option>${
+          daten.faecher.slice().sort((a,b) => a.name.localeCompare(b.name,"de")).map(f =>
+          `<option value="${f.id}"${f.id === t.fach ? " selected" : ""}>${sicher(f.name)}</option>`).join("")}</select></div>
+    </div>
+
+    <div class="gruppentitel">Wann</div>
+    <div class="gruppe">
+      <div class="feldzeile"><label for="tTag">Tag</label>
+        <input id="tTag" type="date" value="${t.tag}"></div>
+      <div class="eintrag">
+        <span class="haupt">Mit Uhrzeit</span>
+        <button class="schalter" role="switch" id="tMitZeit"
+          aria-checked="${t.zeit !== null && t.zeit !== undefined}" aria-label="Mit Uhrzeit"></button>
+      </div>
+      <div class="feldzeile" id="tZeitZeile"${t.zeit === null || t.zeit === undefined ? ' hidden' : ''}>
+        <label for="tZeit">Uhrzeit</label>
+        <input id="tZeit" type="time" value="${uhr(t.zeit === null || t.zeit === undefined ? 480 : t.zeit)}"></div>
+    </div>
+
+    <div class="gruppentitel">Erinnerung</div>
+    <div class="gruppe">
+      <div class="feldzeile"><label for="tErinnerung">Erinnern</label>
+        <select id="tErinnerung">${Object.keys(ERINNERUNGEN).map(k =>
+          `<option value="${k}"${k === t.erinnerung ? " selected" : ""}>${ERINNERUNGEN[k].name}</option>`).join("")}</select></div>
+    </div>
+    <div class="fuss" id="tErinnerungFuss"></div>
+
+    <div class="gruppentitel">Notiz</div>
+    <div class="gruppe" style="padding:12px 14px">
+      <textarea id="tNotiz" rows="3" placeholder="Was drankommt, was mitzubringen ist …"
+        style="width:100%;border:0;outline:0;resize:none;background:none;color:var(--text);
+               font:inherit;font-size:16px">${sicher(t.notiz || "")}</textarea>
+    </div>
+
+    ${vorhanden ? `<div class="gruppe" style="margin-top:22px">
+      <button class="eintrag" data-terminweg="1">
+        <span class="haupt" style="color:#D93025">Termin löschen</span></button>
+    </div>` : ""}`;
+
+  blatt.innerHTML = `<div class="blattkopf"><span class="t">${vorhanden ? "Termin" : "Neuer Termin"}</span>
+      <button type="button" data-terminsichern="1">Sichern</button></div>${h}`;
+  modal.hidden = false;
+  blatt.scrollTop = 0;
+
+  const mitZeit = document.getElementById("tMitZeit");
+  const zeitZeile = document.getElementById("tZeitZeile");
+  const erinnerungFeld = document.getElementById("tErinnerung");
+  const fuss = document.getElementById("tErinnerungFuss");
+
+  function fussAktualisieren() {
+    const entwurf = sammle();
+    const wahl = ERINNERUNGEN[entwurf.erinnerung];
+    if (entwurf.erinnerung === "keine") { fuss.textContent = wahl.text; return; }
+    if (!daten.einstellungen.erinnerungen) {
+      fuss.textContent = "Erinnerungen sind in den Einstellungen ausgeschaltet – so lange kommt nichts.";
+      return;
+    }
+    const z = erinnerungsZeitpunkt(entwurf);
+    const wann = z
+      ? `${TAGE_WOCHE_KURZ[wochentag(z)-1]}, ${z.getDate()}. ${MONATE[z.getMonth()]} um ${uhr(z.getHours()*60+z.getMinutes())} Uhr`
+      : "—";
+    fuss.textContent = `🔔 ${wann}. ${wahl.text}`
+      + (z && z < new Date() ? " Dieser Zeitpunkt ist schon vorbei." : "");
+  }
+
+  function sammle() {
+    const an = mitZeit.getAttribute("aria-checked") === "true";
+    const zeitFeld = document.getElementById("tZeit").value || "08:00";
+    const [hh, mm] = zeitFeld.split(":").map(Number);
+    return {
+      id: t.id,
+      tag: document.getElementById("tTag").value || t.tag,
+      titel: document.getElementById("tTitel").value,
+      notiz: document.getElementById("tNotiz").value,
+      zeit: an ? hh * 60 + mm : null,
+      art: document.getElementById("tArt").value,
+      fach: document.getElementById("tFach").value,
+      erinnerung: erinnerungFeld.value
+    };
+  }
+
+  mitZeit.addEventListener("click", () => {
+    const an = mitZeit.getAttribute("aria-checked") !== "true";
+    mitZeit.setAttribute("aria-checked", String(an));
+    zeitZeile.hidden = !an;
+    fussAktualisieren();
+  });
+  blatt.querySelectorAll("input, select, textarea").forEach(f =>
+    f.addEventListener("input", fussAktualisieren));
+  fussAktualisieren();
+
+  blatt.onclick = ev => {
+    if (ev.target.closest("[data-terminweg]")) {
+      daten.termine = daten.termine.filter(x => x.id !== t.id);
+      sichern(); modal.hidden = true; zeichne();
+      return;
+    }
+    if (!ev.target.closest("[data-terminsichern]")) return;
+
+    const neu = sammle();
+    if (!neu.titel.trim() && !neu.notiz.trim()) { modal.hidden = true; return; }
+
+    const index = daten.termine.findIndex(x => x.id === neu.id);
+    if (index >= 0) daten.termine[index] = neu; else daten.termine.push(neu);
+    sichern();
+    modal.hidden = true;
+    gewaehlterTag = new Date(neu.tag + "T00:00:00");
+    monatsStart = ersterDesMonats(gewaehlterTag);
+    zeichne();
+
+    // In der echten App stellt iOS die Erinnerung. Hier wird gezeigt,
+    // wie sie aussieht.
+    if (neu.erinnerung !== "keine" && daten.einstellungen.erinnerungen) {
+      zeigeMitteilung(neu);
+    }
+  };
+}
+
+/* --- Ferien eintragen oder ändern --- */
+const FERIEN_NAMEN = ["Herbstferien", "Weihnachtsferien", "Winterferien",
+                      "Osterferien", "Pfingstferien", "Sommerferien",
+                      "Bewegliche Ferientage"];
+
+function ferienBearbeiten(id) {
+  const vorhanden = daten.ferien.find(f => f.id === id);
+  const f = vorhanden
+    ? Object.assign({}, vorhanden)
+    : { id: "f" + Date.now(), name: "", von: schluessel(gewaehlterTag),
+        bis: schluessel(gewaehlterTag), notiz: "",
+        erinnerung: daten.einstellungen.standardErinnerung };
+
+  const h = `
+    <div class="gruppentitel">Name</div>
+    <div class="gruppe">
+      <div class="feldzeile"><label for="fName">Ferien</label>
+        <input id="fName" type="text" value="${sicher(f.name)}" placeholder="Wie heißen die Ferien?"></div>
+      <div class="feldzeile"><label for="fVorschlag">Vorschlag</label>
+        <select id="fVorschlag"><option value="">Auswählen …</option>${
+          FERIEN_NAMEN.map(n => `<option value="${n}">${n}</option>`).join("")}</select></div>
+    </div>
+
+    <div class="gruppentitel">Von wann bis wann</div>
+    <div class="gruppe">
+      <div class="feldzeile"><label for="fVon">Erster Tag</label>
+        <input id="fVon" type="date" value="${f.von}"></div>
+      <div class="feldzeile"><label for="fBis">Letzter Tag</label>
+        <input id="fBis" type="date" value="${f.bis}"></div>
+    </div>
+    <div class="fuss">Der letzte Ferientag zählt noch dazu – trag den Tag ein,
+      an dem du noch frei hast, nicht den ersten Schultag danach.</div>
+
+    <div class="gruppentitel">So steht es im Kalender</div>
+    <div class="gruppe" id="fZusammenfassung"></div>
+
+    <div class="gruppentitel">Erinnerung</div>
+    <div class="gruppe">
+      <div class="feldzeile"><label for="fErinnerung">Erinnern</label>
+        <select id="fErinnerung">${Object.keys(ERINNERUNGEN).map(k =>
+          `<option value="${k}"${k === f.erinnerung ? " selected" : ""}>${ERINNERUNGEN[k].name}</option>`).join("")}</select></div>
+    </div>
+    <div class="fuss" id="fErinnerungFuss"></div>
+
+    <div class="gruppentitel">Notiz</div>
+    <div class="gruppe" style="padding:12px 14px">
+      <textarea id="fNotiz" rows="2" placeholder="Was du in den Ferien vorhast …"
+        style="width:100%;border:0;outline:0;resize:none;background:none;color:var(--text);
+               font:inherit;font-size:16px">${sicher(f.notiz || "")}</textarea>
+    </div>
+
+    ${vorhanden ? `<div class="gruppe" style="margin-top:22px">
+      <button class="eintrag" data-ferienweg="1">
+        <span class="haupt" style="color:#D93025">Ferien löschen</span></button>
+    </div>` : ""}`;
+
+  blatt.innerHTML = `<div class="blattkopf"><span class="t">${vorhanden ? "Ferien" : "Neue Ferien"}</span>
+      <button type="button" data-feriensichern="1">Sichern</button></div>${h}`;
+  modal.hidden = false;
+  blatt.scrollTop = 0;
+
+  const nameFeld = document.getElementById("fName");
+  const vonFeld = document.getElementById("fVon");
+  const bisFeld = document.getElementById("fBis");
+  const zusammen = document.getElementById("fZusammenfassung");
+  const fuss = document.getElementById("fErinnerungFuss");
+
+  function sammle() {
+    let von = vonFeld.value || f.von;
+    let bis = bisFeld.value || von;
+    if (bis < von) { const t = von; von = bis; bis = t; }
+    return {
+      id: f.id, name: nameFeld.value, von, bis,
+      notiz: document.getElementById("fNotiz").value,
+      erinnerung: document.getElementById("fErinnerung").value
+    };
+  }
+
+  function aktualisieren() {
+    const e = sammle();
+    const dauer = ferienTage(e);
+    zusammen.innerHTML = `
+      <div class="eintrag"><span class="haupt" style="font-size:15px">Anfang</span>
+        <span class="wert" style="font-size:14px;text-align:right">${sicher(langesDatum(e.von))}</span></div>
+      <div class="eintrag"><span class="haupt" style="font-size:15px">Ende</span>
+        <span class="wert" style="font-size:14px;text-align:right">${sicher(langesDatum(e.bis))}</span></div>
+      <div class="eintrag"><span class="haupt" style="font-size:15px">Dauer</span>
+        <span class="wert" style="font-size:14px">${dauer === 1 ? "1 Tag" : dauer + " Tage"}</span></div>
+      <div class="eintrag"><span class="haupt" style="font-size:15px">Wieder Schule</span>
+        <span class="wert" style="font-size:14px;text-align:right">${sicher(langesDatum(ersterSchultagNach(e)))}</span></div>`;
+
+    if (e.erinnerung === "keine") { fuss.textContent = "Homy sagt zum Ferienbeginn nichts."; return; }
+    if (!daten.einstellungen.erinnerungen) {
+      fuss.textContent = "Erinnerungen sind in den Einstellungen ausgeschaltet – so lange kommt nichts.";
+      return;
+    }
+    const z = erinnerungsZeitpunkt({ tag: e.von, zeit: null, erinnerung: e.erinnerung });
+    fuss.textContent = z
+      ? `🔔 ${TAGE_WOCHE_KURZ[wochentag(z)-1]}, ${z.getDate()}. ${MONATE[z.getMonth()]} um ${uhr(z.getHours()*60+z.getMinutes())} Uhr.`
+        + (z < new Date() ? " Dieser Zeitpunkt ist schon vorbei." : "")
+      : "—";
+  }
+
+  document.getElementById("fVorschlag").addEventListener("change", ev => {
+    if (ev.target.value) { nameFeld.value = ev.target.value; aktualisieren(); }
+  });
+  // Das Ende darf nicht vor dem Anfang liegen.
+  vonFeld.addEventListener("change", () => {
+    if (bisFeld.value && bisFeld.value < vonFeld.value) bisFeld.value = vonFeld.value;
+    aktualisieren();
+  });
+  blatt.querySelectorAll("input, select, textarea").forEach(x =>
+    x.addEventListener("input", aktualisieren));
+  aktualisieren();
+
+  blatt.onclick = ev => {
+    if (ev.target.closest("[data-ferienweg]")) {
+      daten.ferien = daten.ferien.filter(x => x.id !== f.id);
+      sichern(); modal.hidden = true; zeichne();
+      return;
+    }
+    if (!ev.target.closest("[data-feriensichern]")) return;
+
+    const neu = sammle();
+    if (!neu.name.trim()) { modal.hidden = true; return; }
+
+    const index = daten.ferien.findIndex(x => x.id === neu.id);
+    if (index >= 0) daten.ferien[index] = neu; else daten.ferien.push(neu);
+    sichern();
+    modal.hidden = true;
+    gewaehlterTag = new Date(neu.von + "T00:00:00");
+    monatsStart = ersterDesMonats(gewaehlterTag);
+    zeichne();
+
+    if (neu.erinnerung !== "keine" && daten.einstellungen.erinnerungen) {
+      zeigeMitteilung({
+        titel: neu.name, art: "frei", fach: "", tag: neu.von, zeit: null,
+        erinnerung: neu.erinnerung,
+        untertitelText: `Ferien · ${ferienTage(neu)} Tage bis ${new Date(neu.bis + "T00:00:00").getDate()}.${new Date(neu.bis + "T00:00:00").getMonth()+1}.`
+      });
+    }
+  };
+}
+
+/* --- Ein Fach anlegen oder ändern --- */
+function fachBearbeiten(id) {
+  const vorhanden = daten.faecher.find(x => x.id === id);
+  const f = vorhanden
+    ? Object.assign({}, vorhanden)
+    : { id: "f" + Date.now(), name: "", kuerzel: "", f: 6, lehrer: "", raum: "" };
+
+  let farbe = f.f;
+
+  const zeichneFarben = () => Array.from({ length: 12 }, (_, i) =>
+    `<button type="button" data-farbe="${i}" aria-pressed="${i === farbe}"
+       style="background:${fill(i)};color:${tint(i)}" aria-label="Farbe ${i + 1}">Aa</button>`).join("");
+
+  const h = `
+    <div class="gruppentitel">Fach</div>
+    <div class="gruppe">
+      <div class="feldzeile"><label for="faName">Name</label>
+        <input id="faName" type="text" value="${sicher(f.name)}" placeholder="z. B. Mathematik"></div>
+      <div class="feldzeile"><label for="faKuerzel">Kürzel</label>
+        <input id="faKuerzel" type="text" maxlength="4" value="${sicher(f.kuerzel)}" placeholder="z. B. M"></div>
+    </div>
+    <div class="fuss">Das Kürzel steht im Stundenplan und neben dem Hausaufgabenfeld – kurz halten.</div>
+
+    <div class="gruppentitel">Farbe</div>
+    <div class="gruppe"><div class="farbwahl" id="faFarben">${zeichneFarben()}</div></div>
+
+    <div class="gruppentitel">Weiteres</div>
+    <div class="gruppe">
+      <div class="feldzeile"><label for="faLehrer">Lehrkraft</label>
+        <input id="faLehrer" type="text" value="${sicher(f.lehrer || "")}" placeholder="z. B. Fr. Brandt"></div>
+      <div class="feldzeile"><label for="faRaum">Raum</label>
+        <input id="faRaum" type="text" value="${sicher(f.raum || "")}" placeholder="z. B. 204"></div>
+    </div>
+
+    ${vorhanden ? `<div class="gruppe" style="margin-top:22px">
+      <button class="eintrag" data-fachweg="1">
+        <span class="haupt" style="color:#D93025">Fach löschen</span></button>
+    </div>
+    <div class="fuss">Stunden und Hausaufgaben zu diesem Fach werden mitgelöscht.</div>` : ""}
+
+    <div class="fuss" id="faProblem" style="color:#D93025;padding-top:14px"></div>`;
+
+  blatt.innerHTML = `<div class="blattkopf"><span class="t">${vorhanden ? "Fach" : "Neues Fach"}</span>
+      <button type="button" data-fachsichern="1">Sichern</button></div>${h}`;
+  modal.hidden = false;
+  blatt.scrollTop = 0;
+
+  document.getElementById("faFarben").addEventListener("click", ev => {
+    const knopf = ev.target.closest("[data-farbe]");
+    if (!knopf) return;
+    farbe = +knopf.dataset.farbe;
+    document.getElementById("faFarben").innerHTML = zeichneFarben();
+  });
+
+  blatt.onclick = ev => {
+    if (ev.target.closest("[data-fachweg]")) {
+      if (!confirm("Fach „" + (f.name || "") + "“ löschen? Stunden und Hausaufgaben dazu gehen mit.")) return;
+      daten.faecher = daten.faecher.filter(x => x.id !== f.id);
+      Object.keys(daten.stunden).forEach(wt =>
+        Object.keys(daten.stunden[wt]).forEach(st => {
+          if (daten.stunden[wt][st] === f.id) delete daten.stunden[wt][st];
+        }));
+      Object.keys(daten.aufgaben).forEach(k => {
+        if (k.endsWith("|" + f.id)) delete daten.aufgaben[k];
+      });
+      daten.termine.forEach(t => { if (t.fach === f.id) t.fach = ""; });
+      sichern(); modal.hidden = true; zeichne();
+      return;
+    }
+    if (!ev.target.closest("[data-fachsichern]")) return;
+
+    const name = document.getElementById("faName").value.trim();
+    if (!name) {
+      document.getElementById("faProblem").textContent = "Das Fach braucht einen Namen.";
+      return;
+    }
+    const kuerzel = document.getElementById("faKuerzel").value.trim() || name.slice(0, 2).toUpperCase();
+    const neu = {
+      id: f.id, name, kuerzel, f: farbe,
+      lehrer: document.getElementById("faLehrer").value.trim(),
+      raum: document.getElementById("faRaum").value.trim()
+    };
+    const index = daten.faecher.findIndex(x => x.id === neu.id);
+    if (index >= 0) daten.faecher[index] = neu; else daten.faecher.push(neu);
+    sichern(); modal.hidden = true; zeichne();
+  };
+}
+
+/* --- Unterrichtszeiten --- */
+function zeitenBearbeiten() {
+  const liste = zeitenFuer(daten.einstellungen.stunden);
+
+  const h = `<div class="gruppe">` + liste.map(z => `
+      <div class="feldzeile">
+        <label style="width:74px">${z.stunde}. Stunde</label>
+        <input type="time" data-zeitvon="${z.stunde}" value="${uhr(z.von)}" style="flex:0 0 auto">
+        <span style="color:var(--text2)">bis</span>
+        <input type="time" data-zeitbis="${z.stunde}" value="${uhr(z.bis)}" style="flex:0 0 auto">
+      </div>`).join("") + `</div>
+    <div class="fuss">Die Zeiten stehen im Stundenplan und in der Fächerliste.</div>
+    <div class="gruppe" style="margin-top:22px">
+      <button class="eintrag" data-zeitenzurueck="1">
+        <span class="haupt" style="color:var(--akzent)">Auf die üblichen Zeiten zurücksetzen</span>
+      </button>
+    </div>
+    <div class="fuss">45 Minuten je Stunde, 5 Minuten Wechsel, große Pause nach der 2. und 4. Stunde.</div>`;
+
+  blatt.innerHTML = `<div class="blattkopf"><span class="t">Unterrichtszeiten</span>
+      <button type="button" data-schliessen="1">Fertig</button></div>${h}`;
+  modal.hidden = false;
+  blatt.scrollTop = 0;
+
+  const merken = () => {
+    const neu = [];
+    liste.forEach(z => {
+      const von = blatt.querySelector(`[data-zeitvon="${z.stunde}"]`).value;
+      const bis = blatt.querySelector(`[data-zeitbis="${z.stunde}"]`).value;
+      if (!von || !bis) return;
+      const m = t => { const [h2, m2] = t.split(":").map(Number); return h2 * 60 + m2; };
+      neu.push({ stunde: z.stunde, von: m(von), bis: m(bis) });
+    });
+    daten.einstellungen.zeitenListe = neu;
+    sichern();
+  };
+
+  blatt.querySelectorAll("input[type=time]").forEach(x => x.addEventListener("change", merken));
+
+  blatt.onclick = ev => {
+    if (ev.target.closest("[data-zeitenzurueck]")) {
+      daten.einstellungen.zeitenListe = [];
+      sichern(); modal.hidden = true; zeichne();
+      return;
+    }
+    if (ev.target.closest("[data-schliessen]")) { modal.hidden = true; zeichne(); }
+  };
+}
+
+/* --- Sicherung ---
+   Herunterladen kann diese eingebettete Seite nicht (das unterbindet der
+   Rahmen). Kopieren und Einfügen geht aber – und rettet die Daten genauso. */
+function sicherungOeffnen() {
+  const json = JSON.stringify(daten, null, 2);
+
+  const h = `
+    <div class="gruppentitel">Sicherung herausholen</div>
+    <div class="gruppe" style="padding:12px 14px">
+      <textarea class="sicherungsfeld" id="sicherRaus" readonly>${sicher(json)}</textarea>
+    </div>
+    <div class="gruppe" style="margin-top:8px">
+      <button class="eintrag" data-kopieren="1">
+        <span class="haupt" style="color:var(--akzent)">Alles kopieren</span>
+        <span class="wert" id="kopierStand"></span>
+      </button>
+    </div>
+    <div class="fuss">Kopier den Text und sichere ihn, wo du willst – in einer Notiz,
+      einer Mail an dich selbst oder einer Textdatei.</div>
+
+    <div class="gruppentitel">Sicherung einspielen</div>
+    <div class="gruppe" style="padding:12px 14px">
+      <textarea class="sicherungsfeld" id="sicherRein"
+        placeholder="Hier die gesicherte Fassung einfügen …"></textarea>
+    </div>
+    <div class="gruppe" style="margin-top:8px">
+      <button class="eintrag" data-einspielen="1">
+        <span class="haupt" style="color:#D93025">Alles ersetzen</span>
+      </button>
+    </div>
+    <div class="fuss" id="sicherProblem">Ersetzt Fächer, Stundenplan, Hausaufgaben, Notizen,
+      Termine und Ferien durch das Eingefügte. Das lässt sich nicht rückgängig machen.</div>`;
+
+  blatt.innerHTML = `<div class="blattkopf"><span class="t">Sicherung</span>
+      <button type="button" data-schliessen="1">Fertig</button></div>${h}`;
+  modal.hidden = false;
+  blatt.scrollTop = 0;
+
+  blatt.onclick = async ev => {
+    if (ev.target.closest("[data-schliessen]")) { modal.hidden = true; return; }
+
+    if (ev.target.closest("[data-kopieren]")) {
+      const feld = document.getElementById("sicherRaus");
+      const stand = document.getElementById("kopierStand");
+      try {
+        await navigator.clipboard.writeText(feld.value);
+        stand.textContent = "kopiert";
+      } catch (e) {
+        feld.focus(); feld.select();
+        stand.textContent = "markiert – jetzt kopieren";
+      }
+      return;
+    }
+
+    if (ev.target.closest("[data-einspielen]")) {
+      const problem = document.getElementById("sicherProblem");
+      const text = document.getElementById("sicherRein").value.trim();
+      if (!text) { problem.textContent = "Da ist nichts zum Einspielen."; return; }
+      let gelesen;
+      try { gelesen = JSON.parse(text); }
+      catch (e) { problem.textContent = "Das ist keine gültige Sicherung (kein lesbares JSON)."; return; }
+      if (!gelesen || typeof gelesen !== "object" || !Array.isArray(gelesen.faecher)) {
+        problem.textContent = "Das sieht nicht nach einer Homy-Sicherung aus.";
+        return;
+      }
+      if (!confirm("Alles durch die eingefügte Sicherung ersetzen?")) return;
+
+      // Die Anmeldung bleibt, wie sie hier eingestellt ist.
+      const anmeldungBleibt = daten.anmeldung;
+      daten = Object.assign({}, daten, gelesen);
+      daten.anmeldung = anmeldungBleibt;
+      sichern();
+      modal.hidden = true;
+      aufgeklappt = {};
+      zeichne();
+    }
+  };
+}
+
+/* --- Eigenen Code festlegen --- */
+function codeBearbeiten() {
+  const hatCode = !daten.anmeldung.istBeispielCode;
+
+  const h = `
+    ${hatCode ? `<div class="gruppentitel">Zur Sicherheit</div>
+    <div class="gruppe">
+      <div class="feldzeile"><label for="cAlt">Bisheriger Code</label>
+        <input id="cAlt" type="password" inputmode="numeric" placeholder="••••"></div>
+    </div>` : ""}
+
+    <div class="gruppentitel">Neuer Code</div>
+    <div class="gruppe">
+      <div class="feldzeile"><label for="cNeu">Code</label>
+        <input id="cNeu" type="password" inputmode="numeric" placeholder="4 bis 8 Ziffern"></div>
+      <div class="feldzeile"><label for="cNeu2">Noch einmal</label>
+        <input id="cNeu2" type="password" inputmode="numeric" placeholder="Wiederholen"></div>
+    </div>
+    <div class="fuss">Vier bis acht Ziffern. Den Code brauchen alle, die Homy öffnen wollen.</div>
+
+    <div class="gruppentitel">Merkzettel (freiwillig)</div>
+    <div class="gruppe">
+      <div class="feldzeile"><label for="cMerk">Hinweis</label>
+        <input id="cMerk" type="text" value="${sicher(daten.anmeldung.merkzettel || "")}"
+               placeholder="z. B. „Geburtstag von Oma“"></div>
+    </div>
+    <div class="fuss">Erscheint auf dem Anmeldebild unter „Code vergessen?“. Schreib also
+      keinen Hinweis hin, aus dem sich der Code erraten lässt.</div>
+
+    <div class="fuss" id="cProblem" style="color:#D93025;padding-top:14px"></div>`;
+
+  blatt.innerHTML = `<div class="blattkopf"><span class="t">${
+      hatCode ? "Code ändern" : "Eigenen Code festlegen"}</span>
+      <button type="button" data-codesichern="1">Sichern</button></div>${h}`;
+  modal.hidden = false;
+  blatt.scrollTop = 0;
+  setTimeout(() => (document.getElementById(hatCode ? "cAlt" : "cNeu") || {}).focus?.(), 50);
+
+  blatt.onclick = ev => {
+    if (!ev.target.closest("[data-codesichern]")) return;
+    const problem = document.getElementById("cProblem");
+    const neu = (document.getElementById("cNeu").value || "").trim();
+    const neu2 = (document.getElementById("cNeu2").value || "").trim();
+
+    if (hatCode) {
+      const alt = (document.getElementById("cAlt").value || "").trim();
+      if (alt !== daten.anmeldung.code) { problem.textContent = "Der bisherige Code stimmt nicht."; return; }
+    }
+    if (!/^[0-9]{4,8}$/.test(neu)) {
+      problem.textContent = "Der Code muss aus 4 bis 8 Ziffern bestehen."; return;
+    }
+    if (neu !== neu2) { problem.textContent = "Die beiden Eingaben sind nicht gleich."; return; }
+
+    daten.anmeldung.code = neu;
+    daten.anmeldung.istBeispielCode = false;
+    daten.anmeldung.merkzettel = document.getElementById("cMerk").value;
+    daten.anmeldung.an = true;
+    sichern();
+    modal.hidden = true;
+    zeichne();
+  };
+}
+
+/* --- Die nachgestellte Benachrichtigung --- */
+const mitteilung = document.getElementById("mitteilung");
+let mitteilungTimer = null;
+
+function zeigeMitteilung(t) {
+  const art = ARTEN[t.art] || ARTEN.sonstiges;
+  const f = t.fach ? fachVon(t.fach) : null;
+  const z = erinnerungsZeitpunkt(t);
+  const tag = new Date(t.tag + "T00:00:00");
+  const abstand = Math.round((tagStart(tag) - tagStart(z || new Date())) / 86400000);
+
+  const wann = abstand <= 0 ? "Heute" : abstand === 1 ? "Morgen"
+    : abstand === 2 ? "Übermorgen"
+    : `In ${abstand} Tagen (${TAGE_WOCHE_KURZ[wochentag(tag)-1]}, ${tag.getDate()}.${tag.getMonth()+1}.)`;
+  const text = t.zeit !== null && t.zeit !== undefined ? `${wann} um ${uhr(t.zeit)} Uhr` : wann;
+
+  const untertitel = t.untertitelText
+    || [(t.titel || "").trim() ? art.name : "", f ? f.name : ""].filter(Boolean).join(" · ");
+
+  mitteilung.innerHTML = `
+    <span class="msym">${HOMY_SVG}</span>
+    <span style="flex:1;min-width:0">
+      <span class="mtitel">${sicher((t.titel || "").trim() || art.name)}</span>
+      ${untertitel ? `<div class="muntertitel">${sicher(untertitel)}</div>` : ""}
+      <div class="mtext">${sicher(text)}</div>
+      <div class="mdemo">So sieht die Erinnerung auf dem iPhone aus. Sie käme
+        ${z ? sicher(`am ${TAGE_WOCHE_KURZ[wochentag(z)-1]}, ${z.getDate()}. ${MONATE[z.getMonth()]} um ${uhr(z.getHours()*60+z.getMinutes())} Uhr`) : "zum eingestellten Zeitpunkt"} –
+        geschickt von iOS, auch wenn Homy zu ist.</div>
+    </span>
+    <span class="mzeit">jetzt</span>`;
+  mitteilung.hidden = false;
+
+  clearTimeout(mitteilungTimer);
+  mitteilungTimer = setTimeout(() => { mitteilung.hidden = true; }, 7000);
+}
+
+mitteilung.addEventListener("click", () => { mitteilung.hidden = true; });
+
+/* =====================================================================
+   Anmeldung
+   ===================================================================== */
+
+const WANN_NAME = { immer: "Jedes Mal", fuenf: "Nach 5 Minuten",
+                    stunde: "Nach 1 Stunde", start: "Nur beim Neustart" };
+const WANN_TEXT = {
+  immer:  "Sobald du Homy verlässt, ist die App wieder zu.",
+  fuenf:  "Kurz weg und zurück? Dann fragt Homy nicht nach.",
+  stunde: "Innerhalb einer Stunde bleibt Homy offen.",
+  start:  "Homy bleibt offen, bis du die App ganz schließt."
+};
+
+const sperre       = document.getElementById("sperre");
+const sperrPunkte  = document.getElementById("sperrPunkte");
+const sperrStatus  = document.getElementById("sperrStatus");
+const sperrTasten  = document.getElementById("sperrTasten");
+const sperrGruss   = document.getElementById("sperrGruss");
+let   eingabe      = "";
+let   fehlversuche = 0;
+
+const SYM_SCHNELL = `<svg viewBox="0 0 24 24"><path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"/></svg>`;
+/* Das Face-ID-Zeichen, wenn wirklich Biometrie eingerichtet ist. */
+const SYM_GESICHT = `<svg viewBox="0 0 24 24"><path d="M4 4h4V2H2v6h2V4zm16 0v4h2V2h-6v2h4zM4 20v-4H2v6h6v-2H4zm16 0h-4v2h6v-6h-2v4zM9 9.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM12 9v4h-1.5M8.5 15.5c1 1 5 1 6 0"
+  fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+const SYM_WEG     = `<svg viewBox="0 0 24 24"><path d="M22 3H7L1 12l6 9h15a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-3.7 12.3-1.4 1.4L14 13.9l-2.9 2.8-1.4-1.4 2.8-2.9-2.8-2.9 1.4-1.4 2.9 2.8 2.9-2.8 1.4 1.4-2.8 2.9 2.8 2.9z"/></svg>`;
+
+function sperrenNoetig() { return daten.anmeldung.an && !!daten.anmeldung.code; }
+
+/* --- Schnellstart ---------------------------------------------------
+   Erst wird echte Biometrie versucht (WebAuthn: Face ID, Touch ID,
+   Windows Hello). Eingebettete Seiten dürfen das oft nicht – dann merkt
+   sich Homy stattdessen diesen Browser. Beides öffnet ohne Code.
+   In der gebauten iOS-App ist es immer echtes Face ID bzw. Touch ID. */
+
+const zufallsBytes = n => crypto.getRandomValues(new Uint8Array(n));
+const zuText = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const zuBytes = txt => Uint8Array.from(atob(txt), c => c.charCodeAt(0));
+
+async function biometrieMoeglich() {
+  try {
+    return !!(window.PublicKeyCredential
+      && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable());
+  } catch (e) { return false; }
+}
+
+/* Richtet den Schnellstart ein. Gibt zurück, was daraus geworden ist. */
+async function schnellstartEinrichten() {
+  if (await biometrieMoeglich()) {
+    try {
+      const cred = await navigator.credentials.create({
+        publicKey: {
+          challenge: zufallsBytes(32),
+          rp: { name: "Homy" },
+          user: { id: zufallsBytes(16), name: "homy", displayName: "Homy" },
+          pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
+          authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
+          timeout: 60000
+        }
+      });
+      if (cred) {
+        daten.anmeldung.webauthnId = zuText(cred.rawId);
+        daten.anmeldung.gemerkt = false;
+        daten.anmeldung.schnellstart = true;
+        sichern();
+        return "biometrie";
+      }
+    } catch (e) {
+      // Abgebrochen oder in dieser Umgebung nicht erlaubt – dann eben merken.
+    }
+  }
+  daten.anmeldung.webauthnId = "";
+  daten.anmeldung.gemerkt = true;
+  daten.anmeldung.schnellstart = true;
+  sichern();
+  return "gemerkt";
+}
+
+/* Öffnet per Schnellstart. Gibt true zurück, wenn es geklappt hat. */
+async function schnellstartOeffnen() {
+  if (daten.anmeldung.webauthnId) {
+    try {
+      const ok = await navigator.credentials.get({
+        publicKey: {
+          challenge: zufallsBytes(32),
+          allowCredentials: [{ type: "public-key", id: zuBytes(daten.anmeldung.webauthnId) }],
+          userVerification: "required",
+          timeout: 60000
+        }
+      });
+      return !!ok;
+    } catch (e) {
+      return false;   // abgebrochen oder fehlgeschlagen
+    }
+  }
+  return !!daten.anmeldung.gemerkt;
+}
+
+function schnellstartName() {
+  if (daten.anmeldung.webauthnId) return "Face ID / Touch ID";
+  if (daten.anmeldung.gemerkt) return "Dieser Browser ist gemerkt";
+  return "Schnellstart";
+}
+
+function sperreZeigen() {
+  if (!sperrenNoetig()) { sperre.hidden = true; return; }
+  eingabe = "";
+  fehlversuche = 0;
+  const name = (daten.profil.vorname || "").trim();
+  sperrGruss.textContent = name ? "Hallo, " + name + "!" : "Willkommen zurück";
+  sperre.hidden = false;
+  const hinweis = document.getElementById("demohinweis");
+  hinweis.hidden = !daten.anmeldung.istBeispielCode;
+  hinweis.innerHTML = "Zum Ausprobieren: Code <strong>1234</strong>. "
+    + "Einen eigenen Code legst du in den Einstellungen unter „Anmeldung“ fest.";
+  sperreZeichnen();
+}
+
+function sperreZeichnen() {
+  const laenge = daten.anmeldung.code.length;
+  sperrPunkte.innerHTML = Array.from({ length: laenge },
+    (_, i) => `<i class="${i < eingabe.length ? "voll" : ""}"></i>`).join("");
+
+  const tasten = [];
+  for (let i = 1; i <= 9; i++) tasten.push(`<button class="taste" data-ziffer="${i}">${i}</button>`);
+  tasten.push(daten.anmeldung.schnellstart
+    ? `<button class="taste still" data-schnell="1" aria-label="Mit ${schnellstartName()} öffnen">${
+        daten.anmeldung.webauthnId ? SYM_GESICHT : SYM_SCHNELL}</button>`
+    : `<span class="taste leer"></span>`);
+  tasten.push(`<button class="taste" data-ziffer="0">0</button>`);
+  tasten.push(`<button class="taste still loeschen" data-weg="1" aria-label="Letzte Ziffer löschen">${SYM_WEG}</button>`);
+  sperrTasten.innerHTML = tasten.join("");
+}
+
+function sperrZiffer(z) {
+  if (eingabe.length >= daten.anmeldung.code.length) return;
+  eingabe += z;
+  sperrStatus.textContent = "Code eingeben";
+  sperrStatus.classList.remove("rot");
+  sperreZeichnen();
+  if (eingabe.length === daten.anmeldung.code.length) sperrPruefen();
+}
+
+function sperrPruefen() {
+  if (eingabe === daten.anmeldung.code) {
+    aufsperren();
+    return;
+  }
+  fehlversuche++;
+  sperrPunkte.classList.add("falsch");
+  setTimeout(() => sperrPunkte.classList.remove("falsch"), 320);
+  sperrStatus.textContent = "Falscher Code. Versuch es noch einmal.";
+  sperrStatus.classList.add("rot");
+  setTimeout(() => { eingabe = ""; sperreZeichnen(); }, 350);
+}
+
+function aufsperren() {
+  eingabe = "";
+  sperre.hidden = true;
+  zeichne();
+}
+
+sperrTasten.addEventListener("click", ev => {
+  const z = ev.target.closest("[data-ziffer]");
+  if (z) { sperrZiffer(z.dataset.ziffer); return; }
+  if (ev.target.closest("[data-schnell]")) {
+    sperrStatus.textContent = daten.anmeldung.webauthnId
+      ? "Warte auf Face ID / Touch ID …" : "Schnellstart …";
+    sperrStatus.classList.remove("rot");
+    schnellstartOeffnen().then(ok => {
+      if (ok) { aufsperren(); return; }
+      sperrStatus.textContent = "Schnellstart hat nicht geklappt – tipp deinen Code.";
+      sperrStatus.classList.add("rot");
+    });
+    return;
+  }
+  if (ev.target.closest("[data-weg]")) {
+    eingabe = eingabe.slice(0, -1);
+    sperrStatus.textContent = "Code eingeben";
+    sperrStatus.classList.remove("rot");
+    sperreZeichnen();
+  }
+});
+
+document.getElementById("sperrVergessen").addEventListener("click", () => {
+  const m = (daten.anmeldung.merkzettel || "").trim();
+  let text = m ? "Dein Merkzettel: „" + m + "“" : "Für diesen Code ist kein Merkzettel hinterlegt.";
+  text += "\n\nIn der gebauten App ist der Code nirgends im Klartext gespeichert und lässt "
+        + "sich deshalb nicht anzeigen.";
+  if (daten.anmeldung.istBeispielCode) text += "\n\nIn dieser Vorschau lautet er noch 1234.";
+  alert(text);
+});
+
+document.addEventListener("keydown", ev => {
+  if (sperre.hidden) return;
+  if (ev.key >= "0" && ev.key <= "9") { sperrZiffer(ev.key); ev.preventDefault(); }
+  else if (ev.key === "Backspace") {
+    eingabe = eingabe.slice(0, -1); sperreZeichnen(); ev.preventDefault();
+  }
+});
+
+/* =====================================================================
+   Bedienung
+   ===================================================================== */
+
+/* Das Bundesland ist ein Auswahlfeld – das braucht change statt click. */
+el.addEventListener("change", ev => {
+  const land = ev.target.closest("[data-landwahl]");
+  if (land) {
+    daten.einstellungen.bundesland = land.value;
+    sichern(); zeichne();
+    return;
+  }
+  const wann = ev.target.closest("[data-wannwahl]");
+  if (wann) {
+    daten.anmeldung.wann = wann.value;
+    sichern(); zeichne();
+  }
+});
+
+document.querySelectorAll(".tab").forEach(b => {
+  b.addEventListener("click", () => {
+    if (notizOffen) blattSchliessen();
+    tab = b.dataset.tab;
+    zeichne();
+    window.scrollTo(0, 0);
+  });
+});
+
+knopfZurueck.addEventListener("click", () => { wochenVersatz--; aufgeklappt = {}; zeichne(); });
+document.getElementById("suche").addEventListener("click", sucheOeffnen);
+knopfVor.addEventListener("click", () => {
+  if (knopfVor.dataset.rolle === "neu") { neueNotiz(); return; }
+  wochenVersatz++; aufgeklappt = {}; zeichne();
+});
+
+/* Eingeben, Abhaken, Ergänzen */
+el.addEventListener("input", ev => {
+  const t = ev.target;
+  if (t.tagName !== "TEXTAREA") return;
+  hoeheAnpassen(t);
+  const zeile = t.closest(".zeile");
+  const d = new Date(zeile.dataset.tag + "T00:00:00");
+  const alt = daten.aufgaben[zeile.dataset.tag + "|" + zeile.dataset.fach];
+  setzeAufgabe(d, zeile.dataset.fach, t.value, alt ? alt.fertig : false);
+  if (t.value.trim()) {
+    let geaendert = false;
+    if (daten.freieTage[zeile.dataset.tag]) { delete daten.freieTage[zeile.dataset.tag]; geaendert = true; }
+    const fk = zeile.dataset.tag + "|" + zeile.dataset.fach;
+    if (daten.freieFaecher[fk]) { delete daten.freieFaecher[fk]; geaendert = true; }
+    if (geaendert) sichern();
+  }
+
+  const haken = zeile.querySelector(".haken");
+  haken.hidden = !t.value.trim();
+  zeile.classList.toggle("offen", !t.value.trim());
+});
+
+el.addEventListener("click", ev => {
+  // .frei ist der Minus-Knopf einer "nichts auf"-Zeile – der gehört nicht hierher.
+  const haken = ev.target.closest(".feld.haken");
+  if (haken) {
+    const zeile = haken.closest(".zeile");
+    const k = zeile.dataset.tag + "|" + zeile.dataset.fach;
+    if (daten.aufgaben[k]) {
+      daten.aufgaben[k].fertig = !daten.aufgaben[k].fertig;
+      // Ohne Text und ohne Haken bleibt nichts übrig.
+      if (!daten.aufgaben[k].fertig && !daten.aufgaben[k].text.trim()) delete daten.aufgaben[k];
+    } else {
+      // Abhaken geht auch, bevor etwas aufgeschrieben wurde.
+      daten.aufgaben[k] = { text: "", fertig: true };
+    }
+    delete daten.freieFaecher[k];
+    sichern(); zeichne();
+    return;
+  }
+
+  if (ev.target.closest("[data-neuenotiz]")) { neueNotiz(); return; }
+
+  const nKarte = ev.target.closest("[data-notiz]");
+  if (nKarte) { notizOffen = nKarte.dataset.notiz; zeichne(); return; }
+
+  const monat = ev.target.closest("[data-monat]");
+  if (monat) {
+    monatsStart = new Date(monatsStart.getFullYear(),
+                           monatsStart.getMonth() + (+monat.dataset.monat), 1);
+    zeichne();
+    return;
+  }
+
+  const tag2 = ev.target.closest("[data-tag2]");
+  if (tag2) {
+    gewaehlterTag = new Date(tag2.dataset.tag2 + "T00:00:00");
+    zeichne();
+    return;
+  }
+
+  if (ev.target.closest("[data-neuertermin]")) { terminBearbeiten(null); return; }
+  if (ev.target.closest("[data-neueferien]")) { ferienBearbeiten(null); return; }
+
+  const ferienKnopf = ev.target.closest("[data-ferien]");
+  if (ferienKnopf) { ferienBearbeiten(ferienKnopf.dataset.ferien); return; }
+
+  const terminKnopf = ev.target.closest("[data-termin]");
+  if (terminKnopf) { terminBearbeiten(terminKnopf.dataset.termin); return; }
+
+  if (ev.target.closest("[data-zufaecher]")) { tab = "faecher"; zeichne(); window.scrollTo(0,0); return; }
+  if (ev.target.closest("[data-zurueckplan]")) { tab = "stundenplan"; zeichne(); window.scrollTo(0,0); return; }
+
+  if (ev.target.closest("[data-codeaendern]")) { codeBearbeiten(); return; }
+  if (ev.target.closest("[data-sicherung]")) { sicherungOeffnen(); return; }
+
+  if (ev.target.closest("[data-biometrie]")) {
+    schnellstartEinrichten().then(art => {
+      zeichne();
+      alert(art === "biometrie"
+        ? "Geschafft: Homy öffnet sich jetzt mit Face ID bzw. Touch ID.\n\n"
+          + "Tipp beim Anmelden auf das Gesicht-Symbol unten links."
+        : "Echtes Face ID lässt sich hier nicht einrichten – eingebettete Seiten dürfen "
+          + "das meistens nicht.\n\nDer Schnellstart merkt sich weiterhin diesen Browser "
+          + "und öffnet ohne Code. In der gebauten iOS-App ist es immer Face ID bzw. Touch ID.");
+    });
+    return;
+  }
+  if (ev.target.closest("[data-zeiten]")) { zeitenBearbeiten(); return; }
+  if (ev.target.closest("[data-neuesfach]")) { fachBearbeiten(null); return; }
+
+  const fachKnopf = ev.target.closest("[data-fach]");
+  if (fachKnopf) { fachBearbeiten(fachKnopf.dataset.fach); return; }
+
+  if (ev.target.closest("[data-schnellstart]")) {
+    if (daten.anmeldung.schnellstart) {
+      daten.anmeldung.schnellstart = false;
+      daten.anmeldung.gemerkt = false;
+      daten.anmeldung.webauthnId = "";
+      sichern(); zeichne();
+    } else {
+      schnellstartEinrichten().then(art => {
+        zeichne();
+        alert(art === "biometrie"
+          ? "Schnellstart eingerichtet: Homy öffnet sich jetzt mit Face ID bzw. Touch ID."
+          : "Schnellstart eingerichtet: Homy merkt sich diesen Browser und öffnet ohne Code.\n\n"
+            + "Echtes Face ID lässt diese eingebettete Seite nicht zu – in der gebauten "
+            + "iOS-App ist es immer Face ID bzw. Touch ID.");
+      });
+    }
+    return;
+  }
+
+  if (ev.target.closest("[data-anmeldungaus]")) {
+    if (confirm("Anmeldung ausschalten? Danach kann jeder Homy öffnen.")) {
+      daten.anmeldung.an = false;
+      daten.anmeldung.schnellstart = false;
+      daten.anmeldung.gemerkt = false;
+      daten.anmeldung.webauthnId = "";
+      sichern(); zeichne();
+    }
+    return;
+  }
+
+  const anm = ev.target.closest("[data-anmeldung]");
+  if (anm) {
+    const feld = anm.dataset.anmeldung;
+    daten.anmeldung[feld] = !daten.anmeldung[feld];
+    sichern(); zeichne();
+    return;
+  }
+  if (ev.target.closest("[data-sperren]")) { sperreZeigen(); return; }
+
+  const klapp = ev.target.closest("[data-klapp]");
+  if (klapp) {
+    const sk = klapp.dataset.klapp;
+    if (aufgeklappt[sk]) delete aufgeklappt[sk]; else aufgeklappt[sk] = true;
+    zeichne();
+    return;
+  }
+
+  const fachFreiKnopf = ev.target.closest("[data-fachfrei]");
+  if (fachFreiKnopf) {
+    const k = fachFreiKnopf.dataset.fachfrei;
+    if (fachFreiKnopf.dataset.an === "1") {
+      // "Keine Hausaufgaben" und ein Eintrag können nicht beide stimmen.
+      delete daten.aufgaben[k];
+      daten.freieFaecher[k] = true;
+    } else {
+      delete daten.freieFaecher[k];
+    }
+    sichern(); zeichne();
+    return;
+  }
+
+  const freiKnopf = ev.target.closest("[data-frei]");
+  if (freiKnopf) {
+    const sk = freiKnopf.dataset.frei;
+    if (freiKnopf.dataset.an === "1") daten.freieTage[sk] = true;
+    else delete daten.freieTage[sk];
+    sichern(); zeichne();
+    return;
+  }
+
+  const erg = ev.target.closest("[data-ergaenzen]");
+  if (erg) { fachWaehlen(erg.dataset.ergaenzen); return; }
+
+  if (ev.target.closest("[data-scan]")) { fotoWaehlen(); return; }
+  if (ev.target.closest("[data-fotoweg]")) { planFoto = null; zeichne(); return; }
+
+  const zelle = ev.target.closest(".planzelle");
+  if (zelle) { stundeWaehlen(+zelle.dataset.wt, +zelle.dataset.st); return; }
+
+  const darstellung = ev.target.closest("[data-darstellung]");
+  if (darstellung) {
+    daten.einstellungen.darstellung = darstellung.dataset.darstellung;
+    sichern();
+    wendeDarstellungAn();
+    zeichneKritzel();
+    zeichne();
+    return;
+  }
+
+  const schalter = ev.target.closest("[data-schalter]");
+  if (schalter) {
+    const s = schalter.dataset.schalter;
+    daten.einstellungen[s] = !daten.einstellungen[s];
+    sichern(); zeichne();
+    return;
+  }
+
+  const stufe = ev.target.closest("[data-stunden]");
+  if (stufe) {
+    const neu = daten.einstellungen.stunden + (+stufe.dataset.stunden);
+    daten.einstellungen.stunden = Math.max(1, Math.min(14, neu));
+    sichern(); zeichne();
+    return;
+  }
+
+  if (ev.target.closest("[data-profil]")) { profilOeffnen(); return; }
+
+  if (ev.target.closest("[data-zuruecksetzen]")) {
+    try { localStorage.removeItem(SPEICHER); } catch (e) {}
+    laden(); zeichne();
+  }
+});
+
+/* Wischen zwischen den Wochen – wie das Blättern in der App */
+let startX = 0, startY = 0, wischen = false;
+el.addEventListener("touchstart", ev => {
+  if (tab !== "hausaufgaben" || ev.target.tagName === "TEXTAREA") { wischen = false; return; }
+  startX = ev.touches[0].clientX; startY = ev.touches[0].clientY; wischen = true;
+}, { passive: true });
+el.addEventListener("touchend", ev => {
+  if (!wischen) return;
+  const dx = ev.changedTouches[0].clientX - startX;
+  const dy = ev.changedTouches[0].clientY - startY;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    wochenVersatz += dx < 0 ? 1 : -1;
+    aufgeklappt = {};
+    zeichne();
+  }
+  wischen = false;
+}, { passive: true });
+
+/* --- Auswahl-Blätter --- */
+const modal = document.getElementById("modal");
+const blatt = document.getElementById("blatt");
+
+function blattZeigen(titel, inhalt, beiKlick) {
+  blatt.innerHTML = `<div class="blattkopf"><span class="t">${sicher(titel)}</span>
+      <button type="button" data-schliessen="1">Fertig</button></div>${inhalt}`;
+  modal.hidden = false;
+  blatt.scrollTop = 0;
+  blatt.onclick = ev => {
+    if (ev.target.closest("[data-schliessen]")) { modal.hidden = true; return; }
+    const wahl = ev.target.closest("[data-wahl]");
+    if (wahl) { beiKlick(wahl.dataset.wahl); modal.hidden = true; zeichne(); }
+  };
+}
+modal.addEventListener("click", ev => { if (ev.target === modal) modal.hidden = true; });
+
+function fachListe(aktiv, mitFrei) {
+  let h = '<div class="gruppe">';
+  if (mitFrei) {
+    h += `<button class="eintrag" data-wahl="">
+      <span class="haupt">Freistunde</span>
+      ${aktiv === "" ? '<span class="wert" style="color:var(--akzent)">✓</span>' : ""}</button>`;
+  }
+  daten.faecher.slice().sort((a,b) => a.name.localeCompare(b.name,"de")).forEach(f => {
+    h += `<button class="eintrag" data-wahl="${f.id}">
+      <span class="kuerzel" style="background:${fill(f.f)};color:${tint(f.f)};margin-top:0;width:40px">${sicher(f.kuerzel)}</span>
+      <span class="haupt">${sicher(f.name)}</span>
+      ${aktiv === f.id ? '<span class="wert" style="color:var(--akzent)">✓</span>' : ""}</button>`;
+  });
+  return h + "</div>";
+}
+
+function fachWaehlen(tagSchluessel) {
+  const d = new Date(tagSchluessel + "T00:00:00");
+  const schon = faecherAmTag(d).concat(zusatz[tagSchluessel] || []);
+  let h = '<div class="gruppe">';
+  daten.faecher.filter(f => !schon.includes(f.id))
+    .sort((a,b) => a.name.localeCompare(b.name,"de")).forEach(f => {
+      h += `<button class="eintrag" data-wahl="${f.id}">
+        <span class="kuerzel" style="background:${fill(f.f)};color:${tint(f.f)};margin-top:0;width:40px">${sicher(f.kuerzel)}</span>
+        <span class="haupt">${sicher(f.name)}</span></button>`;
+    });
+  h += '</div><div class="fuss">Für Stunden, die nicht im Stundenplan stehen – etwa eine Vertretung.</div>';
+
+  blattZeigen(TAGE[wochentag(d)-1] + ", " + d.getDate() + ". " + MONATE[d.getMonth()], h, id => {
+    (zusatz[tagSchluessel] = zusatz[tagSchluessel] || []).push(id);
+  });
+}
+
+function neueNotiz() {
+  const id = "n" + Date.now();
+  daten.notizen.push({ id, text: "", geaendert: Date.now() });
+  sichern();
+  notizOffen = id;
+  zeichne();
+}
+
+/* Klicks im Schreibblatt (liegt außerhalb von #inhalt) */
+document.addEventListener("click", ev => {
+  if (!notizOffen) return;
+
+  if (ev.target.closest("[data-blattzurueck]")) { blattSchliessen(); return; }
+
+  if (ev.target.closest("[data-blattloeschen]")) {
+    const h = `<div class="gruppe">
+        <button class="eintrag" data-loeschenja="1">
+          <span class="haupt" style="color:#D93025">Notiz löschen</span></button>
+      </div>
+      <div class="fuss">Das lässt sich nicht rückgängig machen.</div>`;
+    blatt.innerHTML = `<div class="blattkopf"><span class="t">Diese Notiz löschen?</span>
+        <button type="button" data-schliessen="1">Abbrechen</button></div>${h}`;
+    modal.hidden = false;
+    blatt.onclick = e2 => {
+      if (e2.target.closest("[data-schliessen]")) { modal.hidden = true; return; }
+      if (e2.target.closest("[data-loeschenja]")) {
+        daten.notizen = daten.notizen.filter(x => x.id !== notizOffen);
+        sichern();
+        notizOffen = null;
+        modal.hidden = true;
+        entferneNotizblatt();
+        zeichne();
+      }
+    };
+  }
+});
+
+function profilOeffnen() {
+  const pr = daten.profil;
+  const feld = (schluessel, titel, typ) =>
+    `<div class="eintrag">
+       <span class="haupt" style="width:96px;flex:none">${titel}</span>
+       <input type="${typ || "text"}" data-profilfeld="${schluessel}"
+              value="${sicher(pr[schluessel] || "")}" placeholder="${titel}"
+              style="flex:1;min-width:0;border:0;outline:0;background:none;
+                     color:var(--text);font:inherit;font-size:16px;padding:2px 0">
+     </div>`;
+
+  const h = `
+    <div class="gruppentitel">Name</div>
+    <div class="gruppe">${feld("vorname","Vorname")}${feld("nachname","Nachname")}</div>
+
+    <div class="gruppentitel">Schule</div>
+    <div class="gruppe">${feld("klasse","Klasse")}${feld("schule","Schule")}</div>
+
+    <div class="gruppentitel">Kontakt</div>
+    <div class="gruppe">${feld("telefon","Telefon","tel")}${feld("email","E-Mail","email")}</div>
+
+    <div class="gruppentitel">Adresse</div>
+    <div class="gruppe" style="padding:12px 14px">
+      <textarea data-profilfeld="adresse" rows="2" placeholder="Straße, Postleitzahl, Ort"
+        style="width:100%;border:0;outline:0;resize:none;background:none;color:var(--text);
+               font:inherit;font-size:16px">${sicher(pr.adresse || "")}</textarea>
+    </div>
+
+    <div class="gruppentitel">Weitere Angaben</div>
+    <div class="gruppe" style="padding:12px 14px">
+      <textarea data-profilfeld="weiteres" rows="3"
+        placeholder="Alles Weitere – Spind-Nummer, Buslinie, wen man im Notfall anruft …"
+        style="width:100%;border:0;outline:0;resize:none;background:none;color:var(--text);
+               font:inherit;font-size:16px">${sicher(pr.weiteres || "")}</textarea>
+    </div>
+
+    <div class="hinweiskasten" style="margin-top:18px">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--akzent)" style="flex:none;margin-top:2px"><path d="M18 8h-1V6a5 5 0 0 0-10 0v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zM9 6a3 3 0 0 1 6 0v2H9V6z"/></svg>
+      <div>
+        <div class="titel">Bleibt bei dir</div>
+        <div class="text">Diese Angaben bleiben auf deinem Gerät. Die App verschickt nichts und
+          hat keine Verbindung ins Internet. Nur wenn du selbst eine Sicherung speicherst,
+          stehen sie mit in dieser Datei.</div>
+      </div>
+    </div>`;
+
+  blatt.innerHTML = `<div class="blattkopf"><span class="t">Meine Daten</span>
+      <button type="button" data-schliessen="1">Fertig</button></div>${h}`;
+  modal.hidden = false;
+  blatt.scrollTop = 0;
+
+  // Tippen schreibt direkt in die Daten – ohne neu zu zeichnen.
+  blatt.querySelectorAll("[data-profilfeld]").forEach(el2 => {
+    el2.addEventListener("input", () => {
+      daten.profil[el2.dataset.profilfeld] = el2.value;
+      sichern();
+    });
+  });
+
+  blatt.onclick = ev => {
+    if (ev.target.closest("[data-schliessen]")) { modal.hidden = true; zeichne(); }
+  };
+}
+
+/* --- Suche über alle Wochen --- */
+function sucheOeffnen() {
+  const h = `
+    <div class="gruppe" style="padding:12px 14px">
+      <input id="suchfeld" type="search" placeholder="Hausaufgaben und Notizen durchsuchen"
+        style="width:100%;border:0;outline:0;background:none;color:var(--text);
+               font:inherit;font-size:16px">
+    </div>
+    <div id="suchergebnis"></div>`;
+
+  blatt.innerHTML = `<div class="blattkopf"><span class="t">Suchen</span>
+      <button type="button" data-schliessen="1">Fertig</button></div>${h}`;
+  modal.hidden = false;
+  blatt.scrollTop = 0;
+
+  const feld = document.getElementById("suchfeld");
+  feld.addEventListener("input", () => zeigeTreffer(feld.value));
+  feld.focus();
+  zeigeTreffer("");
+
+  blatt.onclick = ev => {
+    if (ev.target.closest("[data-schliessen]")) { modal.hidden = true; return; }
+    const treffer = ev.target.closest("[data-sprung]");
+    if (treffer) {
+      // Zur Woche springen, in der der Treffer steht.
+      const ziel = wochenStart(new Date(treffer.dataset.sprung + "T00:00:00"));
+      const jetzt = wochenStart(new Date());
+      wochenVersatz = Math.round((ziel - jetzt) / (7 * 86400000));
+      modal.hidden = true;
+      aufgeklappt = {};
+      zeichne();
+    }
+  };
+}
+
+function zeigeTreffer(begriff) {
+  const ziel = document.getElementById("suchergebnis");
+  if (!ziel) return;
+  const suche = (begriff || "").trim().toLowerCase();
+
+  if (suche.length < 2) {
+    ziel.innerHTML = `<div class="fuss" style="padding-top:14px">
+      Tippe mindestens zwei Buchstaben ein. Gesucht wird in allen Hausaufgaben –
+      auch in älteren Wochen – und in deinen Notizen.</div>`;
+    return;
+  }
+
+  const treffer = [];
+
+  Object.keys(daten.aufgaben).forEach(k => {
+    const a = daten.aufgaben[k];
+    if (!a.text || !a.text.toLowerCase().includes(suche)) return;
+    const [tag, fachId] = k.split("|");
+    const f = fachVon(fachId);
+    const d = new Date(tag + "T00:00:00");
+    treffer.push({
+      text: a.text, fertig: a.fertig, fach: f, tag,
+      detail: [f ? f.name : "", d.getDate() + ". " + MONATE[d.getMonth()] + " " + d.getFullYear()]
+        .filter(Boolean).join(" · ")
+    });
+  });
+
+  daten.notizen.forEach(n => {
+    if (!n.text || !n.text.toLowerCase().includes(suche)) return;
+    const zeilen = n.text.split("\n").map(z => z.trim()).filter(Boolean);
+    treffer.push({ text: zeilen[0] || "Notiz", fertig: false, fach: null, tag: null,
+                   detail: zeilen.slice(1).join(" ") || "Notiz" });
+  });
+
+  treffer.sort((a, b) => (b.tag || "").localeCompare(a.tag || ""));
+
+  if (!treffer.length) {
+    ziel.innerHTML = `<div class="fuss" style="padding-top:14px">
+      Zu „${sicher(begriff)}“ gibt es keinen Eintrag.</div>`;
+    return;
+  }
+
+  ziel.innerHTML = `<div class="gruppentitel" style="margin-top:18px">
+      ${treffer.length === 1 ? "1 Treffer" : treffer.length + " Treffer"}</div>
+    <div class="gruppe">` + treffer.map(t => `
+      <button class="eintrag" ${t.tag ? `data-sprung="${t.tag}"` : ""} style="align-items:flex-start">
+        ${t.fach
+          ? `<span class="kuerzel" style="background:${fill(t.fach.f)};color:${tint(t.fach.f)};margin-top:0;width:42px">${sicher(t.fach.kuerzel)}</span>`
+          : `<span class="kuerzel" style="background:var(--fuellung);color:var(--text2);margin-top:0;width:42px">Notiz</span>`}
+        <span style="flex:1;min-width:0">
+          <span class="haupt" style="${t.fertig ? "color:var(--text2);text-decoration:line-through" : ""}">${sicher(t.text)}</span>
+          <div class="neben">${sicher(t.detail)}</div>
+        </span>
+        ${t.fertig ? '<span class="wert" style="color:#34C759">✓</span>' : ""}
+      </button>`).join("") + `</div>
+    <div class="fuss">Tippe eine Hausaufgabe an, um zu ihrer Woche zu springen.</div>`;
+}
+
+/* --- Stundenplan abfotografieren -----------------------------------
+   Im Browser gibt es keine Texterkennung (die Bibliothek dafür dürfte
+   hier nichts nachladen). Was aber geht: das Foto aufnehmen und beim
+   Ausfüllen des Rasters direkt darüber stehen lassen. In der gebauten
+   iOS-App liest Apples Vision die Kürzel zusätzlich automatisch aus. */
+
+let planFoto = null;
+
+function fotoWaehlen() {
+  const feld = document.createElement("input");
+  feld.type = "file";
+  feld.accept = "image/*";
+  feld.capture = "environment";   // auf dem Handy direkt die Kamera
+  feld.style.display = "none";
+  document.body.appendChild(feld);
+
+  feld.addEventListener("change", () => {
+    const datei = feld.files && feld.files[0];
+    feld.remove();
+    if (!datei) return;
+    const leser = new FileReader();
+    leser.onload = () => {
+      planFoto = leser.result;
+      tab = "stundenplan";
+      zeichne();
+      window.scrollTo(0, 0);
+    };
+    leser.onerror = () => alert("Das Bild konnte nicht gelesen werden.");
+    leser.readAsDataURL(datei);
+  });
+
+  feld.click();
+}
+
+function scanErklaeren() {
+  const h = `
+    <div class="gruppe" style="padding:16px">
+      <div class="schritt"><span class="zahl">1</span>
+        <span class="stext">Du fotografierst deinen Stundenplan ab – die App entzerrt das Bild automatisch.</span></div>
+      <div class="schritt"><span class="zahl">2</span>
+        <span class="stext">Sie liest die Kürzel und erkennt, welches Fach in welchem Feld steht.</span></div>
+      <div class="schritt"><span class="zahl">3</span>
+        <span class="stext">Du siehst das Ergebnis und korrigierst, was falsch gelesen wurde.</span></div>
+      <div class="schritt" style="margin-bottom:0"><span class="zahl">4</span>
+        <span class="stext">Übernehmen – fertig. Kürzel, die es noch nicht gibt, werden als neue Fächer angelegt.</span></div>
+    </div>
+    <div class="fuss">Die Erkennung läuft vollständig auf dem Gerät, das Foto verlässt es nicht.
+      Gedruckte Pläne werden deutlich besser gelesen als handgeschriebene – darum der Prüfschritt.</div>
+    <div class="hinweiskasten" style="margin-top:16px">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="var(--akzent)" style="flex:none;margin-top:1px"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      <div>
+        <div class="titel">Nur in der gebauten App</div>
+        <div class="text">Zum Scannen braucht es die Kamera und Apples Texterkennung – beides gibt es
+          nur in der echten iOS-App, nicht hier in der Browser-Vorschau.
+          Im Stundenplan oben rechts sitzt dort der Scan-Knopf.</div>
+      </div>
+    </div>`;
+  blattZeigen("Stundenplan scannen", h, () => {});
+}
+
+function stundeWaehlen(wt, st) {
+  const aktuell = (daten.stunden[wt] || {})[st] || "";
+  const zeit = zeitenFuer(daten.einstellungen.stunden).find(z => z.stunde === st);
+  const h = fachListe(aktuell, true) +
+    `<div class="fuss">Unterrichtszeit: ${zeit ? uhr(zeit.von) + " – " + uhr(zeit.bis) : "—"}</div>`;
+
+  blattZeigen(TAGE_KURZ[wt-1] + ", " + st + ". Stunde", h, id => {
+    daten.stunden[wt] = daten.stunden[wt] || {};
+    if (id) daten.stunden[wt][st] = id; else delete daten.stunden[wt][st];
+    sichern();
+  });
+}
+
+/* =====================================================================
+   Start
+   ===================================================================== */
+
+try { if (localStorage.getItem("hw_hinweis")) document.getElementById("hinweis").hidden = true; } catch (e) {}
+
+/* Hell/dunkel anwenden: ohne Attribut richtet sich die Seite nach dem Gerät. */
+function wendeDarstellungAn() {
+  const m = (daten.einstellungen && daten.einstellungen.darstellung) || "system";
+  if (m === "system") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", m);
+}
+
+/* Zieht man das Fenster über die Grenze, muss neu gezeichnet werden. */
+window.matchMedia("(min-width: 900px) and (hover: hover)")
+  .addEventListener("change", () => zeichne());
+
+laden();
+wendeDarstellungAn();
+zeichneKritzel();
+zeichne();
+sperreZeigen();
+</script>
