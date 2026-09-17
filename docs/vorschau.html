@@ -139,7 +139,11 @@
   #vor { grid-column: 3; }
   #suche { grid-column: 4; }
   .navtitel { text-align: center; min-width: 0; }
-  .navtitel .zeile1 { font-size: 17px; font-weight: 600; letter-spacing: -.02em; }
+  /* Eine Zeile, auch wenn der Titel lang ist ("Stundenplan und Fächer").
+     Auf dieser Seite sind die drei Knöpfe daneben ohnehin ausgeblendet,
+     der Titel darf ihren Platz mitbenutzen und bleibt dabei mittig. */
+  .navtitel .zeile1 { font-size: 17px; font-weight: 600; letter-spacing: -.02em;
+    white-space: nowrap; }
   .navtitel .zeile2 { font-size: 12px; color: var(--text2); margin-top: 1px; }
   .navknopf {
     height: 36px; width: 36px; margin: 0 auto;
@@ -171,6 +175,14 @@
     font-family: inherit;
   }
   .tab svg { width: 24px; height: 24px; fill: currentColor; }
+  /* Zweizeilige Beschriftung ("Stundenplan &" / "Fächer") eng und mittig.
+     Jede Zeile bleibt zusammen, sonst bricht schon "Stundenplan &" um. */
+  .tab .tabtext { display: block; text-align: center; line-height: 1.15; }
+  .tab .tabtext span { display: block; white-space: nowrap; }
+  /* Auf schmalen Geräten (iPhone SE, mini) ist je Tab nur rund 70px Platz. */
+  @media (max-width: 400px) {
+    .tab { font-size: 9px; padding-left: 2px; padding-right: 2px; }
+  }
   .tab[aria-selected="true"] { color: var(--akzent); }
 
   /* --- Tageskarten --- */
@@ -996,7 +1008,7 @@
     </button>
     <button class="tab" role="tab" data-tab="stundenplan" aria-selected="false">
       <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3V3zm2 6v3h4V9H5zm6 0v3h4V9h-4zm6 0v3h2V9h-2zM5 14v3h4v-3H5zm6 0v3h4v-3h-4zm6 0v3h2v-3h-2zM5 5v2h14V5H5z"/></svg>
-      Stundenplan
+      <span class="tabtext"><span>Stundenplan &amp;</span><span>Fächer</span></span>
     </button>
     <button class="tab" role="tab" data-tab="notizen" aria-selected="false">
       <svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z"/></svg>
@@ -1525,7 +1537,9 @@ function hoeheAnpassen(t) {
 
 /* --- Stundenplan --- */
 function zeichneStundenplan() {
-  navTitel.textContent = "Stundenplan";
+  // Unten in der Tab-Leiste steht nur "Stundenplan" – da ist kein Platz.
+  // Die Überschrift nennt beides, weil die Fächer hier mit dazugehören.
+  navTitel.textContent = "Stundenplan und Fächer";
   navUnter.textContent = "";
 
   const tage = wochentage();

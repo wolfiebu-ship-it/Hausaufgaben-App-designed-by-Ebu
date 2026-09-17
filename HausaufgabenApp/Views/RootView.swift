@@ -20,7 +20,10 @@ struct RootView: View {
                 .tag(Tab.calendar)
 
             TimetableView()
-                .tabItem { Label("Stundenplan", systemImage: "tablecells") }
+                // iOS schreibt die Beschriftung in der Tab-Leiste immer auf
+                // eine Zeile und kürzt sie auf schmalen Geräten ab – zwei
+                // Zeilen lässt die eingebaute Leiste nicht zu.
+                .tabItem { Label("Stundenplan & Fächer", systemImage: "tablecells") }
                 .tag(Tab.timetable)
 
             NotesView()

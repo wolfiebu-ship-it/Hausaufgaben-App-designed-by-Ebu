@@ -30,7 +30,9 @@ struct TimetableView: View {
                     grid
                 }
             }
-            .navigationTitle("Stundenplan")
+            // Unten in der Tab-Leiste steht nur „Stundenplan“ – da ist kein Platz.
+            // Die Überschrift nennt beides, weil die Fächer hier mit dazugehören.
+            .navigationTitle("Stundenplan und Fächer")
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.systemGroupedBackground))
             .toolbar {
@@ -38,7 +40,9 @@ struct TimetableView: View {
                     Button {
                         showSubjects = true
                     } label: {
-                        Label("Fächer", systemImage: "books.vertical")
+                        // Nur das Symbol: Das Wort „Fächer“ steht jetzt in der
+                        // Überschrift, und der längere Titel braucht den Platz.
+                        Image(systemName: "books.vertical")
                     }
                     .accessibilityLabel("Fächer verwalten")
                 }

@@ -261,7 +261,7 @@
     </svg>
     <div>
       <div class="leistenname">Homy</div>
-      <div class="leistenzahl">54 Dateien · 9.579 Zeilen</div>
+      <div class="leistenzahl">54 Dateien · 9.604 Zeilen</div>
     </div>
     <input type="search" id="suche" class="suchfeld" placeholder="Datei suchen …"
            aria-label="Datei suchen">
@@ -277,7 +277,7 @@
        hinterher wieder auseinandernehmen kannst.</p>
     <div class="zahlen">
       <span><b>54</b> Dateien</span>
-      <span><b>9.579</b> Zeilen</span>
+      <span><b>9.604</b> Zeilen</span>
       <span><b>Swift 5</b> · SwiftUI</span>
       <span><b>iOS 17</b> · iPhone und iPad</span>
     </div>
@@ -4623,7 +4623,7 @@ extension UIImage {
       <p class="pfad">HausaufgabenApp/Views/RootView.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 47 Zeilen</span>
+      <span class="marke">Swift · 50 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -4650,7 +4650,10 @@ struct RootView: View {
                 .tag(Tab.calendar)
 
             TimetableView()
-                .tabItem { Label(&quot;Stundenplan&quot;, systemImage: &quot;tablecells&quot;) }
+                // iOS schreibt die Beschriftung in der Tab-Leiste immer auf
+                // eine Zeile und kürzt sie auf schmalen Geräten ab – zwei
+                // Zeilen lässt die eingebaute Leiste nicht zu.
+                .tabItem { Label(&quot;Stundenplan &amp; Fächer&quot;, systemImage: &quot;tablecells&quot;) }
                 .tag(Tab.timetable)
 
             NotesView()
@@ -8645,7 +8648,7 @@ private struct Tipp: View {
       <p class="pfad">HausaufgabenApp/Views/Timetable/TimetableView.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 294 Zeilen</span>
+      <span class="marke">Swift · 298 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -8682,7 +8685,9 @@ struct TimetableView: View {
                     grid
                 }
             }
-            .navigationTitle(&quot;Stundenplan&quot;)
+            // Unten in der Tab-Leiste steht nur „Stundenplan“ – da ist kein Platz.
+            // Die Überschrift nennt beides, weil die Fächer hier mit dazugehören.
+            .navigationTitle(&quot;Stundenplan und Fächer&quot;)
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.systemGroupedBackground))
             .toolbar {
@@ -8690,7 +8695,9 @@ struct TimetableView: View {
                     Button {
                         showSubjects = true
                     } label: {
-                        Label(&quot;Fächer&quot;, systemImage: &quot;books.vertical&quot;)
+                        // Nur das Symbol: Das Wort „Fächer“ steht jetzt in der
+                        // Überschrift, und der längere Titel braucht den Platz.
+                        Image(systemName: &quot;books.vertical&quot;)
                     }
                     .accessibilityLabel(&quot;Fächer verwalten&quot;)
                 }
@@ -10498,7 +10505,7 @@ struct SettingsView: View {
       <p class="pfad">README.md</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Markdown · 353 Zeilen</span>
+      <span class="marke">Markdown · 371 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -10821,9 +10828,27 @@ Ohne Mitgliedschaft kannst du Homy weiterhin **mit Xcode auf deine eigenen Gerä
 
 ---
 
+## Den Quelltext zum Kopieren
+
+`docs/quelltext.html` ist eine Seite, auf der **jede Datei einen eigenen Kopier-Knopf** hat – dazu „Alles kopieren“ für das ganze Projekt am Stück und ein Suchfeld. Ganz oben steht Homy noch einmal **als Prompt**: der ganze Bauplan in Worten, zum Einfügen bei einer KI.
+
+Erzeugt wird die Seite aus dem echten Quelltext:
+
+```
+python3 docs/baue_quelltext_seite.py
+```
+
+Daneben liegen `docs/Homy-Quelltext.txt` (alles in einer Textdatei zum Lesen) und `docs/Homy-Quelltext.zip` (das komplette Projekt zum Bauen).
+
+---
+
 ## Die Vorschau im Browser
 
-Unter `docs/vorschau.html` liegt eine vollständige Nachbildung der Oberfläche als einzelne HTML-Datei – zum Anschauen und Ausprobieren ohne Mac. Darin funktioniert alles, was ein Browser kann:
+Unter `docs/vorschau.html` liegt eine vollständige Nachbildung der Oberfläche als einzelne HTML-Datei – zum Anschauen und Ausprobieren ohne Mac.
+
+Sie **fängt leer an**, genau wie die gebaute App beim ersten Öffnen: Die zwölf üblichen Schulfächer sind angelegt, der Stundenplan ist leer. Im Stundenplan stehen oben nur *Fächer* und *Stundenplan abfotografieren*; das Raster füllt sich, sobald du es einträgst oder abfotografierst – dann erst stehen die farbigen Kürzel drin und tauchen auch im Hausaufgabenheft auf. Wer sich einen gefüllten Stand ansehen will, findet in den Einstellungen unter *Daten* den Knopf **„Beispieldaten einsetzen“** und daneben **„Alles leeren“**.
+
+Darin funktioniert alles, was ein Browser kann:
 
 | Funktioniert in der Vorschau | Nur in der gebauten App |
 |---|---|
