@@ -332,7 +332,11 @@ Daneben liegen `docs/Homy-Quelltext.txt` (alles in einer Textdatei zum Lesen) un
 
 ## Die Vorschau im Browser
 
-Unter `docs/vorschau.html` liegt eine vollständige Nachbildung der Oberfläche als einzelne HTML-Datei – zum Anschauen und Ausprobieren ohne Mac. Darin funktioniert alles, was ein Browser kann:
+Unter `docs/vorschau.html` liegt eine vollständige Nachbildung der Oberfläche als einzelne HTML-Datei – zum Anschauen und Ausprobieren ohne Mac.
+
+Sie **fängt leer an**, genau wie die gebaute App beim ersten Öffnen: Die zwölf üblichen Schulfächer sind angelegt, der Stundenplan ist leer. Im Stundenplan stehen oben nur *Fächer* und *Stundenplan abfotografieren*; das Raster füllt sich, sobald du es einträgst oder abfotografierst – dann erst stehen die farbigen Kürzel drin und tauchen auch im Hausaufgabenheft auf. Wer sich einen gefüllten Stand ansehen will, findet in den Einstellungen unter *Daten* den Knopf **„Beispieldaten einsetzen“** und daneben **„Alles leeren“**.
+
+Darin funktioniert alles, was ein Browser kann:
 
 | Funktioniert in der Vorschau | Nur in der gebauten App |
 |---|---|

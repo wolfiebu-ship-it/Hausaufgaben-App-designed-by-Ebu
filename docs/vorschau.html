@@ -933,8 +933,9 @@
 <div id="hinweis">
   <div>
     <strong>Homy – Vorschau im Browser.</strong> So sieht und bedient sich die App, die im Repository liegt.
-    Die echte App ist eine native iOS-App und wird mit Xcode aufs Gerät geladen; hier siehst du die Oberfläche
-    mit Beispieldaten. Deine Eingaben bleiben nur in diesem Browser.
+    Sie fängt leer an, genau wie die gebaute App: Der Stundenplan ist deiner, sobald du ihn einträgst.
+    Zum Anschauen gibt es in den Einstellungen „Beispieldaten einsetzen“.
+    Deine Eingaben bleiben nur in diesem Browser.
   </div>
   <button type="button" onclick="this.parentElement.hidden=true;try{localStorage.setItem('hw_hinweis','1')}catch(e){}" aria-label="Hinweis ausblenden">&times;</button>
 </div>
@@ -1139,19 +1140,38 @@ function laden() {
     }
   } catch (e) { /* Speicher nicht verfügbar – dann eben mit Beispieldaten */ }
 
-  daten = {
-    faecher: BEISPIEL.faecher,
-    stunden: BEISPIEL.stunden,
-    aufgaben: beispielAufgaben(),
+  // Wie beim ersten Öffnen der echten App: die üblichen Schulfächer sind
+  // schon angelegt, aber der Stundenplan ist leer. Den trägt jeder selbst
+  // ein oder fotografiert ihn ab.
+  daten = leereDaten();
+}
+
+function leereDaten() {
+  return {
+    faecher: BEISPIEL.faecher.map(f => Object.assign({}, f)),
+    stunden: {},
+    aufgaben: {},
     freieTage: {},
     freieFaecher: {},
     notizen: [],
     profil: { vorname:"", nachname:"", klasse:"", schule:"", telefon:"", email:"", adresse:"", weiteres:"" },
     einstellungen: Object.assign({}, BEISPIEL.einstellungen),
     anmeldung: Object.assign({}, BEISPIEL.anmeldung),
-    termine: beispielTermine(),
-    ferien: beispielFerien()
+    termine: [],
+    ferien: []
   };
+}
+
+/* Zum Anschauen: ein ausgefüllter Plan mit Aufgaben, Terminen und Ferien. */
+function beispielDatenEinsetzen() {
+  daten.faecher = BEISPIEL.faecher.map(f => Object.assign({}, f));
+  daten.stunden = JSON.parse(JSON.stringify(BEISPIEL.stunden));
+  daten.aufgaben = beispielAufgaben();
+  daten.termine = beispielTermine();
+  daten.ferien = beispielFerien();
+  daten.freieTage = {};
+  daten.freieFaecher = {};
+  sichern();
 }
 
 /* Ein paar eingetragene Aufgaben in der laufenden Woche, damit beim
@@ -1576,8 +1596,24 @@ function zeichneStundenplan() {
     html += "</div>";
   });
 
-  html += `</div></div>
-    <div class="fuss" style="padding-top:14px">Auf ein Feld tippen, um das Fach zu ändern.
+  html += "</div></div>";
+
+  const belegt = Object.keys(daten.stunden)
+    .reduce((n, wt) => n + Object.values(daten.stunden[wt]).filter(Boolean).length, 0);
+  if (!belegt) {
+    html += `<div class="hinweiskasten" style="margin-top:16px">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="var(--akzent)"
+           style="flex:none;margin-top:1px"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      <div>
+        <div class="titel">Dein Stundenplan ist noch leer</div>
+        <div class="text">Fotografier ihn oben ab und übertrag ihn, oder tipp direkt
+          auf ein Feld im Raster und wähl das Fach. Sobald etwas drinsteht, stehen die
+          Kürzel auch im Hausaufgabenheft neben jedem Tag.</div>
+      </div>
+    </div>`;
+  }
+
+  html += `<div class="fuss" style="padding-top:14px">Auf ein Feld tippen, um das Fach zu ändern.
     ${planFoto ? "Das Foto oben bleibt stehen, bis du es entfernst." :
       "In der gebauten iOS-App liest Apples Texterkennung die Kürzel zusätzlich automatisch aus dem Foto."}</div>`;
   el.innerHTML = html;
@@ -2063,13 +2099,25 @@ function zeichneEinstellungen() {
         </span>
         <span class="wert" style="color:var(--text3)">&#8250;</span>
       </button>
+      <button class="eintrag" data-beispiel="1">
+        <span>
+          <span class="haupt">Beispieldaten einsetzen</span>
+          <div class="neben">Ein ausgefüllter Stundenplan mit Aufgaben, Terminen und
+            Ferien – nur zum Anschauen.</div>
+        </span>
+        <span class="wert" style="color:var(--text3)">&#8250;</span>
+      </button>
       <button class="eintrag" data-zuruecksetzen="1">
-        <span class="haupt" style="color:#D93025">Beispieldaten wiederherstellen</span>
+        <span class="haupt" style="color:#D93025">Alles leeren</span>
       </button>
     </div>
-    <div class="fuss">Die gebaute App speichert die Sicherung als Datei, etwa in deiner
-      iCloud Drive. Diese eingebettete Seite darf nichts herunterladen – dafür gibt es
-      hier Kopieren und Einfügen.</div>
+    <div class="fuss">Homy fängt leer an – so wie die gebaute App beim ersten Öffnen.
+      Der Stundenplan ist deiner, sobald du ihn einträgst oder abfotografierst.
+      Die zwölf üblichen Schulfächer sind schon angelegt; umbenennen oder löschen
+      kannst du sie unter „Fächer“.<br><br>
+      Die gebaute App speichert die Sicherung als Datei, etwa in deiner iCloud Drive.
+      Diese eingebettete Seite darf nichts herunterladen – dafür gibt es hier Kopieren
+      und Einfügen.</div>
 
     <div class="gruppentitel">Über die App</div>
     <div class="gruppe">
@@ -3622,9 +3670,25 @@ el.addEventListener("click", ev => {
 
   if (ev.target.closest("[data-profil]")) { profilOeffnen(); return; }
 
+  if (ev.target.closest("[data-beispiel]")) {
+    beispielDatenEinsetzen();
+    aufgeklappt = {};
+    tab = "stundenplan";
+    zeichne();
+    window.scrollTo(0, 0);
+    return;
+  }
+
   if (ev.target.closest("[data-zuruecksetzen]")) {
-    try { localStorage.removeItem(SPEICHER); } catch (e) {}
-    laden(); zeichne();
+    if (!confirm("Wirklich alles leeren? Stundenplan, Hausaufgaben, Notizen, "
+               + "Termine und Ferien werden gelöscht.")) return;
+    const anmeldungBleibt = daten.anmeldung;
+    daten = leereDaten();
+    daten.anmeldung = anmeldungBleibt;
+    sichern();
+    planFoto = null;
+    aufgeklappt = {};
+    zeichne();
   }
 });
 
