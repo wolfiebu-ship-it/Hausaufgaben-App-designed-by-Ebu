@@ -316,6 +316,20 @@ Ohne Mitgliedschaft kannst du Homy weiterhin **mit Xcode auf deine eigenen Gerä
 
 ---
 
+## Den Quelltext zum Kopieren
+
+`docs/quelltext.html` ist eine Seite, auf der **jede Datei einen eigenen Kopier-Knopf** hat – dazu „Alles kopieren“ für das ganze Projekt am Stück und ein Suchfeld. Ganz oben steht Homy noch einmal **als Prompt**: der ganze Bauplan in Worten, zum Einfügen bei einer KI.
+
+Erzeugt wird die Seite aus dem echten Quelltext:
+
+```
+python3 docs/baue_quelltext_seite.py
+```
+
+Daneben liegen `docs/Homy-Quelltext.txt` (alles in einer Textdatei zum Lesen) und `docs/Homy-Quelltext.zip` (das komplette Projekt zum Bauen).
+
+---
+
 ## Die Vorschau im Browser
 
 Unter `docs/vorschau.html` liegt eine vollständige Nachbildung der Oberfläche als einzelne HTML-Datei – zum Anschauen und Ausprobieren ohne Mac. Darin funktioniert alles, was ein Browser kann:
