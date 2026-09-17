@@ -25,6 +25,10 @@ struct ScanResult {
     var unknownCodes: [String] = []
     /// Wurde überhaupt Text gefunden?
     var foundText = false
+    /// Unterrichtszeiten aus der Spalte links – leer, wenn keine zu lesen waren.
+    var times: [PeriodTime] = []
+    /// Fächer, die wegen dieses Fotos neu angelegt wurden (für die Prüfansicht).
+    var createdSubjects: [Subject] = []
 }
 
 /// Liest einen fotografierten Stundenplan aus: Text erkennen, das Raster aus
@@ -143,8 +147,13 @@ enum TimetableRecognizer {
         let leftEdge = firstColumnX - 0.09
 
         var buckets: [String: [Piece]] = [:]
+        // Was links neben dem Raster steht, ist die Stunden- und Zeitspalte.
+        var timeColumn: [Piece] = []
         for piece in body {
-            guard piece.x > leftEdge else { continue }
+            guard piece.x > leftEdge else {
+                timeColumn.append(piece)
+                continue
+            }
             guard let column = nearestIndex(of: piece.x, in: columns.map(\.x)) else { continue }
             guard let row = nearestIndex(of: piece.y, in: rowCenters) else { continue }
             guard row < 14 else { continue }
@@ -177,7 +186,94 @@ enum TimetableRecognizer {
 
         result.cells.sort { ($0.period, $0.weekday) < ($1.period, $1.weekday) }
         result.unknownCodes = unknown.sorted()
+        result.times = readTimes(from: timeColumn, rowCenters: rowCenters)
         return result
+    }
+
+    // MARK: - Unterrichtszeiten
+
+    /// Liest die Zeiten aus der Spalte links neben dem Raster.
+    ///
+    /// Erkannt wird alles, was wie eine Uhrzeit aussieht: „8:00 – 8:45“,
+    /// „08.00-08.45“, oder Anfang und Ende in zwei Zeilen untereinander.
+    /// Steht nur der Anfang da, werden 45 Minuten angenommen.
+    private static func readTimes(from pieces: [Piece], rowCenters: [CGFloat]) -> [PeriodTime] {
+        guard !pieces.isEmpty, !rowCenters.isEmpty else { return [] }
+
+        // Jedes Textstück der nächstgelegenen Zeile zuordnen.
+        var proZeile: [Int: [Piece]] = [:]
+        for piece in pieces {
+            guard let row = nearestIndex(of: piece.y, in: rowCenters), row < 14 else { continue }
+            proZeile[row, default: []].append(piece)
+        }
+
+        var gefunden: [PeriodTime] = []
+        for (row, group) in proZeile {
+            let text = group.sorted { $0.y < $1.y }.map(\.text).joined(separator: " ")
+            let minuten = minutesInText(text)
+            guard let start = minuten.first else { continue }
+
+            // Der zweite Wert ist das Ende – aber nur, wenn er danach liegt
+            // und die Stunde nicht länger als drei Zeitstunden dauert.
+            var ende = start + 45
+            if minuten.count >= 2 {
+                let kandidat = minuten[1]
+                if kandidat > start && kandidat - start <= 180 { ende = kandidat }
+            }
+            gefunden.append(PeriodTime(period: row + 1, startMinutes: start, endMinutes: ende))
+        }
+
+        gefunden.sort { $0.period < $1.period }
+
+        // Zeiten müssen im Lauf des Tages größer werden. Was aus der Reihe
+        // fällt, war ein Lesefehler – lieber weglassen als falsch eintragen.
+        var geprueft: [PeriodTime] = []
+        for zeit in gefunden {
+            if let letzte = geprueft.last, zeit.startMinutes <= letzte.startMinutes { continue }
+            geprueft.append(zeit)
+        }
+
+        // Einzelne Treffer sind eher Zufall als eine gelesene Zeitspalte.
+        return geprueft.count >= 3 ? geprueft : []
+    }
+
+    /// Alle Uhrzeiten in einem Text, als Minuten seit Mitternacht.
+    /// Aus „1. Std 8:00 - 8:45“ wird [480, 525]; die „1.“ zählt nicht mit.
+    private static func minutesInText(_ text: String) -> [Int] {
+        var ergebnis: [Int] = []
+        let zeichen = Array(text)
+        var index = 0
+
+        while index < zeichen.count {
+            guard zeichen[index].isNumber else { index += 1; continue }
+
+            var stundeText = ""
+            while index < zeichen.count, zeichen[index].isNumber, stundeText.count < 2 {
+                stundeText.append(zeichen[index])
+                index += 1
+            }
+            // Ein Trenner muss folgen, sonst ist es keine Uhrzeit, sondern
+            // eine Stundennummer oder eine Raumnummer.
+            guard index < zeichen.count, zeichen[index] == ":" || zeichen[index] == "." else { continue }
+            let trenner = zeichen[index]
+            index += 1
+
+            var minuteText = ""
+            while index < zeichen.count, zeichen[index].isNumber, minuteText.count < 2 {
+                minuteText.append(zeichen[index])
+                index += 1
+            }
+            // „1.“ am Zeilenanfang hat keine zwei Ziffern dahinter.
+            guard minuteText.count == 2 else { continue }
+            // Ein Punkt als Trenner kommt auch in Datumsangaben vor – bei
+            // „1.9“ fehlt die zweite Ziffer, das fängt die Prüfung oben ab.
+            _ = trenner
+
+            guard let stunde = Int(stundeText), let minute = Int(minuteText),
+                  (0...23).contains(stunde), (0...59).contains(minute) else { continue }
+            ergebnis.append(stunde * 60 + minute)
+        }
+        return ergebnis
     }
 
     // MARK: - Hilfsmittel

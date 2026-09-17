@@ -1874,7 +1874,15 @@ function zeichneEinstellungen() {
         </span>
         <span class="wert" style="color:var(--text3)">&#8250;</span>
       </button>
+      <div class="eintrag">
+        <span class="haupt">Klasse</span>
+        <input id="klasseFeld" value="${sicher(pr.klasse || "")}" placeholder="z. B. 8b"
+          data-klasse="1" style="margin-left:auto;max-width:140px;text-align:right;
+          border:0;outline:0;background:none;color:var(--text);font:inherit;font-size:16px">
+      </div>
     </div>
+    <div class="fuss">Die Klasse steht auch auf der Seite „Meine Daten“ – hier kannst du
+      sie am Schuljahresanfang schnell ändern.</div>
 
     <div class="gruppentitel">Erinnerungen</div>
     <div class="gruppe">
@@ -3486,6 +3494,15 @@ knopfVor.addEventListener("click", () => {
 /* Eingeben, Abhaken, Ergänzen */
 el.addEventListener("input", ev => {
   const t = ev.target;
+
+  // Klasse in den Einstellungen: nur sichern, nicht neu zeichnen –
+  // sonst springt der Schreibzeiger beim Tippen aus dem Feld.
+  if (t.dataset && t.dataset.klasse) {
+    daten.profil.klasse = t.value;
+    sichern();
+    return;
+  }
+
   if (t.tagName !== "TEXTAREA") return;
   hoeheAnpassen(t);
   const zeile = t.closest(".zeile");
@@ -4008,21 +4025,26 @@ function scanErklaeren() {
       <div class="schritt"><span class="zahl">1</span>
         <span class="stext">Du fotografierst deinen Stundenplan ab – die App entzerrt das Bild automatisch.</span></div>
       <div class="schritt"><span class="zahl">2</span>
-        <span class="stext">Sie liest die Kürzel und erkennt, welches Fach in welchem Feld steht.</span></div>
+        <span class="stext">Sie liest die Kürzel und erkennt, welches Fach in welchem Feld steht –
+          und aus der Spalte links die Unterrichtszeiten.</span></div>
       <div class="schritt"><span class="zahl">3</span>
-        <span class="stext">Du siehst das Ergebnis und korrigierst, was falsch gelesen wurde.</span></div>
+        <span class="stext">Fächer, die es noch nicht gibt, legt sie dabei selbst an. Aus „BIO“ wird
+          „Biologie“, aus „EK“ wird „Erdkunde“ – die Liste kennt die üblichen Kürzel.</span></div>
       <div class="schritt" style="margin-bottom:0"><span class="zahl">4</span>
-        <span class="stext">Übernehmen – fertig. Kürzel, die es noch nicht gibt, werden als neue Fächer angelegt.</span></div>
+        <span class="stext">Du siehst den fertigen Plan und tippst auf „Übernehmen“. Von Hand
+          nachtragen musst du nichts – nur nachsehen, falls etwas falsch gelesen wurde.</span></div>
     </div>
     <div class="fuss">Die Erkennung läuft vollständig auf dem Gerät, das Foto verlässt es nicht.
-      Gedruckte Pläne werden deutlich besser gelesen als handgeschriebene – darum der Prüfschritt.</div>
+      Gedruckte Pläne werden deutlich besser gelesen als handgeschriebene – darum zeigt Homy
+      das Ergebnis vorher an, statt es stillschweigend zu übernehmen.</div>
     <div class="hinweiskasten" style="margin-top:16px">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="var(--akzent)" style="flex:none;margin-top:1px"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
       <div>
         <div class="titel">Nur in der gebauten App</div>
         <div class="text">Zum Scannen braucht es die Kamera und Apples Texterkennung – beides gibt es
-          nur in der echten iOS-App, nicht hier in der Browser-Vorschau.
-          Im Stundenplan oben rechts sitzt dort der Scan-Knopf.</div>
+          nur in der echten iOS-App, nicht hier in der Browser-Vorschau. Das automatische
+          Eintragen der Fächer und Zeiten kann diese Seite deshalb nicht vorführen; ein Foto
+          kannst du hier nur als Vorlage danebenlegen und die Felder antippen.</div>
       </div>
     </div>`;
   blattZeigen("Stundenplan scannen", h, () => {});

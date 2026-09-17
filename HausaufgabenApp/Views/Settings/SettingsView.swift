@@ -443,8 +443,28 @@ struct SettingsView: View {
                 }
                 .padding(.vertical, 4)
             }
+
+            // Die Klasse steht auch unter „Meine Daten“ – hier direkt, weil
+            // sie sich jedes Jahr ändert und man sie sonst lange sucht.
+            HStack(spacing: 12) {
+                Image(systemName: "person.2.fill")
+                    .foregroundStyle(.tint)
+                    .frame(width: 24)
+
+                Text("Klasse")
+
+                Spacer(minLength: 12)
+
+                TextField("z. B. 8b", text: $store.profile.schoolClass)
+                    .multilineTextAlignment(.trailing)
+                    .textInputAutocapitalization(.characters)
+                    .autocorrectionDisabled()
+                    .frame(maxWidth: 140)
+            }
         } header: {
             Text("Über mich")
+        } footer: {
+            Text("Die Klasse steht auch auf der Seite „Meine Daten“ – hier kannst du sie am Schuljahresanfang schnell ändern.")
         }
     }
 

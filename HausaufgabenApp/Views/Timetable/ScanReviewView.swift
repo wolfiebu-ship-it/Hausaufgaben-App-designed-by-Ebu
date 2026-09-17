@@ -62,7 +62,7 @@ struct ScanReviewView: View {
 
                     raster
 
-                    Text("Tippe auf ein Feld, um das Fach zu ändern oder es zu leeren. Felder, die beim Scannen übersehen wurden, kannst du hier ergänzen.")
+                    Text("Du musst hier nichts mehr machen – „Stundenplan übernehmen“ genügt. Wenn etwas falsch gelesen wurde: auf ein Feld tippen, um das Fach zu ändern oder es zu leeren. Übersehene Felder kannst du hier ergänzen.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -86,25 +86,75 @@ struct ScanReviewView: View {
     // MARK: - Teile
 
     private var kopf: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.title3)
-                .foregroundStyle(.tint)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(.tint)
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text("\(zugeordnet) von \(cells.count) Feldern zugeordnet")
-                    .font(.subheadline.weight(.semibold))
-                Text("Bitte kurz prüfen – beim Abfotografieren passieren leicht Lesefehler.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("\(zugeordnet) von \(cells.count) Feldern eingetragen")
+                        .font(.subheadline.weight(.semibold))
+                    Text("Alles ist schon fertig – sieh es dir kurz an, beim Abfotografieren passieren leicht Lesefehler.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
             }
-            Spacer(minLength: 0)
+
+            if !result.createdSubjects.isEmpty {
+                Divider()
+                erledigtZeile(symbol: "books.vertical.fill",
+                              titel: result.createdSubjects.count == 1
+                                  ? "1 neues Fach angelegt"
+                                  : "\(result.createdSubjects.count) neue Fächer angelegt",
+                              text: result.createdSubjects
+                                  .map { $0.displayName }
+                                  .joined(separator: ", "))
+            }
+
+            if !result.times.isEmpty {
+                Divider()
+                erledigtZeile(symbol: "clock.fill",
+                              titel: "Unterrichtszeiten übernommen",
+                              text: zeitenText)
+            }
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground),
                     in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+    }
+
+    private func erledigtZeile(symbol: String, titel: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol)
+                .font(.footnote)
+                .foregroundStyle(.tint)
+                .frame(width: 20)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(titel)
+                    .font(.footnote.weight(.semibold))
+                Text(text)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+    }
+
+    /// „1. 08:00 – 08:45 · 2. 08:50 – 09:35 · …“, gekürzt auf die ersten drei.
+    private var zeitenText: String {
+        let anfang = result.times.prefix(3)
+            .map { "\($0.period). \($0.rangeText)" }
+            .joined(separator: " · ")
+        if result.times.count > 3 {
+            return anfang + " · und \(result.times.count - 3) weitere"
+        }
+        return anfang
     }
 
     private var unbekannteKuerzel: some View {
@@ -265,7 +315,7 @@ struct ScanReviewView: View {
     }
 
     private func legeFaecherAn() {
-        let zuordnung = store.createSubjects(forCodes: offeneKuerzel)
+        let (zuordnung, _) = store.createSubjects(forCodes: offeneKuerzel)
         for index in cells.indices where cells[index].subjectID == nil {
             let code = cells[index].code.trimmingCharacters(in: .whitespacesAndNewlines)
             if let id = zuordnung[code] ?? zuordnung[code.uppercased()] {

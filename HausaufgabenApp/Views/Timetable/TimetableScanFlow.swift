@@ -28,7 +28,7 @@ struct TimetableScanFlow: View {
                 case .nothingFound: nothingFoundView
                 case .review(let result):
                     ScanReviewView(result: result) { lessons in
-                        store.replaceTimetable(with: lessons)
+                        store.replaceTimetable(with: lessons, times: result.times)
                         dismiss()
                     } onRetry: {
                         stage = .intro
@@ -75,14 +75,14 @@ struct TimetableScanFlow: View {
                     Image(systemName: "doc.viewfinder")
                         .font(.system(size: 34))
                         .foregroundStyle(.tint)
-                    Text("Fotografiere deinen Stundenplan ab – die App trägt die Fächer für dich ein.")
+                    Text("Fotografiere deinen Stundenplan ab – Homy trägt Fächer und Unterrichtszeiten von allein ein.")
                         .font(.headline)
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
                 VStack(alignment: .leading, spacing: 14) {
                     Tipp(nummer: 1, text: "Leg den Plan flach hin und sorge für gutes Licht.")
-                    Tipp(nummer: 2, text: "Halte die Kamera gerade darüber, sodass alle Wochentage und Stunden im Bild sind.")
+                    Tipp(nummer: 2, text: "Halte die Kamera gerade darüber, sodass alle Wochentage und Stunden im Bild sind – auch die Spalte mit den Uhrzeiten links.")
                     Tipp(nummer: 3, text: "Gedruckte Pläne werden deutlich besser erkannt als handgeschriebene.")
                 }
                 .padding(16)
@@ -112,7 +112,7 @@ struct TimetableScanFlow: View {
                     .controlSize(.large)
                 }
 
-                Text("Die Erkennung läuft vollständig auf deinem Gerät – das Foto verlässt es nicht. Anschließend siehst du das Ergebnis und kannst alles korrigieren, bevor es übernommen wird.")
+                Text("Die Erkennung läuft vollständig auf deinem Gerät – das Foto verlässt es nicht. Fächer, die Homy noch nicht kennt, werden dabei gleich angelegt. Danach siehst du das fertige Ergebnis und kannst es noch ändern, bevor es übernommen wird.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -163,12 +163,29 @@ struct TimetableScanFlow: View {
     private func verarbeite(_ image: UIImage) {
         stage = .working
         Task {
-            let result = await TimetableRecognizer.recognize(image: image, subjects: store.subjects)
-            if result.cells.isEmpty {
+            var result = await TimetableRecognizer.recognize(image: image, subjects: store.subjects)
+            guard !result.cells.isEmpty else {
                 stage = .nothingFound
-            } else {
-                stage = .review(result)
+                return
             }
+
+            // Alles, was auf dem Foto stand, wird gleich eingetragen: Für jedes
+            // Kürzel ohne passendes Fach wird eins angelegt, und die Felder
+            // werden ihm zugeordnet. Nachsehen kann man trotzdem gleich – aber
+            // von Hand nachtragen muss niemand mehr.
+            if !result.unknownCodes.isEmpty {
+                let (zuordnung, neue) = store.createSubjects(forCodes: result.unknownCodes)
+                result.createdSubjects = neue
+                for index in result.cells.indices where result.cells[index].subjectID == nil {
+                    let code = result.cells[index].code.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if let id = zuordnung[code] ?? zuordnung[code.uppercased()] {
+                        result.cells[index].subjectID = id
+                    }
+                }
+                result.unknownCodes = []
+            }
+
+            stage = .review(result)
         }
     }
 }

@@ -261,7 +261,7 @@
     </svg>
     <div>
       <div class="leistenname">Homy</div>
-      <div class="leistenzahl">54 Dateien · 9.604 Zeilen</div>
+      <div class="leistenzahl">55 Dateien · 9.890 Zeilen</div>
     </div>
     <input type="search" id="suche" class="suchfeld" placeholder="Datei suchen …"
            aria-label="Datei suchen">
@@ -276,8 +276,8 @@
        komplette Projekt auf einmal – mit Dateinamen als Trenner, damit du es
        hinterher wieder auseinandernehmen kannst.</p>
     <div class="zahlen">
-      <span><b>54</b> Dateien</span>
-      <span><b>9.604</b> Zeilen</span>
+      <span><b>55</b> Dateien</span>
+      <span><b>9.890</b> Zeilen</span>
       <span><b>Swift 5</b> · SwiftUI</span>
       <span><b>iOS 17</b> · iPhone und iPad</span>
     </div>
@@ -2133,7 +2133,7 @@ extension Subject {
       <p class="pfad">HausaufgabenApp/Store/AppStore.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 880 Zeilen</span>
+      <span class="marke">Swift · 898 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -2366,7 +2366,7 @@ final class AppStore: ObservableObject {
 
     /// Ersetzt den gesamten Stundenplan – wird nach einem geprüften Scan aufgerufen.
     /// Fächer und Hausaufgaben bleiben unangetastet.
-    func replaceTimetable(with newLessons: [Lesson]) {
+    func replaceTimetable(with newLessons: [Lesson], times: [PeriodTime] = []) {
         let validIDs = Set(subjects.map(\.id))
         lessons = newLessons.filter { lesson in
             guard (1...7).contains(lesson.weekday), lesson.period &gt;= 1 else { return false }
@@ -2380,15 +2380,30 @@ final class AppStore: ObservableObject {
         if lessons.contains(where: { $0.weekday == 6 }) {
             settings.includeSaturday = true
         }
+        // Zeiten aus dem Foto übernehmen, soweit welche gelesen wurden.
+        // Stunden ohne erkannte Zeit behalten ihre bisherige.
+        if !times.isEmpty {
+            var neue = settings.periodTimes
+            for zeit in times where zeit.period &gt;= 1 &amp;&amp; zeit.period &lt;= 14 {
+                if let index = neue.firstIndex(where: { $0.period == zeit.period }) {
+                    neue[index] = zeit
+                } else {
+                    neue.append(zeit)
+                }
+            }
+            settings.periodTimes = neue.sorted { $0.period &lt; $1.period }
+            settings.showTimes = true
+        }
         dataRevision += 1
         saveNow()
     }
 
     /// Legt für erkannte, aber unbekannte Kürzel neue Fächer an und gibt zurück,
-    /// welches Kürzel zu welchem Fach wurde.
+    /// welches Kürzel zu welchem Fach wurde und welche Fächer dabei neu entstanden.
     @discardableResult
-    func createSubjects(forCodes codes: [String]) -&gt; [String: UUID] {
+    func createSubjects(forCodes codes: [String]) -&gt; (mapping: [String: UUID], created: [Subject]) {
         var mapping: [String: UUID] = [:]
+        var neuAngelegt: [Subject] = []
         for code in codes {
             let cleaned = code.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !cleaned.isEmpty else { continue }
@@ -2400,14 +2415,17 @@ final class AppStore: ObservableObject {
                 continue
             }
 
-            let subject = Subject(name: cleaned,
+            // „BIO“ wird zu „Biologie“, wenn das Kürzel bekannt ist –
+            // im Stundenplan steht weiter das Kürzel vom Zettel.
+            let subject = Subject(name: SubjectNames.fullName(for: cleaned),
                                   short: String(cleaned.prefix(4)),
                                   colorIndex: AppTheme.suggestedColorIndex(usedBy: subjects))
             subjects.append(subject)
             mapping[cleaned] = subject.id
+            neuAngelegt.append(subject)
         }
         scheduleSave()
-        return mapping
+        return (mapping, neuAngelegt)
     }
 
     // MARK: - Hausaufgaben
@@ -3161,7 +3179,7 @@ final class LockController: ObservableObject {
     <button type="button" class="mehr" data-mehr>Ganz anzeigen</button>
   </div>
 </article>
-<h2 class="gruppe">Support – Helfer<span class="gruppenzahl">10</span></h2>
+<h2 class="gruppe">Support – Helfer<span class="gruppenzahl">11</span></h2>
 <article class="datei" data-suche="hausaufgabenapp/support/apptheme.swift">
   <header class="dateikopf">
     <div class="dateiname">
@@ -4290,15 +4308,116 @@ enum SchoolCalendar {
     <button type="button" class="mehr" data-mehr>Ganz anzeigen</button>
   </div>
 </article>
-<article class="datei" data-suche="hausaufgabenapp/support/timetablerecognizer.swift">
+<article class="datei" data-suche="hausaufgabenapp/support/subjectnames.swift">
   <header class="dateikopf">
     <div class="dateiname">
       <span class="nummer">26</span>
+      <h3>SubjectNames.swift</h3>
+      <p class="pfad">HausaufgabenApp/Support/SubjectNames.swift</p>
+    </div>
+    <div class="dateitat">
+      <span class="marke">Swift · 84 Zeilen</span>
+      <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
+    </div>
+  </header>
+  <div class="codehuelle">
+    <pre class="code"><code>import Foundation
+
+/// Übliche Fachkürzel an deutschen Schulen und der Name dahinter.
+///
+/// Damit trägt Homy nach dem Abfotografieren nicht „BIO“ als Fachnamen ein,
+/// sondern „Biologie“. Das Kürzel aus dem Foto bleibt trotzdem stehen – im
+/// Stundenplan steht ja genau das, was auch auf dem Zettel steht.
+///
+/// Die Liste ist eine Hilfe, keine Vorschrift: Steht ein Kürzel nicht drin,
+/// wird es einfach selbst zum Namen und lässt sich unter „Fächer“ ändern.
+enum SubjectNames {
+
+    /// Kürzel → Fachname. Alles klein geschrieben, verglichen wird ohne Groß-/Kleinschreibung.
+    private static let table: [String: String] = [
+        // Hauptfächer
+        &quot;d&quot;: &quot;Deutsch&quot;, &quot;de&quot;: &quot;Deutsch&quot;, &quot;deu&quot;: &quot;Deutsch&quot;,
+        &quot;m&quot;: &quot;Mathematik&quot;, &quot;ma&quot;: &quot;Mathematik&quot;, &quot;mat&quot;: &quot;Mathematik&quot;, &quot;mathe&quot;: &quot;Mathematik&quot;,
+        &quot;e&quot;: &quot;Englisch&quot;, &quot;en&quot;: &quot;Englisch&quot;, &quot;eng&quot;: &quot;Englisch&quot;,
+
+        // Weitere Sprachen
+        &quot;f&quot;: &quot;Französisch&quot;, &quot;fr&quot;: &quot;Französisch&quot;, &quot;frz&quot;: &quot;Französisch&quot;,
+        &quot;l&quot;: &quot;Latein&quot;, &quot;la&quot;: &quot;Latein&quot;, &quot;lat&quot;: &quot;Latein&quot;,
+        &quot;s&quot;: &quot;Spanisch&quot;, &quot;spa&quot;: &quot;Spanisch&quot;, &quot;span&quot;: &quot;Spanisch&quot;,
+        &quot;ru&quot;: &quot;Russisch&quot;, &quot;it&quot;: &quot;Italienisch&quot;, &quot;tü&quot;: &quot;Türkisch&quot;, &quot;tu&quot;: &quot;Türkisch&quot;,
+        &quot;gr&quot;: &quot;Griechisch&quot;, &quot;nl&quot;: &quot;Niederländisch&quot;,
+
+        // Naturwissenschaften
+        &quot;bi&quot;: &quot;Biologie&quot;, &quot;bio&quot;: &quot;Biologie&quot;,
+        &quot;ch&quot;: &quot;Chemie&quot;, &quot;che&quot;: &quot;Chemie&quot;, &quot;c&quot;: &quot;Chemie&quot;,
+        &quot;ph&quot;: &quot;Physik&quot;, &quot;phy&quot;: &quot;Physik&quot;, &quot;p&quot;: &quot;Physik&quot;,
+        &quot;nw&quot;: &quot;Naturwissenschaften&quot;, &quot;nawi&quot;: &quot;Naturwissenschaften&quot;,
+        &quot;if&quot;: &quot;Informatik&quot;, &quot;inf&quot;: &quot;Informatik&quot;, &quot;ifo&quot;: &quot;Informatik&quot;,
+        &quot;tc&quot;: &quot;Technik&quot;, &quot;te&quot;: &quot;Technik&quot;, &quot;tech&quot;: &quot;Technik&quot;,
+
+        // Gesellschaft
+        &quot;g&quot;: &quot;Geschichte&quot;, &quot;ge&quot;: &quot;Geschichte&quot;, &quot;ges&quot;: &quot;Geschichte&quot;, &quot;gesch&quot;: &quot;Geschichte&quot;,
+        &quot;ek&quot;: &quot;Erdkunde&quot;, &quot;erd&quot;: &quot;Erdkunde&quot;, &quot;geo&quot;: &quot;Erdkunde&quot;, &quot;gg&quot;: &quot;Geographie&quot;,
+        &quot;po&quot;: &quot;Politik&quot;, &quot;pol&quot;: &quot;Politik&quot;, &quot;sw&quot;: &quot;Sozialwissenschaften&quot;,
+        &quot;sowi&quot;: &quot;Sozialwissenschaften&quot;, &quot;gk&quot;: &quot;Gemeinschaftskunde&quot;,
+        &quot;wi&quot;: &quot;Wirtschaft&quot;, &quot;wn&quot;: &quot;Wirtschaft&quot;, &quot;wl&quot;: &quot;Wirtschaftslehre&quot;,
+        &quot;al&quot;: &quot;Arbeitslehre&quot;, &quot;hw&quot;: &quot;Hauswirtschaft&quot;,
+
+        // Religion, Ethik, Philosophie
+        &quot;re&quot;: &quot;Religion&quot;, &quot;rel&quot;: &quot;Religion&quot;,
+        &quot;kr&quot;: &quot;Katholische Religion&quot;, &quot;ka&quot;: &quot;Katholische Religion&quot;,
+        &quot;er&quot;: &quot;Evangelische Religion&quot;, &quot;ev&quot;: &quot;Evangelische Religion&quot;,
+        &quot;eth&quot;: &quot;Ethik&quot;, &quot;et&quot;: &quot;Ethik&quot;, &quot;ethik&quot;: &quot;Ethik&quot;,
+        &quot;pl&quot;: &quot;Philosophie&quot;, &quot;phi&quot;: &quot;Philosophie&quot;, &quot;pp&quot;: &quot;Praktische Philosophie&quot;,
+        &quot;lk&quot;: &quot;Lebenskunde&quot;,
+
+        // Musisch und Sport
+        &quot;ku&quot;: &quot;Kunst&quot;, &quot;kun&quot;: &quot;Kunst&quot;, &quot;bk&quot;: &quot;Bildende Kunst&quot;,
+        &quot;mu&quot;: &quot;Musik&quot;, &quot;mus&quot;: &quot;Musik&quot;,
+        &quot;sp&quot;: &quot;Sport&quot;, &quot;spo&quot;: &quot;Sport&quot;, &quot;sport&quot;: &quot;Sport&quot;,
+        &quot;ds&quot;: &quot;Darstellendes Spiel&quot;, &quot;th&quot;: &quot;Theater&quot;, &quot;wk&quot;: &quot;Werken&quot;,
+
+        // Schulalltag
+        &quot;kl&quot;: &quot;Klassenlehrerstunde&quot;, &quot;klr&quot;: &quot;Klassenrat&quot;,
+        &quot;lz&quot;: &quot;Lernzeit&quot;, &quot;lb&quot;: &quot;Lernbüro&quot;, &quot;fö&quot;: &quot;Förderunterricht&quot;,
+        &quot;foe&quot;: &quot;Förderunterricht&quot;, &quot;wp&quot;: &quot;Wahlpflicht&quot;, &quot;ag&quot;: &quot;Arbeitsgemeinschaft&quot;,
+        &quot;mi&quot;: &quot;Mittagspause&quot;, &quot;vt&quot;: &quot;Vertretung&quot;, &quot;frei&quot;: &quot;Freistunde&quot;
+    ]
+
+    /// Der Fachname zu einem Kürzel – oder das Kürzel selbst, wenn es unbekannt ist.
+    static func fullName(for code: String) -&gt; String {
+        let cleaned = code
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: &quot;.-&quot;))
+        guard !cleaned.isEmpty else { return code }
+
+        // Steht der ganze Name schon da („Mathematik“), bleibt er stehen.
+        if cleaned.count &gt; 6 { return cleaned }
+        return table[cleaned.lowercased()] ?? cleaned
+    }
+
+    /// Kennt die Liste dieses Kürzel?
+    static func isKnown(_ code: String) -&gt; Bool {
+        let cleaned = code
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: &quot;.-&quot;))
+            .lowercased()
+        return table[cleaned] != nil
+    }
+}
+</code></pre>
+    <button type="button" class="mehr" data-mehr>Ganz anzeigen</button>
+  </div>
+</article>
+<article class="datei" data-suche="hausaufgabenapp/support/timetablerecognizer.swift">
+  <header class="dateikopf">
+    <div class="dateiname">
+      <span class="nummer">27</span>
       <h3>TimetableRecognizer.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/TimetableRecognizer.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 309 Zeilen</span>
+      <span class="marke">Swift · 405 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -4330,6 +4449,10 @@ struct ScanResult {
     var unknownCodes: [String] = []
     /// Wurde überhaupt Text gefunden?
     var foundText = false
+    /// Unterrichtszeiten aus der Spalte links – leer, wenn keine zu lesen waren.
+    var times: [PeriodTime] = []
+    /// Fächer, die wegen dieses Fotos neu angelegt wurden (für die Prüfansicht).
+    var createdSubjects: [Subject] = []
 }
 
 /// Liest einen fotografierten Stundenplan aus: Text erkennen, das Raster aus
@@ -4448,8 +4571,13 @@ enum TimetableRecognizer {
         let leftEdge = firstColumnX - 0.09
 
         var buckets: [String: [Piece]] = [:]
+        // Was links neben dem Raster steht, ist die Stunden- und Zeitspalte.
+        var timeColumn: [Piece] = []
         for piece in body {
-            guard piece.x &gt; leftEdge else { continue }
+            guard piece.x &gt; leftEdge else {
+                timeColumn.append(piece)
+                continue
+            }
             guard let column = nearestIndex(of: piece.x, in: columns.map(\.x)) else { continue }
             guard let row = nearestIndex(of: piece.y, in: rowCenters) else { continue }
             guard row &lt; 14 else { continue }
@@ -4482,7 +4610,94 @@ enum TimetableRecognizer {
 
         result.cells.sort { ($0.period, $0.weekday) &lt; ($1.period, $1.weekday) }
         result.unknownCodes = unknown.sorted()
+        result.times = readTimes(from: timeColumn, rowCenters: rowCenters)
         return result
+    }
+
+    // MARK: - Unterrichtszeiten
+
+    /// Liest die Zeiten aus der Spalte links neben dem Raster.
+    ///
+    /// Erkannt wird alles, was wie eine Uhrzeit aussieht: „8:00 – 8:45“,
+    /// „08.00-08.45“, oder Anfang und Ende in zwei Zeilen untereinander.
+    /// Steht nur der Anfang da, werden 45 Minuten angenommen.
+    private static func readTimes(from pieces: [Piece], rowCenters: [CGFloat]) -&gt; [PeriodTime] {
+        guard !pieces.isEmpty, !rowCenters.isEmpty else { return [] }
+
+        // Jedes Textstück der nächstgelegenen Zeile zuordnen.
+        var proZeile: [Int: [Piece]] = [:]
+        for piece in pieces {
+            guard let row = nearestIndex(of: piece.y, in: rowCenters), row &lt; 14 else { continue }
+            proZeile[row, default: []].append(piece)
+        }
+
+        var gefunden: [PeriodTime] = []
+        for (row, group) in proZeile {
+            let text = group.sorted { $0.y &lt; $1.y }.map(\.text).joined(separator: &quot; &quot;)
+            let minuten = minutesInText(text)
+            guard let start = minuten.first else { continue }
+
+            // Der zweite Wert ist das Ende – aber nur, wenn er danach liegt
+            // und die Stunde nicht länger als drei Zeitstunden dauert.
+            var ende = start + 45
+            if minuten.count &gt;= 2 {
+                let kandidat = minuten[1]
+                if kandidat &gt; start &amp;&amp; kandidat - start &lt;= 180 { ende = kandidat }
+            }
+            gefunden.append(PeriodTime(period: row + 1, startMinutes: start, endMinutes: ende))
+        }
+
+        gefunden.sort { $0.period &lt; $1.period }
+
+        // Zeiten müssen im Lauf des Tages größer werden. Was aus der Reihe
+        // fällt, war ein Lesefehler – lieber weglassen als falsch eintragen.
+        var geprueft: [PeriodTime] = []
+        for zeit in gefunden {
+            if let letzte = geprueft.last, zeit.startMinutes &lt;= letzte.startMinutes { continue }
+            geprueft.append(zeit)
+        }
+
+        // Einzelne Treffer sind eher Zufall als eine gelesene Zeitspalte.
+        return geprueft.count &gt;= 3 ? geprueft : []
+    }
+
+    /// Alle Uhrzeiten in einem Text, als Minuten seit Mitternacht.
+    /// Aus „1. Std 8:00 - 8:45“ wird [480, 525]; die „1.“ zählt nicht mit.
+    private static func minutesInText(_ text: String) -&gt; [Int] {
+        var ergebnis: [Int] = []
+        let zeichen = Array(text)
+        var index = 0
+
+        while index &lt; zeichen.count {
+            guard zeichen[index].isNumber else { index += 1; continue }
+
+            var stundeText = &quot;&quot;
+            while index &lt; zeichen.count, zeichen[index].isNumber, stundeText.count &lt; 2 {
+                stundeText.append(zeichen[index])
+                index += 1
+            }
+            // Ein Trenner muss folgen, sonst ist es keine Uhrzeit, sondern
+            // eine Stundennummer oder eine Raumnummer.
+            guard index &lt; zeichen.count, zeichen[index] == &quot;:&quot; || zeichen[index] == &quot;.&quot; else { continue }
+            let trenner = zeichen[index]
+            index += 1
+
+            var minuteText = &quot;&quot;
+            while index &lt; zeichen.count, zeichen[index].isNumber, minuteText.count &lt; 2 {
+                minuteText.append(zeichen[index])
+                index += 1
+            }
+            // „1.“ am Zeilenanfang hat keine zwei Ziffern dahinter.
+            guard minuteText.count == 2 else { continue }
+            // Ein Punkt als Trenner kommt auch in Datumsangaben vor – bei
+            // „1.9“ fehlt die zweite Ziffer, das fängt die Prüfung oben ab.
+            _ = trenner
+
+            guard let stunde = Int(stundeText), let minute = Int(minuteText),
+                  (0...23).contains(stunde), (0...59).contains(minute) else { continue }
+            ergebnis.append(stunde * 60 + minute)
+        }
+        return ergebnis
     }
 
     // MARK: - Hilfsmittel
@@ -4620,7 +4835,7 @@ extension UIImage {
 <article class="datei" data-suche="hausaufgabenapp/views/rootview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">27</span>
+      <span class="nummer">28</span>
       <h3>RootView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/RootView.swift</p>
     </div>
@@ -4688,7 +4903,7 @@ struct RootView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/lock/appgateview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">28</span>
+      <span class="nummer">29</span>
       <h3>AppGateView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Lock/AppGateView.swift</p>
     </div>
@@ -4742,7 +4957,7 @@ struct AppGateView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/lock/locksetupview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">29</span>
+      <span class="nummer">30</span>
       <h3>LockSetupView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Lock/LockSetupView.swift</p>
     </div>
@@ -4875,7 +5090,7 @@ struct LockSetupView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/lock/lockview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">30</span>
+      <span class="nummer">31</span>
       <h3>LockView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Lock/LockView.swift</p>
     </div>
@@ -5159,7 +5374,7 @@ struct LockView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/homeworkdaycard.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">31</span>
+      <span class="nummer">32</span>
       <h3>HomeworkDayCard.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/HomeworkDayCard.swift</p>
     </div>
@@ -5510,7 +5725,7 @@ struct HomeworkDayCard: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/homeworkpagerview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">32</span>
+      <span class="nummer">33</span>
       <h3>HomeworkPagerView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/HomeworkPagerView.swift</p>
     </div>
@@ -5702,7 +5917,7 @@ struct HomeworkPagerView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/homeworkrow.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">33</span>
+      <span class="nummer">34</span>
       <h3>HomeworkRow.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/HomeworkRow.swift</p>
     </div>
@@ -5909,7 +6124,7 @@ struct SubjectBadge: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/homeworkweekview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">34</span>
+      <span class="nummer">35</span>
       <h3>HomeworkWeekView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/HomeworkWeekView.swift</p>
     </div>
@@ -6076,7 +6291,7 @@ struct HintBox: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/searchview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">35</span>
+      <span class="nummer">36</span>
       <h3>SearchView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/SearchView.swift</p>
     </div>
@@ -6238,7 +6453,7 @@ struct SearchResultRow: View {
 <article class="datei" data-suche="hausaufgabenapp/views/calendar/calendarview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">36</span>
+      <span class="nummer">37</span>
       <h3>CalendarView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Calendar/CalendarView.swift</p>
     </div>
@@ -7105,7 +7320,7 @@ struct HolidayRow: View {
 <article class="datei" data-suche="hausaufgabenapp/views/calendar/eventeditorview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">37</span>
+      <span class="nummer">38</span>
       <h3>EventEditorView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Calendar/EventEditorView.swift</p>
     </div>
@@ -7347,7 +7562,7 @@ struct EventEditorView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/calendar/holidayeditorview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">38</span>
+      <span class="nummer">39</span>
       <h3>HolidayEditorView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Calendar/HolidayEditorView.swift</p>
     </div>
@@ -7598,7 +7813,7 @@ struct HolidayEditorView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/notes/notedetailview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">39</span>
+      <span class="nummer">40</span>
       <h3>NoteDetailView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Notes/NoteDetailView.swift</p>
     </div>
@@ -7692,7 +7907,7 @@ struct NoteDetailView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/notes/notesview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">40</span>
+      <span class="nummer">41</span>
       <h3>NotesView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Notes/NotesView.swift</p>
     </div>
@@ -7844,7 +8059,7 @@ struct NoteRow: View {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/documentscannerview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">41</span>
+      <span class="nummer">42</span>
       <h3>DocumentScannerView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/DocumentScannerView.swift</p>
     </div>
@@ -7910,7 +8125,7 @@ struct DocumentScannerView: UIViewControllerRepresentable {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/lessoneditorview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">42</span>
+      <span class="nummer">43</span>
       <h3>LessonEditorView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/LessonEditorView.swift</p>
     </div>
@@ -8057,12 +8272,12 @@ struct LessonEditorView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/scanreviewview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">43</span>
+      <span class="nummer">44</span>
       <h3>ScanReviewView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/ScanReviewView.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 359 Zeilen</span>
+      <span class="marke">Swift · 409 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -8131,7 +8346,7 @@ struct ScanReviewView: View {
 
                     raster
 
-                    Text(&quot;Tippe auf ein Feld, um das Fach zu ändern oder es zu leeren. Felder, die beim Scannen übersehen wurden, kannst du hier ergänzen.&quot;)
+                    Text(&quot;Du musst hier nichts mehr machen – „Stundenplan übernehmen“ genügt. Wenn etwas falsch gelesen wurde: auf ein Feld tippen, um das Fach zu ändern oder es zu leeren. Übersehene Felder kannst du hier ergänzen.&quot;)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -8155,25 +8370,75 @@ struct ScanReviewView: View {
     // MARK: - Teile
 
     private var kopf: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: &quot;checkmark.circle.fill&quot;)
-                .font(.title3)
-                .foregroundStyle(.tint)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: &quot;checkmark.circle.fill&quot;)
+                    .font(.title3)
+                    .foregroundStyle(.tint)
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text(&quot;\(zugeordnet) von \(cells.count) Feldern zugeordnet&quot;)
-                    .font(.subheadline.weight(.semibold))
-                Text(&quot;Bitte kurz prüfen – beim Abfotografieren passieren leicht Lesefehler.&quot;)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(&quot;\(zugeordnet) von \(cells.count) Feldern eingetragen&quot;)
+                        .font(.subheadline.weight(.semibold))
+                    Text(&quot;Alles ist schon fertig – sieh es dir kurz an, beim Abfotografieren passieren leicht Lesefehler.&quot;)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
             }
-            Spacer(minLength: 0)
+
+            if !result.createdSubjects.isEmpty {
+                Divider()
+                erledigtZeile(symbol: &quot;books.vertical.fill&quot;,
+                              titel: result.createdSubjects.count == 1
+                                  ? &quot;1 neues Fach angelegt&quot;
+                                  : &quot;\(result.createdSubjects.count) neue Fächer angelegt&quot;,
+                              text: result.createdSubjects
+                                  .map { $0.displayName }
+                                  .joined(separator: &quot;, &quot;))
+            }
+
+            if !result.times.isEmpty {
+                Divider()
+                erledigtZeile(symbol: &quot;clock.fill&quot;,
+                              titel: &quot;Unterrichtszeiten übernommen&quot;,
+                              text: zeitenText)
+            }
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground),
                     in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+    }
+
+    private func erledigtZeile(symbol: String, titel: String, text: String) -&gt; some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol)
+                .font(.footnote)
+                .foregroundStyle(.tint)
+                .frame(width: 20)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(titel)
+                    .font(.footnote.weight(.semibold))
+                Text(text)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+    }
+
+    /// „1. 08:00 – 08:45 · 2. 08:50 – 09:35 · …“, gekürzt auf die ersten drei.
+    private var zeitenText: String {
+        let anfang = result.times.prefix(3)
+            .map { &quot;\($0.period). \($0.rangeText)&quot; }
+            .joined(separator: &quot; · &quot;)
+        if result.times.count &gt; 3 {
+            return anfang + &quot; · und \(result.times.count - 3) weitere&quot;
+        }
+        return anfang
     }
 
     private var unbekannteKuerzel: some View {
@@ -8334,7 +8599,7 @@ struct ScanReviewView: View {
     }
 
     private func legeFaecherAn() {
-        let zuordnung = store.createSubjects(forCodes: offeneKuerzel)
+        let (zuordnung, _) = store.createSubjects(forCodes: offeneKuerzel)
         for index in cells.indices where cells[index].subjectID == nil {
             let code = cells[index].code.trimmingCharacters(in: .whitespacesAndNewlines)
             if let id = zuordnung[code] ?? zuordnung[code.uppercased()] {
@@ -8433,12 +8698,12 @@ struct ScanCellEditor: View {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/timetablescanflow.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">44</span>
+      <span class="nummer">45</span>
       <h3>TimetableScanFlow.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 195 Zeilen</span>
+      <span class="marke">Swift · 212 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -8473,7 +8738,7 @@ struct TimetableScanFlow: View {
                 case .nothingFound: nothingFoundView
                 case .review(let result):
                     ScanReviewView(result: result) { lessons in
-                        store.replaceTimetable(with: lessons)
+                        store.replaceTimetable(with: lessons, times: result.times)
                         dismiss()
                     } onRetry: {
                         stage = .intro
@@ -8520,14 +8785,14 @@ struct TimetableScanFlow: View {
                     Image(systemName: &quot;doc.viewfinder&quot;)
                         .font(.system(size: 34))
                         .foregroundStyle(.tint)
-                    Text(&quot;Fotografiere deinen Stundenplan ab – die App trägt die Fächer für dich ein.&quot;)
+                    Text(&quot;Fotografiere deinen Stundenplan ab – Homy trägt Fächer und Unterrichtszeiten von allein ein.&quot;)
                         .font(.headline)
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
                 VStack(alignment: .leading, spacing: 14) {
                     Tipp(nummer: 1, text: &quot;Leg den Plan flach hin und sorge für gutes Licht.&quot;)
-                    Tipp(nummer: 2, text: &quot;Halte die Kamera gerade darüber, sodass alle Wochentage und Stunden im Bild sind.&quot;)
+                    Tipp(nummer: 2, text: &quot;Halte die Kamera gerade darüber, sodass alle Wochentage und Stunden im Bild sind – auch die Spalte mit den Uhrzeiten links.&quot;)
                     Tipp(nummer: 3, text: &quot;Gedruckte Pläne werden deutlich besser erkannt als handgeschriebene.&quot;)
                 }
                 .padding(16)
@@ -8557,7 +8822,7 @@ struct TimetableScanFlow: View {
                     .controlSize(.large)
                 }
 
-                Text(&quot;Die Erkennung läuft vollständig auf deinem Gerät – das Foto verlässt es nicht. Anschließend siehst du das Ergebnis und kannst alles korrigieren, bevor es übernommen wird.&quot;)
+                Text(&quot;Die Erkennung läuft vollständig auf deinem Gerät – das Foto verlässt es nicht. Fächer, die Homy noch nicht kennt, werden dabei gleich angelegt. Danach siehst du das fertige Ergebnis und kannst es noch ändern, bevor es übernommen wird.&quot;)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -8608,12 +8873,29 @@ struct TimetableScanFlow: View {
     private func verarbeite(_ image: UIImage) {
         stage = .working
         Task {
-            let result = await TimetableRecognizer.recognize(image: image, subjects: store.subjects)
-            if result.cells.isEmpty {
+            var result = await TimetableRecognizer.recognize(image: image, subjects: store.subjects)
+            guard !result.cells.isEmpty else {
                 stage = .nothingFound
-            } else {
-                stage = .review(result)
+                return
             }
+
+            // Alles, was auf dem Foto stand, wird gleich eingetragen: Für jedes
+            // Kürzel ohne passendes Fach wird eins angelegt, und die Felder
+            // werden ihm zugeordnet. Nachsehen kann man trotzdem gleich – aber
+            // von Hand nachtragen muss niemand mehr.
+            if !result.unknownCodes.isEmpty {
+                let (zuordnung, neue) = store.createSubjects(forCodes: result.unknownCodes)
+                result.createdSubjects = neue
+                for index in result.cells.indices where result.cells[index].subjectID == nil {
+                    let code = result.cells[index].code.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if let id = zuordnung[code] ?? zuordnung[code.uppercased()] {
+                        result.cells[index].subjectID = id
+                    }
+                }
+                result.unknownCodes = []
+            }
+
+            stage = .review(result)
         }
     }
 }
@@ -8645,7 +8927,7 @@ private struct Tipp: View {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/timetableview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">45</span>
+      <span class="nummer">46</span>
       <h3>TimetableView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/TimetableView.swift</p>
     </div>
@@ -8961,7 +9243,7 @@ struct TimetableCell: View {
 <article class="datei" data-suche="hausaufgabenapp/views/subjects/subjecteditorview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">46</span>
+      <span class="nummer">47</span>
       <h3>SubjectEditorView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Subjects/SubjectEditorView.swift</p>
     </div>
@@ -9161,7 +9443,7 @@ struct SubjectEditorView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/subjects/subjectsview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">47</span>
+      <span class="nummer">48</span>
       <h3>SubjectsView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Subjects/SubjectsView.swift</p>
     </div>
@@ -9447,7 +9729,7 @@ struct SubjectRow: View {
 <article class="datei" data-suche="hausaufgabenapp/views/settings/periodtimesview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">48</span>
+      <span class="nummer">49</span>
       <h3>PeriodTimesView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Settings/PeriodTimesView.swift</p>
     </div>
@@ -9535,7 +9817,7 @@ struct PeriodTimesView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/settings/profileview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">49</span>
+      <span class="nummer">50</span>
       <h3>ProfileView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Settings/ProfileView.swift</p>
     </div>
@@ -9679,12 +9961,12 @@ struct LabeledField: View {
 <article class="datei" data-suche="hausaufgabenapp/views/settings/settingsview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">50</span>
+      <span class="nummer">51</span>
       <h3>SettingsView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Settings/SettingsView.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 695 Zeilen</span>
+      <span class="marke">Swift · 715 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -10134,8 +10416,28 @@ struct SettingsView: View {
                 }
                 .padding(.vertical, 4)
             }
+
+            // Die Klasse steht auch unter „Meine Daten“ – hier direkt, weil
+            // sie sich jedes Jahr ändert und man sie sonst lange sucht.
+            HStack(spacing: 12) {
+                Image(systemName: &quot;person.2.fill&quot;)
+                    .foregroundStyle(.tint)
+                    .frame(width: 24)
+
+                Text(&quot;Klasse&quot;)
+
+                Spacer(minLength: 12)
+
+                TextField(&quot;z. B. 8b&quot;, text: $store.profile.schoolClass)
+                    .multilineTextAlignment(.trailing)
+                    .textInputAutocapitalization(.characters)
+                    .autocorrectionDisabled()
+                    .frame(maxWidth: 140)
+            }
         } header: {
             Text(&quot;Über mich&quot;)
+        } footer: {
+            Text(&quot;Die Klasse steht auch auf der Seite „Meine Daten“ – hier kannst du sie am Schuljahresanfang schnell ändern.&quot;)
         }
     }
 
@@ -10392,7 +10694,7 @@ struct SettingsView: View {
 <article class="datei" data-suche="hausaufgabenapp/assets.xcassets/accentcolor.colorset/contents.json">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">51</span>
+      <span class="nummer">52</span>
       <h3>Contents.json</h3>
       <p class="pfad">HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json</p>
     </div>
@@ -10447,7 +10749,7 @@ struct SettingsView: View {
 <article class="datei" data-suche="hausaufgabenapp/assets.xcassets/appicon.appiconset/contents.json">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">52</span>
+      <span class="nummer">53</span>
       <h3>Contents.json</h3>
       <p class="pfad">HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json</p>
     </div>
@@ -10478,7 +10780,7 @@ struct SettingsView: View {
 <article class="datei" data-suche="hausaufgabenapp/assets.xcassets/contents.json">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">53</span>
+      <span class="nummer">54</span>
       <h3>Contents.json</h3>
       <p class="pfad">HausaufgabenApp/Assets.xcassets/Contents.json</p>
     </div>
@@ -10502,7 +10804,7 @@ struct SettingsView: View {
 <article class="datei" data-suche="readme.md">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">54</span>
+      <span class="nummer">55</span>
       <h3>README.md</h3>
       <p class="pfad">README.md</p>
     </div>

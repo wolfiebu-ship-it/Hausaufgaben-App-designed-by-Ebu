@@ -226,7 +226,7 @@ final class AppStore: ObservableObject {
 
     /// Ersetzt den gesamten Stundenplan – wird nach einem geprüften Scan aufgerufen.
     /// Fächer und Hausaufgaben bleiben unangetastet.
-    func replaceTimetable(with newLessons: [Lesson]) {
+    func replaceTimetable(with newLessons: [Lesson], times: [PeriodTime] = []) {
         let validIDs = Set(subjects.map(\.id))
         lessons = newLessons.filter { lesson in
             guard (1...7).contains(lesson.weekday), lesson.period >= 1 else { return false }
@@ -240,15 +240,30 @@ final class AppStore: ObservableObject {
         if lessons.contains(where: { $0.weekday == 6 }) {
             settings.includeSaturday = true
         }
+        // Zeiten aus dem Foto übernehmen, soweit welche gelesen wurden.
+        // Stunden ohne erkannte Zeit behalten ihre bisherige.
+        if !times.isEmpty {
+            var neue = settings.periodTimes
+            for zeit in times where zeit.period >= 1 && zeit.period <= 14 {
+                if let index = neue.firstIndex(where: { $0.period == zeit.period }) {
+                    neue[index] = zeit
+                } else {
+                    neue.append(zeit)
+                }
+            }
+            settings.periodTimes = neue.sorted { $0.period < $1.period }
+            settings.showTimes = true
+        }
         dataRevision += 1
         saveNow()
     }
 
     /// Legt für erkannte, aber unbekannte Kürzel neue Fächer an und gibt zurück,
-    /// welches Kürzel zu welchem Fach wurde.
+    /// welches Kürzel zu welchem Fach wurde und welche Fächer dabei neu entstanden.
     @discardableResult
-    func createSubjects(forCodes codes: [String]) -> [String: UUID] {
+    func createSubjects(forCodes codes: [String]) -> (mapping: [String: UUID], created: [Subject]) {
         var mapping: [String: UUID] = [:]
+        var neuAngelegt: [Subject] = []
         for code in codes {
             let cleaned = code.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !cleaned.isEmpty else { continue }
@@ -260,14 +275,17 @@ final class AppStore: ObservableObject {
                 continue
             }
 
-            let subject = Subject(name: cleaned,
+            // „BIO“ wird zu „Biologie“, wenn das Kürzel bekannt ist –
+            // im Stundenplan steht weiter das Kürzel vom Zettel.
+            let subject = Subject(name: SubjectNames.fullName(for: cleaned),
                                   short: String(cleaned.prefix(4)),
                                   colorIndex: AppTheme.suggestedColorIndex(usedBy: subjects))
             subjects.append(subject)
             mapping[cleaned] = subject.id
+            neuAngelegt.append(subject)
         }
         scheduleSave()
-        return mapping
+        return (mapping, neuAngelegt)
     }
 
     // MARK: - Hausaufgaben

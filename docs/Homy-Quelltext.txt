@@ -40,38 +40,39 @@ INHALT
   24. HausaufgabenApp/Support/PublicHolidays.swift
   25. HausaufgabenApp/Support/Reminders.swift
   26. HausaufgabenApp/Support/SchoolCalendar.swift
-  27. HausaufgabenApp/Support/TimetableRecognizer.swift
-  28. HausaufgabenApp/Views/Calendar/CalendarView.swift
-  29. HausaufgabenApp/Views/Calendar/EventEditorView.swift
-  30. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
-  31. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
-  32. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
-  33. HausaufgabenApp/Views/Homework/HomeworkRow.swift
-  34. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
-  35. HausaufgabenApp/Views/Homework/SearchView.swift
-  36. HausaufgabenApp/Views/Lock/AppGateView.swift
-  37. HausaufgabenApp/Views/Lock/LockSetupView.swift
-  38. HausaufgabenApp/Views/Lock/LockView.swift
-  39. HausaufgabenApp/Views/Notes/NoteDetailView.swift
-  40. HausaufgabenApp/Views/Notes/NotesView.swift
-  41. HausaufgabenApp/Views/RootView.swift
-  42. HausaufgabenApp/Views/Settings/PeriodTimesView.swift
-  43. HausaufgabenApp/Views/Settings/ProfileView.swift
-  44. HausaufgabenApp/Views/Settings/SettingsView.swift
-  45. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
-  46. HausaufgabenApp/Views/Subjects/SubjectsView.swift
-  47. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
-  48. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
-  49. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
-  50. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
-  51. HausaufgabenApp/Views/Timetable/TimetableView.swift
-  52. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
-  53. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
-  54. HausaufgabenApp/Assets.xcassets/Contents.json
+  27. HausaufgabenApp/Support/SubjectNames.swift
+  28. HausaufgabenApp/Support/TimetableRecognizer.swift
+  29. HausaufgabenApp/Views/Calendar/CalendarView.swift
+  30. HausaufgabenApp/Views/Calendar/EventEditorView.swift
+  31. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
+  32. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
+  33. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
+  34. HausaufgabenApp/Views/Homework/HomeworkRow.swift
+  35. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
+  36. HausaufgabenApp/Views/Homework/SearchView.swift
+  37. HausaufgabenApp/Views/Lock/AppGateView.swift
+  38. HausaufgabenApp/Views/Lock/LockSetupView.swift
+  39. HausaufgabenApp/Views/Lock/LockView.swift
+  40. HausaufgabenApp/Views/Notes/NoteDetailView.swift
+  41. HausaufgabenApp/Views/Notes/NotesView.swift
+  42. HausaufgabenApp/Views/RootView.swift
+  43. HausaufgabenApp/Views/Settings/PeriodTimesView.swift
+  44. HausaufgabenApp/Views/Settings/ProfileView.swift
+  45. HausaufgabenApp/Views/Settings/SettingsView.swift
+  46. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
+  47. HausaufgabenApp/Views/Subjects/SubjectsView.swift
+  48. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
+  49. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
+  50. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
+  51. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
+  52. HausaufgabenApp/Views/Timetable/TimetableView.swift
+  53. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
+  54. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
+  55. HausaufgabenApp/Assets.xcassets/Contents.json
 
 
 ================================================================================
-  1. README.md
+   1. README.md
 ================================================================================
 
 <img src="docs/homy-logo.png" alt="" width="104" align="left" hspace="14" vspace="4">
@@ -192,6 +193,8 @@ Der Prüfschritt ist Absicht: Ein Foto kann schief, dunkel oder handgeschrieben 
 Alles läuft auf dem Gerät – das Foto wird nicht hochgeladen und nirgends gespeichert. Beim ersten Scan fragt iOS nach der Kameraerlaubnis.
 
 > Der Dokumentenscanner braucht eine echte Kamera und funktioniert deshalb **nicht im Simulator**. Zum Ausprobieren am Mac lässt sich stattdessen ein Foto aus der Mediathek wählen.
+
+> **In der Browser-Vorschau** gibt es das Foto und die Vorlage, aber keine automatische Texterkennung: Eine eingebettete Seite darf die dafür nötige Bibliothek nicht nachladen. Dort nimmst du das Foto auf, es bleibt über dem Raster stehen, und du tippst den Plan daneben ab.
 
 ### 5. Notizen
 
@@ -355,6 +358,85 @@ HausaufgabenApp/
 
 ---
 
+## Homy veröffentlichen
+
+Bis hierher läuft Homy auf deinen eigenen Geräten. In den App Store zu kommen ist ein eigener Schritt – hier ehrlich, was dafür nötig ist.
+
+### Was Apple verlangt
+
+| | |
+|---|---|
+| **Mac mit Xcode** | Ohne geht es nicht. Eine iOS-App lässt sich nur auf einem Mac bauen und hochladen. |
+| **Apple Developer Program** | 99 € im Jahr. Ohne diese Mitgliedschaft geht weder App Store noch TestFlight. |
+| **Volljährigkeit** | Apple vergibt Entwickler-Accounts nur an Volljährige. Als Schüler brauchst du dafür deine Eltern: Der Account läuft dann auf sie, und sie sind es auch, die die Vereinbarungen unterschreiben. Das ist keine Formalie, die man umgehen sollte – es ist ein Vertrag. |
+| **App Store Connect** | Dort legst du den Eintrag an: Name, Beschreibung, Schlüsselwörter, Altersfreigabe, Bildschirmfotos in mehreren Größen und ein 1024-px-Symbol (hast du). |
+| **Datenschutz-Angaben** | Bei Homy angenehm kurz: „Es werden keine Daten erfasst“. Homy hat keinen Server, keine Analyse, keine Werbung, keine Netzwerkzugriffe. Genau so kannst du es angeben. |
+| **Prüfung** | Apple sieht sich jede App an, das dauert meist ein paar Tage. Ablehnungen sind normal und kommen mit einer Begründung; danach bessert man nach und reicht erneut ein. |
+
+### Was Homy dafür schon mitbringt
+
+- Ein eigenes App-Symbol in 1024 px und einen eigenen Namen.
+- Keine fremden Bibliotheken – nichts, dessen Lizenz du angeben müsstest.
+- Keine Datenerfassung, also eine unkomplizierte Datenschutz-Auskunft.
+- Sinnvolle Texte für die Berechtigungen (Kamera, Fotos, Face ID) – die verlangt Apple, und sie stehen schon im Projekt.
+
+### Was du dafür noch brauchst
+
+- **Bildschirmfotos** aus dem Simulator in den von Apple verlangten Größen.
+- Einen **Beschreibungstext** und ein paar Schlüsselwörter.
+- Eine **Support-Adresse** (eine E-Mail reicht) – die verlangt Apple als Kontakt.
+- Eine **Datenschutzerklärung** im Netz. Auch wenn Homy nichts erfasst: Apple will eine erreichbare Adresse. Ein kurzer Text auf einer GitHub-Pages-Seite genügt.
+
+### Der kleinere Weg ohne Store
+
+Ohne Mitgliedschaft kannst du Homy weiterhin **mit Xcode auf deine eigenen Geräte laden** (siehe oben). Die Installation hält dann sieben Tage und wird mit einem Klick erneuert. Für dich und deine Familie reicht das völlig – und kostet nichts.
+
+---
+
+## Den Quelltext zum Kopieren
+
+`docs/quelltext.html` ist eine Seite, auf der **jede Datei einen eigenen Kopier-Knopf** hat – dazu „Alles kopieren“ für das ganze Projekt am Stück und ein Suchfeld. Ganz oben steht Homy noch einmal **als Prompt**: der ganze Bauplan in Worten, zum Einfügen bei einer KI.
+
+Erzeugt wird die Seite aus dem echten Quelltext:
+
+```
+python3 docs/baue_quelltext_seite.py
+```
+
+Daneben liegen `docs/Homy-Quelltext.txt` (alles in einer Textdatei zum Lesen) und `docs/Homy-Quelltext.zip` (das komplette Projekt zum Bauen).
+
+---
+
+## Die Vorschau im Browser
+
+Unter `docs/vorschau.html` liegt eine vollständige Nachbildung der Oberfläche als einzelne HTML-Datei – zum Anschauen und Ausprobieren ohne Mac.
+
+Sie **fängt leer an**, genau wie die gebaute App beim ersten Öffnen: Die zwölf üblichen Schulfächer sind angelegt, der Stundenplan ist leer. Im Stundenplan stehen oben nur *Fächer* und *Stundenplan abfotografieren*; das Raster füllt sich, sobald du es einträgst oder abfotografierst – dann erst stehen die farbigen Kürzel drin und tauchen auch im Hausaufgabenheft auf. Wer sich einen gefüllten Stand ansehen will, findet in den Einstellungen unter *Daten* den Knopf **„Beispieldaten einsetzen“** und daneben **„Alles leeren“**.
+
+Darin funktioniert alles, was ein Browser kann:
+
+| Funktioniert in der Vorschau | Nur in der gebauten App |
+|---|---|
+| Hausaufgaben eintragen, abhaken, „keine Hausaufgaben“ | |
+| Wochen blättern, Suche über alle Wochen | |
+| Kalender: Termine, Ferien, Feiertage je Bundesland | |
+| Notizen schreiben | |
+| Stundenplan ausfüllen, Fächer anlegen und ändern | |
+| Unterrichtszeiten einstellen | |
+| **Eigenen Code festlegen**, ändern, Anmeldung aus | Prüfwert statt Klartext (SHA-256) |
+| **Schnellstart** – versucht Face ID/Touch ID über WebAuthn, sonst merkt er sich den Browser | Immer echtes Face ID / Touch ID |
+| **Foto des Stundenplans** aufnehmen; es bleibt als Vorlage über dem Raster stehen | Automatische Texterkennung (Apple Vision) |
+| Sicherung herauskopieren und einspielen | Sicherung als Datei, z. B. in iCloud Drive |
+| Hell/dunkel, alle Erklärungen | Echte Benachrichtigungen von iOS |
+
+Drei Dinge kann ein Browser prinzipiell nicht, und die sind deshalb nachgestellt statt echt:
+
+- **Benachrichtigungen** – in der Vorschau erscheint zur Ansicht ein nachgebautes Banner. In der App schickt iOS sie wirklich, auch wenn Homy zu ist.
+- **Texterkennung beim Scannen** – die Bibliothek dafür müsste Dateien nachladen, was eine eingebettete Seite nicht darf.
+- **Herunterladen** – deshalb gibt es die Sicherung zum Kopieren statt als Datei.
+
+---
+
 ## Wenn etwas nicht klappt
 
 | Problem | Lösung |
@@ -367,7 +449,7 @@ HausaufgabenApp/
 
 
 ================================================================================
-  2. HausaufgabenApp.xcodeproj/project.pbxproj
+   2. HausaufgabenApp.xcodeproj/project.pbxproj
 ================================================================================
 
 // !$*UTF8*$!
@@ -662,7 +744,7 @@ HausaufgabenApp/
 
 
 ================================================================================
-  3. HausaufgabenApp.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+   3. HausaufgabenApp.xcodeproj/project.xcworkspace/contents.xcworkspacedata
 ================================================================================
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -675,7 +757,7 @@ HausaufgabenApp/
 
 
 ================================================================================
-  4. HausaufgabenApp/HausaufgabenApp.swift
+   4. HausaufgabenApp/HausaufgabenApp.swift
 ================================================================================
 
 import SwiftUI
@@ -698,7 +780,7 @@ struct HausaufgabenApp: App {
 
 
 ================================================================================
-  5. HausaufgabenApp/Models/AppData.swift
+   5. HausaufgabenApp/Models/AppData.swift
 ================================================================================
 
 import Foundation
@@ -834,7 +916,7 @@ struct AppData: Codable {
 
 
 ================================================================================
-  6. HausaufgabenApp/Models/AppSettings.swift
+   6. HausaufgabenApp/Models/AppSettings.swift
 ================================================================================
 
 import Foundation
@@ -974,7 +1056,7 @@ struct AppSettings: Codable, Hashable {
 
 
 ================================================================================
-  7. HausaufgabenApp/Models/CalendarEvent.swift
+   7. HausaufgabenApp/Models/CalendarEvent.swift
 ================================================================================
 
 import SwiftUI
@@ -1211,7 +1293,7 @@ struct CalendarEvent: Identifiable, Codable, Hashable {
 
 
 ================================================================================
-  8. HausaufgabenApp/Models/FederalState.swift
+   8. HausaufgabenApp/Models/FederalState.swift
 ================================================================================
 
 import Foundation
@@ -1293,7 +1375,7 @@ enum FederalState: String, Codable, Hashable, CaseIterable, Identifiable {
 
 
 ================================================================================
-  9. HausaufgabenApp/Models/Holiday.swift
+   9. HausaufgabenApp/Models/Holiday.swift
 ================================================================================
 
 import SwiftUI
@@ -2161,7 +2243,7 @@ final class AppStore: ObservableObject {
 
     /// Ersetzt den gesamten Stundenplan – wird nach einem geprüften Scan aufgerufen.
     /// Fächer und Hausaufgaben bleiben unangetastet.
-    func replaceTimetable(with newLessons: [Lesson]) {
+    func replaceTimetable(with newLessons: [Lesson], times: [PeriodTime] = []) {
         let validIDs = Set(subjects.map(\.id))
         lessons = newLessons.filter { lesson in
             guard (1...7).contains(lesson.weekday), lesson.period >= 1 else { return false }
@@ -2175,15 +2257,30 @@ final class AppStore: ObservableObject {
         if lessons.contains(where: { $0.weekday == 6 }) {
             settings.includeSaturday = true
         }
+        // Zeiten aus dem Foto übernehmen, soweit welche gelesen wurden.
+        // Stunden ohne erkannte Zeit behalten ihre bisherige.
+        if !times.isEmpty {
+            var neue = settings.periodTimes
+            for zeit in times where zeit.period >= 1 && zeit.period <= 14 {
+                if let index = neue.firstIndex(where: { $0.period == zeit.period }) {
+                    neue[index] = zeit
+                } else {
+                    neue.append(zeit)
+                }
+            }
+            settings.periodTimes = neue.sorted { $0.period < $1.period }
+            settings.showTimes = true
+        }
         dataRevision += 1
         saveNow()
     }
 
     /// Legt für erkannte, aber unbekannte Kürzel neue Fächer an und gibt zurück,
-    /// welches Kürzel zu welchem Fach wurde.
+    /// welches Kürzel zu welchem Fach wurde und welche Fächer dabei neu entstanden.
     @discardableResult
-    func createSubjects(forCodes codes: [String]) -> [String: UUID] {
+    func createSubjects(forCodes codes: [String]) -> (mapping: [String: UUID], created: [Subject]) {
         var mapping: [String: UUID] = [:]
+        var neuAngelegt: [Subject] = []
         for code in codes {
             let cleaned = code.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !cleaned.isEmpty else { continue }
@@ -2195,14 +2292,17 @@ final class AppStore: ObservableObject {
                 continue
             }
 
-            let subject = Subject(name: cleaned,
+            // „BIO“ wird zu „Biologie“, wenn das Kürzel bekannt ist –
+            // im Stundenplan steht weiter das Kürzel vom Zettel.
+            let subject = Subject(name: SubjectNames.fullName(for: cleaned),
                                   short: String(cleaned.prefix(4)),
                                   colorIndex: AppTheme.suggestedColorIndex(usedBy: subjects))
             subjects.append(subject)
             mapping[cleaned] = subject.id
+            neuAngelegt.append(subject)
         }
         scheduleSave()
-        return mapping
+        return (mapping, neuAngelegt)
     }
 
     // MARK: - Hausaufgaben
@@ -3973,7 +4073,97 @@ enum SchoolCalendar {
 
 
 ================================================================================
-  27. HausaufgabenApp/Support/TimetableRecognizer.swift
+  27. HausaufgabenApp/Support/SubjectNames.swift
+================================================================================
+
+import Foundation
+
+/// Übliche Fachkürzel an deutschen Schulen und der Name dahinter.
+///
+/// Damit trägt Homy nach dem Abfotografieren nicht „BIO“ als Fachnamen ein,
+/// sondern „Biologie“. Das Kürzel aus dem Foto bleibt trotzdem stehen – im
+/// Stundenplan steht ja genau das, was auch auf dem Zettel steht.
+///
+/// Die Liste ist eine Hilfe, keine Vorschrift: Steht ein Kürzel nicht drin,
+/// wird es einfach selbst zum Namen und lässt sich unter „Fächer“ ändern.
+enum SubjectNames {
+
+    /// Kürzel → Fachname. Alles klein geschrieben, verglichen wird ohne Groß-/Kleinschreibung.
+    private static let table: [String: String] = [
+        // Hauptfächer
+        "d": "Deutsch", "de": "Deutsch", "deu": "Deutsch",
+        "m": "Mathematik", "ma": "Mathematik", "mat": "Mathematik", "mathe": "Mathematik",
+        "e": "Englisch", "en": "Englisch", "eng": "Englisch",
+
+        // Weitere Sprachen
+        "f": "Französisch", "fr": "Französisch", "frz": "Französisch",
+        "l": "Latein", "la": "Latein", "lat": "Latein",
+        "s": "Spanisch", "spa": "Spanisch", "span": "Spanisch",
+        "ru": "Russisch", "it": "Italienisch", "tü": "Türkisch", "tu": "Türkisch",
+        "gr": "Griechisch", "nl": "Niederländisch",
+
+        // Naturwissenschaften
+        "bi": "Biologie", "bio": "Biologie",
+        "ch": "Chemie", "che": "Chemie", "c": "Chemie",
+        "ph": "Physik", "phy": "Physik", "p": "Physik",
+        "nw": "Naturwissenschaften", "nawi": "Naturwissenschaften",
+        "if": "Informatik", "inf": "Informatik", "ifo": "Informatik",
+        "tc": "Technik", "te": "Technik", "tech": "Technik",
+
+        // Gesellschaft
+        "g": "Geschichte", "ge": "Geschichte", "ges": "Geschichte", "gesch": "Geschichte",
+        "ek": "Erdkunde", "erd": "Erdkunde", "geo": "Erdkunde", "gg": "Geographie",
+        "po": "Politik", "pol": "Politik", "sw": "Sozialwissenschaften",
+        "sowi": "Sozialwissenschaften", "gk": "Gemeinschaftskunde",
+        "wi": "Wirtschaft", "wn": "Wirtschaft", "wl": "Wirtschaftslehre",
+        "al": "Arbeitslehre", "hw": "Hauswirtschaft",
+
+        // Religion, Ethik, Philosophie
+        "re": "Religion", "rel": "Religion",
+        "kr": "Katholische Religion", "ka": "Katholische Religion",
+        "er": "Evangelische Religion", "ev": "Evangelische Religion",
+        "eth": "Ethik", "et": "Ethik", "ethik": "Ethik",
+        "pl": "Philosophie", "phi": "Philosophie", "pp": "Praktische Philosophie",
+        "lk": "Lebenskunde",
+
+        // Musisch und Sport
+        "ku": "Kunst", "kun": "Kunst", "bk": "Bildende Kunst",
+        "mu": "Musik", "mus": "Musik",
+        "sp": "Sport", "spo": "Sport", "sport": "Sport",
+        "ds": "Darstellendes Spiel", "th": "Theater", "wk": "Werken",
+
+        // Schulalltag
+        "kl": "Klassenlehrerstunde", "klr": "Klassenrat",
+        "lz": "Lernzeit", "lb": "Lernbüro", "fö": "Förderunterricht",
+        "foe": "Förderunterricht", "wp": "Wahlpflicht", "ag": "Arbeitsgemeinschaft",
+        "mi": "Mittagspause", "vt": "Vertretung", "frei": "Freistunde"
+    ]
+
+    /// Der Fachname zu einem Kürzel – oder das Kürzel selbst, wenn es unbekannt ist.
+    static func fullName(for code: String) -> String {
+        let cleaned = code
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ".-"))
+        guard !cleaned.isEmpty else { return code }
+
+        // Steht der ganze Name schon da („Mathematik“), bleibt er stehen.
+        if cleaned.count > 6 { return cleaned }
+        return table[cleaned.lowercased()] ?? cleaned
+    }
+
+    /// Kennt die Liste dieses Kürzel?
+    static func isKnown(_ code: String) -> Bool {
+        let cleaned = code
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ".-"))
+            .lowercased()
+        return table[cleaned] != nil
+    }
+}
+
+
+================================================================================
+  28. HausaufgabenApp/Support/TimetableRecognizer.swift
 ================================================================================
 
 import Foundation
@@ -4003,6 +4193,10 @@ struct ScanResult {
     var unknownCodes: [String] = []
     /// Wurde überhaupt Text gefunden?
     var foundText = false
+    /// Unterrichtszeiten aus der Spalte links – leer, wenn keine zu lesen waren.
+    var times: [PeriodTime] = []
+    /// Fächer, die wegen dieses Fotos neu angelegt wurden (für die Prüfansicht).
+    var createdSubjects: [Subject] = []
 }
 
 /// Liest einen fotografierten Stundenplan aus: Text erkennen, das Raster aus
@@ -4121,8 +4315,13 @@ enum TimetableRecognizer {
         let leftEdge = firstColumnX - 0.09
 
         var buckets: [String: [Piece]] = [:]
+        // Was links neben dem Raster steht, ist die Stunden- und Zeitspalte.
+        var timeColumn: [Piece] = []
         for piece in body {
-            guard piece.x > leftEdge else { continue }
+            guard piece.x > leftEdge else {
+                timeColumn.append(piece)
+                continue
+            }
             guard let column = nearestIndex(of: piece.x, in: columns.map(\.x)) else { continue }
             guard let row = nearestIndex(of: piece.y, in: rowCenters) else { continue }
             guard row < 14 else { continue }
@@ -4155,7 +4354,94 @@ enum TimetableRecognizer {
 
         result.cells.sort { ($0.period, $0.weekday) < ($1.period, $1.weekday) }
         result.unknownCodes = unknown.sorted()
+        result.times = readTimes(from: timeColumn, rowCenters: rowCenters)
         return result
+    }
+
+    // MARK: - Unterrichtszeiten
+
+    /// Liest die Zeiten aus der Spalte links neben dem Raster.
+    ///
+    /// Erkannt wird alles, was wie eine Uhrzeit aussieht: „8:00 – 8:45“,
+    /// „08.00-08.45“, oder Anfang und Ende in zwei Zeilen untereinander.
+    /// Steht nur der Anfang da, werden 45 Minuten angenommen.
+    private static func readTimes(from pieces: [Piece], rowCenters: [CGFloat]) -> [PeriodTime] {
+        guard !pieces.isEmpty, !rowCenters.isEmpty else { return [] }
+
+        // Jedes Textstück der nächstgelegenen Zeile zuordnen.
+        var proZeile: [Int: [Piece]] = [:]
+        for piece in pieces {
+            guard let row = nearestIndex(of: piece.y, in: rowCenters), row < 14 else { continue }
+            proZeile[row, default: []].append(piece)
+        }
+
+        var gefunden: [PeriodTime] = []
+        for (row, group) in proZeile {
+            let text = group.sorted { $0.y < $1.y }.map(\.text).joined(separator: " ")
+            let minuten = minutesInText(text)
+            guard let start = minuten.first else { continue }
+
+            // Der zweite Wert ist das Ende – aber nur, wenn er danach liegt
+            // und die Stunde nicht länger als drei Zeitstunden dauert.
+            var ende = start + 45
+            if minuten.count >= 2 {
+                let kandidat = minuten[1]
+                if kandidat > start && kandidat - start <= 180 { ende = kandidat }
+            }
+            gefunden.append(PeriodTime(period: row + 1, startMinutes: start, endMinutes: ende))
+        }
+
+        gefunden.sort { $0.period < $1.period }
+
+        // Zeiten müssen im Lauf des Tages größer werden. Was aus der Reihe
+        // fällt, war ein Lesefehler – lieber weglassen als falsch eintragen.
+        var geprueft: [PeriodTime] = []
+        for zeit in gefunden {
+            if let letzte = geprueft.last, zeit.startMinutes <= letzte.startMinutes { continue }
+            geprueft.append(zeit)
+        }
+
+        // Einzelne Treffer sind eher Zufall als eine gelesene Zeitspalte.
+        return geprueft.count >= 3 ? geprueft : []
+    }
+
+    /// Alle Uhrzeiten in einem Text, als Minuten seit Mitternacht.
+    /// Aus „1. Std 8:00 - 8:45“ wird [480, 525]; die „1.“ zählt nicht mit.
+    private static func minutesInText(_ text: String) -> [Int] {
+        var ergebnis: [Int] = []
+        let zeichen = Array(text)
+        var index = 0
+
+        while index < zeichen.count {
+            guard zeichen[index].isNumber else { index += 1; continue }
+
+            var stundeText = ""
+            while index < zeichen.count, zeichen[index].isNumber, stundeText.count < 2 {
+                stundeText.append(zeichen[index])
+                index += 1
+            }
+            // Ein Trenner muss folgen, sonst ist es keine Uhrzeit, sondern
+            // eine Stundennummer oder eine Raumnummer.
+            guard index < zeichen.count, zeichen[index] == ":" || zeichen[index] == "." else { continue }
+            let trenner = zeichen[index]
+            index += 1
+
+            var minuteText = ""
+            while index < zeichen.count, zeichen[index].isNumber, minuteText.count < 2 {
+                minuteText.append(zeichen[index])
+                index += 1
+            }
+            // „1.“ am Zeilenanfang hat keine zwei Ziffern dahinter.
+            guard minuteText.count == 2 else { continue }
+            // Ein Punkt als Trenner kommt auch in Datumsangaben vor – bei
+            // „1.9“ fehlt die zweite Ziffer, das fängt die Prüfung oben ab.
+            _ = trenner
+
+            guard let stunde = Int(stundeText), let minute = Int(minuteText),
+                  (0...23).contains(stunde), (0...59).contains(minute) else { continue }
+            ergebnis.append(stunde * 60 + minute)
+        }
+        return ergebnis
     }
 
     // MARK: - Hilfsmittel
@@ -4288,7 +4574,7 @@ extension UIImage {
 
 
 ================================================================================
-  28. HausaufgabenApp/Views/Calendar/CalendarView.swift
+  29. HausaufgabenApp/Views/Calendar/CalendarView.swift
 ================================================================================
 
 import SwiftUI
@@ -5144,7 +5430,7 @@ struct HolidayRow: View {
 
 
 ================================================================================
-  29. HausaufgabenApp/Views/Calendar/EventEditorView.swift
+  30. HausaufgabenApp/Views/Calendar/EventEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -5375,7 +5661,7 @@ struct EventEditorView: View {
 
 
 ================================================================================
-  30. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
+  31. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -5614,7 +5900,7 @@ struct HolidayEditorView: View {
 
 
 ================================================================================
-  31. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
+  32. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
 ================================================================================
 
 import SwiftUI
@@ -5954,7 +6240,7 @@ struct HomeworkDayCard: View {
 
 
 ================================================================================
-  32. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
+  33. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
 ================================================================================
 
 import SwiftUI
@@ -6135,7 +6421,7 @@ struct HomeworkPagerView: View {
 
 
 ================================================================================
-  33. HausaufgabenApp/Views/Homework/HomeworkRow.swift
+  34. HausaufgabenApp/Views/Homework/HomeworkRow.swift
 ================================================================================
 
 import SwiftUI
@@ -6331,7 +6617,7 @@ struct SubjectBadge: View {
 
 
 ================================================================================
-  34. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
+  35. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
 ================================================================================
 
 import SwiftUI
@@ -6487,7 +6773,7 @@ struct HintBox: View {
 
 
 ================================================================================
-  35. HausaufgabenApp/Views/Homework/SearchView.swift
+  36. HausaufgabenApp/Views/Homework/SearchView.swift
 ================================================================================
 
 import SwiftUI
@@ -6637,7 +6923,7 @@ struct SearchResultRow: View {
 
 
 ================================================================================
-  36. HausaufgabenApp/Views/Lock/AppGateView.swift
+  37. HausaufgabenApp/Views/Lock/AppGateView.swift
 ================================================================================
 
 import SwiftUI
@@ -6680,7 +6966,7 @@ struct AppGateView: View {
 
 
 ================================================================================
-  37. HausaufgabenApp/Views/Lock/LockSetupView.swift
+  38. HausaufgabenApp/Views/Lock/LockSetupView.swift
 ================================================================================
 
 import SwiftUI
@@ -6802,7 +7088,7 @@ struct LockSetupView: View {
 
 
 ================================================================================
-  38. HausaufgabenApp/Views/Lock/LockView.swift
+  39. HausaufgabenApp/Views/Lock/LockView.swift
 ================================================================================
 
 import SwiftUI
@@ -7074,7 +7360,7 @@ struct LockView: View {
 
 
 ================================================================================
-  39. HausaufgabenApp/Views/Notes/NoteDetailView.swift
+  40. HausaufgabenApp/Views/Notes/NoteDetailView.swift
 ================================================================================
 
 import SwiftUI
@@ -7157,7 +7443,7 @@ struct NoteDetailView: View {
 
 
 ================================================================================
-  40. HausaufgabenApp/Views/Notes/NotesView.swift
+  41. HausaufgabenApp/Views/Notes/NotesView.swift
 ================================================================================
 
 import SwiftUI
@@ -7297,7 +7583,7 @@ struct NoteRow: View {
 
 
 ================================================================================
-  41. HausaufgabenApp/Views/RootView.swift
+  42. HausaufgabenApp/Views/RootView.swift
 ================================================================================
 
 import SwiftUI
@@ -7353,7 +7639,7 @@ struct RootView: View {
 
 
 ================================================================================
-  42. HausaufgabenApp/Views/Settings/PeriodTimesView.swift
+  43. HausaufgabenApp/Views/Settings/PeriodTimesView.swift
 ================================================================================
 
 import SwiftUI
@@ -7430,7 +7716,7 @@ struct PeriodTimesView: View {
 
 
 ================================================================================
-  43. HausaufgabenApp/Views/Settings/ProfileView.swift
+  44. HausaufgabenApp/Views/Settings/ProfileView.swift
 ================================================================================
 
 import SwiftUI
@@ -7563,7 +7849,7 @@ struct LabeledField: View {
 
 
 ================================================================================
-  44. HausaufgabenApp/Views/Settings/SettingsView.swift
+  45. HausaufgabenApp/Views/Settings/SettingsView.swift
 ================================================================================
 
 import SwiftUI
@@ -8011,8 +8297,28 @@ struct SettingsView: View {
                 }
                 .padding(.vertical, 4)
             }
+
+            // Die Klasse steht auch unter „Meine Daten“ – hier direkt, weil
+            // sie sich jedes Jahr ändert und man sie sonst lange sucht.
+            HStack(spacing: 12) {
+                Image(systemName: "person.2.fill")
+                    .foregroundStyle(.tint)
+                    .frame(width: 24)
+
+                Text("Klasse")
+
+                Spacer(minLength: 12)
+
+                TextField("z. B. 8b", text: $store.profile.schoolClass)
+                    .multilineTextAlignment(.trailing)
+                    .textInputAutocapitalization(.characters)
+                    .autocorrectionDisabled()
+                    .frame(maxWidth: 140)
+            }
         } header: {
             Text("Über mich")
+        } footer: {
+            Text("Die Klasse steht auch auf der Seite „Meine Daten“ – hier kannst du sie am Schuljahresanfang schnell ändern.")
         }
     }
 
@@ -8264,7 +8570,7 @@ struct SettingsView: View {
 
 
 ================================================================================
-  45. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
+  46. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -8453,7 +8759,7 @@ struct SubjectEditorView: View {
 
 
 ================================================================================
-  46. HausaufgabenApp/Views/Subjects/SubjectsView.swift
+  47. HausaufgabenApp/Views/Subjects/SubjectsView.swift
 ================================================================================
 
 import SwiftUI
@@ -8727,7 +9033,7 @@ struct SubjectRow: View {
 
 
 ================================================================================
-  47. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
+  48. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
 ================================================================================
 
 import SwiftUI
@@ -8782,7 +9088,7 @@ struct DocumentScannerView: UIViewControllerRepresentable {
 
 
 ================================================================================
-  48. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
+  49. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -8918,7 +9224,7 @@ struct LessonEditorView: View {
 
 
 ================================================================================
-  49. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
+  50. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
 ================================================================================
 
 import SwiftUI
@@ -8985,7 +9291,7 @@ struct ScanReviewView: View {
 
                     raster
 
-                    Text("Tippe auf ein Feld, um das Fach zu ändern oder es zu leeren. Felder, die beim Scannen übersehen wurden, kannst du hier ergänzen.")
+                    Text("Du musst hier nichts mehr machen – „Stundenplan übernehmen“ genügt. Wenn etwas falsch gelesen wurde: auf ein Feld tippen, um das Fach zu ändern oder es zu leeren. Übersehene Felder kannst du hier ergänzen.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -9009,25 +9315,75 @@ struct ScanReviewView: View {
     // MARK: - Teile
 
     private var kopf: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.title3)
-                .foregroundStyle(.tint)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(.tint)
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text("\(zugeordnet) von \(cells.count) Feldern zugeordnet")
-                    .font(.subheadline.weight(.semibold))
-                Text("Bitte kurz prüfen – beim Abfotografieren passieren leicht Lesefehler.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("\(zugeordnet) von \(cells.count) Feldern eingetragen")
+                        .font(.subheadline.weight(.semibold))
+                    Text("Alles ist schon fertig – sieh es dir kurz an, beim Abfotografieren passieren leicht Lesefehler.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
             }
-            Spacer(minLength: 0)
+
+            if !result.createdSubjects.isEmpty {
+                Divider()
+                erledigtZeile(symbol: "books.vertical.fill",
+                              titel: result.createdSubjects.count == 1
+                                  ? "1 neues Fach angelegt"
+                                  : "\(result.createdSubjects.count) neue Fächer angelegt",
+                              text: result.createdSubjects
+                                  .map { $0.displayName }
+                                  .joined(separator: ", "))
+            }
+
+            if !result.times.isEmpty {
+                Divider()
+                erledigtZeile(symbol: "clock.fill",
+                              titel: "Unterrichtszeiten übernommen",
+                              text: zeitenText)
+            }
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground),
                     in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+    }
+
+    private func erledigtZeile(symbol: String, titel: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol)
+                .font(.footnote)
+                .foregroundStyle(.tint)
+                .frame(width: 20)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(titel)
+                    .font(.footnote.weight(.semibold))
+                Text(text)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+    }
+
+    /// „1. 08:00 – 08:45 · 2. 08:50 – 09:35 · …“, gekürzt auf die ersten drei.
+    private var zeitenText: String {
+        let anfang = result.times.prefix(3)
+            .map { "\($0.period). \($0.rangeText)" }
+            .joined(separator: " · ")
+        if result.times.count > 3 {
+            return anfang + " · und \(result.times.count - 3) weitere"
+        }
+        return anfang
     }
 
     private var unbekannteKuerzel: some View {
@@ -9188,7 +9544,7 @@ struct ScanReviewView: View {
     }
 
     private func legeFaecherAn() {
-        let zuordnung = store.createSubjects(forCodes: offeneKuerzel)
+        let (zuordnung, _) = store.createSubjects(forCodes: offeneKuerzel)
         for index in cells.indices where cells[index].subjectID == nil {
             let code = cells[index].code.trimmingCharacters(in: .whitespacesAndNewlines)
             if let id = zuordnung[code] ?? zuordnung[code.uppercased()] {
@@ -9283,7 +9639,7 @@ struct ScanCellEditor: View {
 
 
 ================================================================================
-  50. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
+  51. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
 ================================================================================
 
 import SwiftUI
@@ -9316,7 +9672,7 @@ struct TimetableScanFlow: View {
                 case .nothingFound: nothingFoundView
                 case .review(let result):
                     ScanReviewView(result: result) { lessons in
-                        store.replaceTimetable(with: lessons)
+                        store.replaceTimetable(with: lessons, times: result.times)
                         dismiss()
                     } onRetry: {
                         stage = .intro
@@ -9363,14 +9719,14 @@ struct TimetableScanFlow: View {
                     Image(systemName: "doc.viewfinder")
                         .font(.system(size: 34))
                         .foregroundStyle(.tint)
-                    Text("Fotografiere deinen Stundenplan ab – die App trägt die Fächer für dich ein.")
+                    Text("Fotografiere deinen Stundenplan ab – Homy trägt Fächer und Unterrichtszeiten von allein ein.")
                         .font(.headline)
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
                 VStack(alignment: .leading, spacing: 14) {
                     Tipp(nummer: 1, text: "Leg den Plan flach hin und sorge für gutes Licht.")
-                    Tipp(nummer: 2, text: "Halte die Kamera gerade darüber, sodass alle Wochentage und Stunden im Bild sind.")
+                    Tipp(nummer: 2, text: "Halte die Kamera gerade darüber, sodass alle Wochentage und Stunden im Bild sind – auch die Spalte mit den Uhrzeiten links.")
                     Tipp(nummer: 3, text: "Gedruckte Pläne werden deutlich besser erkannt als handgeschriebene.")
                 }
                 .padding(16)
@@ -9400,7 +9756,7 @@ struct TimetableScanFlow: View {
                     .controlSize(.large)
                 }
 
-                Text("Die Erkennung läuft vollständig auf deinem Gerät – das Foto verlässt es nicht. Anschließend siehst du das Ergebnis und kannst alles korrigieren, bevor es übernommen wird.")
+                Text("Die Erkennung läuft vollständig auf deinem Gerät – das Foto verlässt es nicht. Fächer, die Homy noch nicht kennt, werden dabei gleich angelegt. Danach siehst du das fertige Ergebnis und kannst es noch ändern, bevor es übernommen wird.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -9451,12 +9807,29 @@ struct TimetableScanFlow: View {
     private func verarbeite(_ image: UIImage) {
         stage = .working
         Task {
-            let result = await TimetableRecognizer.recognize(image: image, subjects: store.subjects)
-            if result.cells.isEmpty {
+            var result = await TimetableRecognizer.recognize(image: image, subjects: store.subjects)
+            guard !result.cells.isEmpty else {
                 stage = .nothingFound
-            } else {
-                stage = .review(result)
+                return
             }
+
+            // Alles, was auf dem Foto stand, wird gleich eingetragen: Für jedes
+            // Kürzel ohne passendes Fach wird eins angelegt, und die Felder
+            // werden ihm zugeordnet. Nachsehen kann man trotzdem gleich – aber
+            // von Hand nachtragen muss niemand mehr.
+            if !result.unknownCodes.isEmpty {
+                let (zuordnung, neue) = store.createSubjects(forCodes: result.unknownCodes)
+                result.createdSubjects = neue
+                for index in result.cells.indices where result.cells[index].subjectID == nil {
+                    let code = result.cells[index].code.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if let id = zuordnung[code] ?? zuordnung[code.uppercased()] {
+                        result.cells[index].subjectID = id
+                    }
+                }
+                result.unknownCodes = []
+            }
+
+            stage = .review(result)
         }
     }
 }
@@ -9484,7 +9857,7 @@ private struct Tipp: View {
 
 
 ================================================================================
-  51. HausaufgabenApp/Views/Timetable/TimetableView.swift
+  52. HausaufgabenApp/Views/Timetable/TimetableView.swift
 ================================================================================
 
 import SwiftUI
@@ -9788,7 +10161,7 @@ struct TimetableCell: View {
 
 
 ================================================================================
-  52. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
+  53. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
 ================================================================================
 
 {
@@ -9832,7 +10205,7 @@ struct TimetableCell: View {
 
 
 ================================================================================
-  53. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
+  54. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
 ================================================================================
 
 {
@@ -9852,7 +10225,7 @@ struct TimetableCell: View {
 
 
 ================================================================================
-  54. HausaufgabenApp/Assets.xcassets/Contents.json
+  55. HausaufgabenApp/Assets.xcassets/Contents.json
 ================================================================================
 
 {
@@ -9863,6 +10236,3 @@ struct TimetableCell: View {
 }
 
 
-================================================================================
-  Ende – 54 Dateien, 9516 Zeilen
-================================================================================
