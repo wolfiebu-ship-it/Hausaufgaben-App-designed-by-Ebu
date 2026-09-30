@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Datenschutz – Homy</title>
+<meta name="description" content="Datenschutzerklärung für Homy, das Hausaufgabenheft für iPhone und iPad.">
+<style>
+  :root {
+    --grund: #F7F7FB;
+    --karte: #FFFFFF;
+    --text: #17171A;
+    --text2: #5B5B66;
+    --akzent: #3B72FF;
+    --rand: rgba(60,60,67,.16);
+    --gut-grund: #E2F5E8;
+    --gut-rand: #A8DCBB;
+    --gut-text: #14532D;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --grund: #0C0C0F;
+      --karte: #17171C;
+      --text: #F3F3F6;
+      --text2: #A0A0AC;
+      --akzent: #7FA5FF;
+      --rand: rgba(235,235,245,.16);
+      --gut-grund: #12301F;
+      --gut-rand: #2C5C3F;
+      --gut-text: #A7E8C0;
+    }
+  }
+  :root[data-theme="dark"] {
+    --grund: #0C0C0F; --karte: #17171C; --text: #F3F3F6; --text2: #A0A0AC;
+    --akzent: #7FA5FF; --rand: rgba(235,235,245,.16);
+    --gut-grund: #12301F; --gut-rand: #2C5C3F; --gut-text: #A7E8C0;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--grund);
+    color: var(--text);
+    font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    padding: 0 16px 64px;
+  }
+  main { max-width: 680px; margin: 0 auto; }
+
+  header { padding: 40px 0 8px; display: flex; align-items: center; gap: 16px; }
+  header svg { width: 56px; height: 56px; flex: none; border-radius: 13px; }
+  h1 { font-size: 30px; line-height: 1.15; margin: 0; letter-spacing: -.02em; }
+  .unter { color: var(--text2); font-size: 15px; margin-top: 4px; }
+
+  h2 {
+    font-size: 20px; margin: 34px 0 10px; letter-spacing: -.01em;
+    padding-top: 22px; border-top: 1px solid var(--rand);
+  }
+  h2:first-of-type { border-top: 0; padding-top: 0; }
+  p { margin: 0 0 12px; }
+  ul { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  strong { font-weight: 600; }
+  a { color: var(--akzent); }
+
+  .kern {
+    background: var(--gut-grund);
+    border: 1px solid var(--gut-rand);
+    color: var(--gut-text);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin: 24px 0 8px;
+    font-size: 17px;
+  }
+  .kern strong { font-weight: 700; }
+
+  .karte {
+    background: var(--karte);
+    border: 1px solid var(--rand);
+    border-radius: 14px;
+    padding: 4px 20px 16px;
+    margin-bottom: 8px;
+  }
+
+  footer {
+    margin-top: 40px; padding-top: 20px;
+    border-top: 1px solid var(--rand);
+    color: var(--text2); font-size: 14px;
+  }
+  .luecke {
+    background: rgba(255,196,77,.18);
+    border-radius: 5px; padding: 1px 6px; font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <svg viewBox="0 0 100 100" aria-hidden="true">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B72FF"/><stop offset="1" stop-color="#7A5AF0"/>
+    </linearGradient></defs>
+    <rect width="100" height="100" rx="22.5" fill="url(#g)"/>
+    <path d="M 50 18 L 81 45.28 L 81 80 L 19 80 L 19 45.28 Z"
+          fill="none" stroke="#fff" stroke-width="7.5" stroke-linejoin="round"/>
+    <g transform="rotate(38 50 60)">
+      <path d="M 50 45 L 55.25 52.2 L 44.75 52.2 Z" fill="#4A3A22"/>
+      <path d="M 44.75 52.2 L 55.25 52.2 L 55.25 71.01 Q 55.25 75 51.26 75
+               L 48.74 75 Q 44.75 75 44.75 71.01 Z" fill="#FFC44D"/>
+      <rect x="44.75" y="54.6" width="10.5" height="2.1" fill="#F0A52E"/>
+    </g>
+  </svg>
+  <div>
+    <h1>Datenschutz&shy;erklärung</h1>
+    <div class="unter">Homy – Hausaufgabenheft für iPhone und iPad</div>
+  </div>
+</header>
+
+<div class="kern">
+  <strong>Homy erfasst keine Daten.</strong> Die App hat keinen Server, kein Konto,
+  keine Werbung und keine Analyse. Sie baut überhaupt keine Verbindung ins Internet auf.
+  Alles, was du einträgst, bleibt auf deinem Gerät.
+</div>
+
+<h2>Wer dafür verantwortlich ist</h2>
+<div class="karte">
+  <p>
+    <span class="luecke">Name und Anschrift hier eintragen</span><br>
+    E-Mail: <span class="luecke">Support-Adresse hier eintragen</span>
+  </p>
+  <p style="color:var(--text2);font-size:15px;margin-bottom:8px">
+    Diese Angaben verlangt Apple und verlangt das Gesetz. Sie müssen ausgefüllt
+    sein, bevor die Seite veröffentlicht wird.
+  </p>
+</div>
+
+<h2>Welche Daten die App verarbeitet</h2>
+<p>
+  Homy speichert das, was du selbst einträgst, in einer einzigen Datei im
+  Dokumentenordner der App auf deinem Gerät:
+</p>
+<ul>
+  <li>Hausaufgaben, Notizen, Termine und Ferien</li>
+  <li>deinen Stundenplan und deine Fächer</li>
+  <li>freiwillige Angaben zu dir: Name, Klasse, Schule, Telefonnummer,
+      E-Mail-Adresse, Anschrift und ein freies Feld</li>
+  <li>deine Einstellungen, darunter das gewählte Bundesland</li>
+</ul>
+<p>
+  Diese Daten werden <strong>nicht übertragen</strong>. Sie verlassen das Gerät nur,
+  wenn du selbst eine Sicherungsdatei erstellst und sie irgendwohin kopierst.
+</p>
+
+<h2>Kamera und Fotos</h2>
+<p>
+  Wenn du deinen Stundenplan abfotografierst, wird das Bild auf dem Gerät
+  ausgewertet – mit der Texterkennung, die zu iOS gehört. Das Foto wird
+  <strong>nicht hochgeladen</strong> und nicht gespeichert; nach dem Übertragen
+  in den Stundenplan ist es weg. Auf deine Fotomediathek greift Homy nur zu,
+  wenn du selbst ein Bild auswählst.
+</p>
+
+<h2>Code und Face ID</h2>
+<p>
+  Wenn du die Anmeldung einschaltest, speichert Homy <strong>nicht deinen Code</strong>,
+  sondern nur einen Prüfwert daraus (SHA-256 mit einer Zufallsbeigabe). Aus dem
+  Prüfwert lässt sich der Code nicht zurückrechnen.
+</p>
+<p>
+  Face ID und Touch ID laufen über iOS. Die App bekommt dabei nur die Antwort
+  „erkannt“ oder „nicht erkannt“ – <strong>dein Gesicht und dein Fingerabdruck
+  erreichen Homy nie</strong>. Sie bleiben in der Secure Enclave deines Geräts.
+</p>
+
+<h2>Mitteilungen</h2>
+<p>
+  Erinnerungen an Termine und Ferien stellt Homy über die Mitteilungen von iOS.
+  Auch das passiert vollständig auf dem Gerät; es gibt keine Push-Nachrichten
+  von einem Server.
+</p>
+
+<h2>Keine Weitergabe, keine Dritten</h2>
+<ul>
+  <li>Keine Werbenetzwerke, keine Analysedienste, keine Absturzberichte an Dritte.</li>
+  <li>Keine fremden Programmbibliotheken – Homy benutzt nur, was zu iOS gehört.</li>
+  <li>Keine Werbe-Kennung (IDFA), kein App-übergreifendes Tracking.</li>
+</ul>
+
+<h2>Deine Rechte</h2>
+<p>
+  Da alle Daten ausschließlich auf deinem Gerät liegen, hast du sie vollständig
+  selbst in der Hand: Du kannst sie in der App ändern, einzeln oder komplett
+  löschen und als Sicherung exportieren. Löschst du die App, sind die Daten weg.
+  Es gibt nichts, was jemand anderes für dich löschen müsste, weil niemand
+  anderes sie hat.
+</p>
+
+<h2>Kinder und Jugendliche</h2>
+<p>
+  Homy richtet sich an Schülerinnen und Schüler. Gerade deshalb erfasst die App
+  nichts: keine Anmeldung, kein Konto, keine Daten an Dritte.
+</p>
+
+<h2>Änderungen</h2>
+<p>
+  Ändert sich etwas an der App, das für den Datenschutz wichtig ist, wird diese
+  Seite geändert. Unten steht, wann sie zuletzt bearbeitet wurde.
+</p>
+
+<footer>
+  Stand: <span class="luecke">Datum eintragen</span> ·
+  <a href="index.html">Zurück zu Homy</a>
+</footer>
+
+</main>
+</body>
+</html>

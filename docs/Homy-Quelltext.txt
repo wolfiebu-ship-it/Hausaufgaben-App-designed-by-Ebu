@@ -1,7 +1,7 @@
 ================================================================================
   HOMY – Dein Hausaufgabenheft
   Vollständiger Quelltext
-  Stand: 17.09.2026
+  Stand: 30.09.2026
 ================================================================================
 
 Das hier ist die ganze App zum Nachlesen. Zum Bauen brauchst du aber den
@@ -18,57 +18,58 @@ INHALT
    2. HausaufgabenApp.xcodeproj/project.pbxproj
    3. HausaufgabenApp.xcodeproj/project.xcworkspace/contents.xcworkspacedata
    4. HausaufgabenApp/HausaufgabenApp.swift
-   5. HausaufgabenApp/Models/AppData.swift
-   6. HausaufgabenApp/Models/AppSettings.swift
-   7. HausaufgabenApp/Models/CalendarEvent.swift
-   8. HausaufgabenApp/Models/FederalState.swift
-   9. HausaufgabenApp/Models/Holiday.swift
-  10. HausaufgabenApp/Models/HomeworkEntry.swift
-  11. HausaufgabenApp/Models/Lesson.swift
-  12. HausaufgabenApp/Models/LockSettings.swift
-  13. HausaufgabenApp/Models/Note.swift
-  14. HausaufgabenApp/Models/Profile.swift
-  15. HausaufgabenApp/Models/Subject.swift
-  16. HausaufgabenApp/Store/AppStore.swift
-  17. HausaufgabenApp/Store/LockController.swift
-  18. HausaufgabenApp/Support/AppTheme.swift
-  19. HausaufgabenApp/Support/BackupDocument.swift
-  20. HausaufgabenApp/Support/BiometricAuth.swift
-  21. HausaufgabenApp/Support/DoodleBackground.swift
-  22. HausaufgabenApp/Support/Haptics.swift
-  23. HausaufgabenApp/Support/HomyLogo.swift
-  24. HausaufgabenApp/Support/PublicHolidays.swift
-  25. HausaufgabenApp/Support/Reminders.swift
-  26. HausaufgabenApp/Support/SchoolCalendar.swift
-  27. HausaufgabenApp/Support/SubjectNames.swift
-  28. HausaufgabenApp/Support/TimetableRecognizer.swift
-  29. HausaufgabenApp/Views/Calendar/CalendarView.swift
-  30. HausaufgabenApp/Views/Calendar/EventEditorView.swift
-  31. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
-  32. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
-  33. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
-  34. HausaufgabenApp/Views/Homework/HomeworkRow.swift
-  35. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
-  36. HausaufgabenApp/Views/Homework/SearchView.swift
-  37. HausaufgabenApp/Views/Lock/AppGateView.swift
-  38. HausaufgabenApp/Views/Lock/LockSetupView.swift
-  39. HausaufgabenApp/Views/Lock/LockView.swift
-  40. HausaufgabenApp/Views/Notes/NoteDetailView.swift
-  41. HausaufgabenApp/Views/Notes/NotesView.swift
-  42. HausaufgabenApp/Views/RootView.swift
-  43. HausaufgabenApp/Views/Settings/ProfileView.swift
-  44. HausaufgabenApp/Views/Settings/SettingsView.swift
-  45. HausaufgabenApp/Views/Settings/TimetableSettingsView.swift
-  46. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
-  47. HausaufgabenApp/Views/Subjects/SubjectsView.swift
-  48. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
-  49. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
-  50. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
-  51. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
-  52. HausaufgabenApp/Views/Timetable/TimetableView.swift
-  53. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
-  54. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
-  55. HausaufgabenApp/Assets.xcassets/Contents.json
+   5. HausaufgabenApp/PrivacyInfo.xcprivacy
+   6. HausaufgabenApp/Models/AppData.swift
+   7. HausaufgabenApp/Models/AppSettings.swift
+   8. HausaufgabenApp/Models/CalendarEvent.swift
+   9. HausaufgabenApp/Models/FederalState.swift
+  10. HausaufgabenApp/Models/Holiday.swift
+  11. HausaufgabenApp/Models/HomeworkEntry.swift
+  12. HausaufgabenApp/Models/Lesson.swift
+  13. HausaufgabenApp/Models/LockSettings.swift
+  14. HausaufgabenApp/Models/Note.swift
+  15. HausaufgabenApp/Models/Profile.swift
+  16. HausaufgabenApp/Models/Subject.swift
+  17. HausaufgabenApp/Store/AppStore.swift
+  18. HausaufgabenApp/Store/LockController.swift
+  19. HausaufgabenApp/Support/AppTheme.swift
+  20. HausaufgabenApp/Support/BackupDocument.swift
+  21. HausaufgabenApp/Support/BiometricAuth.swift
+  22. HausaufgabenApp/Support/DoodleBackground.swift
+  23. HausaufgabenApp/Support/Haptics.swift
+  24. HausaufgabenApp/Support/HomyLogo.swift
+  25. HausaufgabenApp/Support/PublicHolidays.swift
+  26. HausaufgabenApp/Support/Reminders.swift
+  27. HausaufgabenApp/Support/SchoolCalendar.swift
+  28. HausaufgabenApp/Support/SubjectNames.swift
+  29. HausaufgabenApp/Support/TimetableRecognizer.swift
+  30. HausaufgabenApp/Views/Calendar/CalendarView.swift
+  31. HausaufgabenApp/Views/Calendar/EventEditorView.swift
+  32. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
+  33. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
+  34. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
+  35. HausaufgabenApp/Views/Homework/HomeworkRow.swift
+  36. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
+  37. HausaufgabenApp/Views/Homework/SearchView.swift
+  38. HausaufgabenApp/Views/Lock/AppGateView.swift
+  39. HausaufgabenApp/Views/Lock/LockSetupView.swift
+  40. HausaufgabenApp/Views/Lock/LockView.swift
+  41. HausaufgabenApp/Views/Notes/NoteDetailView.swift
+  42. HausaufgabenApp/Views/Notes/NotesView.swift
+  43. HausaufgabenApp/Views/RootView.swift
+  44. HausaufgabenApp/Views/Settings/ProfileView.swift
+  45. HausaufgabenApp/Views/Settings/SettingsView.swift
+  46. HausaufgabenApp/Views/Settings/TimetableSettingsView.swift
+  47. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
+  48. HausaufgabenApp/Views/Subjects/SubjectsView.swift
+  49. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
+  50. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
+  51. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
+  52. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
+  53. HausaufgabenApp/Views/Timetable/TimetableView.swift
+  54. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
+  55. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
+  56. HausaufgabenApp/Assets.xcassets/Contents.json
 
 
 ================================================================================
@@ -391,6 +392,14 @@ Bis hierher läuft Homy auf deinen eigenen Geräten. In den App Store zu kommen 
 
 Ohne Mitgliedschaft kannst du Homy weiterhin **mit Xcode auf deine eigenen Geräte laden** (siehe oben). Die Installation hält dann sieben Tage und wird mit einem Klick erneuert. Für dich und deine Familie reicht das völlig – und kostet nichts.
 
+### Die Arbeitsanleitung
+
+In **[`docs/VEROEFFENTLICHEN.md`](docs/VEROEFFENTLICHEN.md)** steht der ganze Weg Schritt für Schritt – mit allen Texten fertig zum Einfügen: Name, Untertitel, Schlüsselwörter, Beschreibung, die Antworten auf Altersfreigabe und Datenschutz-Fragebogen, die Bildschirmfoto-Größen und die Hinweise für die Prüfung.
+
+Darin auch **Weg A**: Homy sofort als Webseite veröffentlichen. Dafür liegen in `docs/` schon eine Startseite (`index.html`) und eine Datenschutzerklärung (`datenschutz.html`); eingeschaltet wird es mit sechs Klicks unter *Settings → Pages*. Die Datenschutz-Adresse daraus verlangt Apple ohnehin.
+
+Fürs Projekt selbst ist schon erledigt, was Apple verlangt: `HausaufgabenApp/PrivacyInfo.xcprivacy` (der Datenschutzbericht seit 2024, bei Homy leer – es wird nichts erfasst) und `ITSAppUsesNonExemptEncryption = NO` (die Ausfuhr-Erklärung; Homy verschlüsselt nichts, der Code wird nur gehasht).
+
 ---
 
 ## Den Quelltext zum Kopieren
@@ -660,6 +669,7 @@ Drei Dinge kann ein Browser prinzipiell nicht, und die sind deshalb nachgestellt
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Homy;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Zum Scannen deines Stundenplans wird die Kamera gebraucht. Das Foto bleibt auf dem Gerät.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Damit du Homy mit einem Blick öffnen kannst, statt jedes Mal deinen Code zu tippen.";
@@ -693,6 +703,7 @@ Drei Dinge kann ein Browser prinzipiell nicht, und die sind deshalb nachgestellt
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Homy;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Zum Scannen deines Stundenplans wird die Kamera gebraucht. Das Foto bleibt auf dem Gerät.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Damit du Homy mit einem Blick öffnen kannst, statt jedes Mal deinen Code zu tippen.";
@@ -780,7 +791,47 @@ struct HausaufgabenApp: App {
 
 
 ================================================================================
-   5. HausaufgabenApp/Models/AppData.swift
+   5. HausaufgabenApp/PrivacyInfo.xcprivacy
+================================================================================
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Datenschutzbericht für den App Store.
+
+  Apple verlangt diese Datei seit 2024 von jeder App. Bei Homy ist sie so
+  kurz, wie eine solche Datei nur sein kann, und das ist keine Schönfärberei:
+
+  - NSPrivacyTracking = false: Homy verfolgt niemanden über andere Apps
+    oder Webseiten hinweg. Es gibt keine Werbe-Kennung, kein Tracking-SDK.
+  - NSPrivacyCollectedDataTypes leer: Homy erfasst keine Daten. Alles, was
+    eingetragen wird, liegt in einer Datei auf dem Gerät und wird nirgendwo
+    hingeschickt – die App öffnet überhaupt keine Netzwerkverbindung.
+  - NSPrivacyAccessedAPITypes leer: Homy benutzt keine der Schnittstellen,
+    für die Apple eine Begründung verlangt. Geprüft: keine UserDefaults,
+    keine Dateizeitstempel, keine Abfrage von Systemstartzeit, freiem
+    Speicherplatz oder aktiver Tastatur. Vom Dateisystem nur fileExists,
+    urls(for:in:) und moveItem – die stehen auf keiner dieser Listen.
+
+  Wird eine dieser Schnittstellen später doch benutzt, gehört sie hier
+  eingetragen. Sonst weist Apple die App beim Hochladen zurück.
+-->
+<plist version="1.0">
+<dict>
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array/>
+</dict>
+</plist>
+
+
+================================================================================
+   6. HausaufgabenApp/Models/AppData.swift
 ================================================================================
 
 import Foundation
@@ -916,7 +967,7 @@ struct AppData: Codable {
 
 
 ================================================================================
-   6. HausaufgabenApp/Models/AppSettings.swift
+   7. HausaufgabenApp/Models/AppSettings.swift
 ================================================================================
 
 import Foundation
@@ -1073,7 +1124,7 @@ struct AppSettings: Codable, Hashable {
 
 
 ================================================================================
-   7. HausaufgabenApp/Models/CalendarEvent.swift
+   8. HausaufgabenApp/Models/CalendarEvent.swift
 ================================================================================
 
 import SwiftUI
@@ -1310,7 +1361,7 @@ struct CalendarEvent: Identifiable, Codable, Hashable {
 
 
 ================================================================================
-   8. HausaufgabenApp/Models/FederalState.swift
+   9. HausaufgabenApp/Models/FederalState.swift
 ================================================================================
 
 import Foundation
@@ -1392,7 +1443,7 @@ enum FederalState: String, Codable, Hashable, CaseIterable, Identifiable {
 
 
 ================================================================================
-   9. HausaufgabenApp/Models/Holiday.swift
+  10. HausaufgabenApp/Models/Holiday.swift
 ================================================================================
 
 import SwiftUI
@@ -1562,7 +1613,7 @@ struct Holiday: Identifiable, Codable, Hashable {
 
 
 ================================================================================
-  10. HausaufgabenApp/Models/HomeworkEntry.swift
+  11. HausaufgabenApp/Models/HomeworkEntry.swift
 ================================================================================
 
 import Foundation
@@ -1604,7 +1655,7 @@ struct HomeworkEntry: Identifiable, Codable, Hashable {
 
 
 ================================================================================
-  11. HausaufgabenApp/Models/Lesson.swift
+  12. HausaufgabenApp/Models/Lesson.swift
 ================================================================================
 
 import Foundation
@@ -1646,7 +1697,7 @@ struct Lesson: Identifiable, Codable, Hashable {
 
 
 ================================================================================
-  12. HausaufgabenApp/Models/LockSettings.swift
+  13. HausaufgabenApp/Models/LockSettings.swift
 ================================================================================
 
 import Foundation
@@ -1804,7 +1855,7 @@ struct LockSettings: Codable, Hashable {
 
 
 ================================================================================
-  13. HausaufgabenApp/Models/Note.swift
+  14. HausaufgabenApp/Models/Note.swift
 ================================================================================
 
 import Foundation
@@ -1877,7 +1928,7 @@ struct Note: Identifiable, Codable, Hashable {
 
 
 ================================================================================
-  14. HausaufgabenApp/Models/Profile.swift
+  15. HausaufgabenApp/Models/Profile.swift
 ================================================================================
 
 import Foundation
@@ -1955,7 +2006,7 @@ struct Profile: Codable, Hashable {
 
 
 ================================================================================
-  15. HausaufgabenApp/Models/Subject.swift
+  16. HausaufgabenApp/Models/Subject.swift
 ================================================================================
 
 import SwiftUI
@@ -2029,7 +2080,7 @@ extension Subject {
 
 
 ================================================================================
-  16. HausaufgabenApp/Store/AppStore.swift
+  17. HausaufgabenApp/Store/AppStore.swift
 ================================================================================
 
 import Foundation
@@ -2933,7 +2984,7 @@ final class AppStore: ObservableObject {
 
 
 ================================================================================
-  17. HausaufgabenApp/Store/LockController.swift
+  18. HausaufgabenApp/Store/LockController.swift
 ================================================================================
 
 import Foundation
@@ -3061,7 +3112,7 @@ final class LockController: ObservableObject {
 
 
 ================================================================================
-  18. HausaufgabenApp/Support/AppTheme.swift
+  19. HausaufgabenApp/Support/AppTheme.swift
 ================================================================================
 
 import SwiftUI
@@ -3177,7 +3228,7 @@ func hideKeyboard() {
 
 
 ================================================================================
-  19. HausaufgabenApp/Support/BackupDocument.swift
+  20. HausaufgabenApp/Support/BackupDocument.swift
 ================================================================================
 
 import SwiftUI
@@ -3208,7 +3259,7 @@ struct BackupDocument: FileDocument {
 
 
 ================================================================================
-  20. HausaufgabenApp/Support/BiometricAuth.swift
+  21. HausaufgabenApp/Support/BiometricAuth.swift
 ================================================================================
 
 import Foundation
@@ -3288,7 +3339,7 @@ enum BiometricAuth {
 
 
 ================================================================================
-  21. HausaufgabenApp/Support/DoodleBackground.swift
+  22. HausaufgabenApp/Support/DoodleBackground.swift
 ================================================================================
 
 import SwiftUI
@@ -3365,7 +3416,7 @@ struct DoodleCanvas: View {
 
 
 ================================================================================
-  22. HausaufgabenApp/Support/Haptics.swift
+  23. HausaufgabenApp/Support/Haptics.swift
 ================================================================================
 
 import UIKit
@@ -3397,7 +3448,7 @@ enum Haptics {
 
 
 ================================================================================
-  23. HausaufgabenApp/Support/HomyLogo.swift
+  24. HausaufgabenApp/Support/HomyLogo.swift
 ================================================================================
 
 import SwiftUI
@@ -3530,7 +3581,7 @@ struct HomyWordmark: View {
 
 
 ================================================================================
-  24. HausaufgabenApp/Support/PublicHolidays.swift
+  25. HausaufgabenApp/Support/PublicHolidays.swift
 ================================================================================
 
 import Foundation
@@ -3725,7 +3776,7 @@ enum PublicHolidays {
 
 
 ================================================================================
-  25. HausaufgabenApp/Support/Reminders.swift
+  26. HausaufgabenApp/Support/Reminders.swift
 ================================================================================
 
 import Foundation
@@ -3903,7 +3954,7 @@ extension Holiday {
 
 
 ================================================================================
-  26. HausaufgabenApp/Support/SchoolCalendar.swift
+  27. HausaufgabenApp/Support/SchoolCalendar.swift
 ================================================================================
 
 import Foundation
@@ -4090,7 +4141,7 @@ enum SchoolCalendar {
 
 
 ================================================================================
-  27. HausaufgabenApp/Support/SubjectNames.swift
+  28. HausaufgabenApp/Support/SubjectNames.swift
 ================================================================================
 
 import Foundation
@@ -4180,7 +4231,7 @@ enum SubjectNames {
 
 
 ================================================================================
-  28. HausaufgabenApp/Support/TimetableRecognizer.swift
+  29. HausaufgabenApp/Support/TimetableRecognizer.swift
 ================================================================================
 
 import Foundation
@@ -4591,7 +4642,7 @@ extension UIImage {
 
 
 ================================================================================
-  29. HausaufgabenApp/Views/Calendar/CalendarView.swift
+  30. HausaufgabenApp/Views/Calendar/CalendarView.swift
 ================================================================================
 
 import SwiftUI
@@ -5447,7 +5498,7 @@ struct HolidayRow: View {
 
 
 ================================================================================
-  30. HausaufgabenApp/Views/Calendar/EventEditorView.swift
+  31. HausaufgabenApp/Views/Calendar/EventEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -5678,7 +5729,7 @@ struct EventEditorView: View {
 
 
 ================================================================================
-  31. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
+  32. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -5917,7 +5968,7 @@ struct HolidayEditorView: View {
 
 
 ================================================================================
-  32. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
+  33. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
 ================================================================================
 
 import SwiftUI
@@ -6257,7 +6308,7 @@ struct HomeworkDayCard: View {
 
 
 ================================================================================
-  33. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
+  34. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
 ================================================================================
 
 import SwiftUI
@@ -6438,7 +6489,7 @@ struct HomeworkPagerView: View {
 
 
 ================================================================================
-  34. HausaufgabenApp/Views/Homework/HomeworkRow.swift
+  35. HausaufgabenApp/Views/Homework/HomeworkRow.swift
 ================================================================================
 
 import SwiftUI
@@ -6634,7 +6685,7 @@ struct SubjectBadge: View {
 
 
 ================================================================================
-  35. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
+  36. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
 ================================================================================
 
 import SwiftUI
@@ -6790,7 +6841,7 @@ struct HintBox: View {
 
 
 ================================================================================
-  36. HausaufgabenApp/Views/Homework/SearchView.swift
+  37. HausaufgabenApp/Views/Homework/SearchView.swift
 ================================================================================
 
 import SwiftUI
@@ -6940,7 +6991,7 @@ struct SearchResultRow: View {
 
 
 ================================================================================
-  37. HausaufgabenApp/Views/Lock/AppGateView.swift
+  38. HausaufgabenApp/Views/Lock/AppGateView.swift
 ================================================================================
 
 import SwiftUI
@@ -6983,7 +7034,7 @@ struct AppGateView: View {
 
 
 ================================================================================
-  38. HausaufgabenApp/Views/Lock/LockSetupView.swift
+  39. HausaufgabenApp/Views/Lock/LockSetupView.swift
 ================================================================================
 
 import SwiftUI
@@ -7105,7 +7156,7 @@ struct LockSetupView: View {
 
 
 ================================================================================
-  39. HausaufgabenApp/Views/Lock/LockView.swift
+  40. HausaufgabenApp/Views/Lock/LockView.swift
 ================================================================================
 
 import SwiftUI
@@ -7377,7 +7428,7 @@ struct LockView: View {
 
 
 ================================================================================
-  40. HausaufgabenApp/Views/Notes/NoteDetailView.swift
+  41. HausaufgabenApp/Views/Notes/NoteDetailView.swift
 ================================================================================
 
 import SwiftUI
@@ -7460,7 +7511,7 @@ struct NoteDetailView: View {
 
 
 ================================================================================
-  41. HausaufgabenApp/Views/Notes/NotesView.swift
+  42. HausaufgabenApp/Views/Notes/NotesView.swift
 ================================================================================
 
 import SwiftUI
@@ -7600,7 +7651,7 @@ struct NoteRow: View {
 
 
 ================================================================================
-  42. HausaufgabenApp/Views/RootView.swift
+  43. HausaufgabenApp/Views/RootView.swift
 ================================================================================
 
 import SwiftUI
@@ -7656,7 +7707,7 @@ struct RootView: View {
 
 
 ================================================================================
-  43. HausaufgabenApp/Views/Settings/ProfileView.swift
+  44. HausaufgabenApp/Views/Settings/ProfileView.swift
 ================================================================================
 
 import SwiftUI
@@ -7789,7 +7840,7 @@ struct LabeledField: View {
 
 
 ================================================================================
-  44. HausaufgabenApp/Views/Settings/SettingsView.swift
+  45. HausaufgabenApp/Views/Settings/SettingsView.swift
 ================================================================================
 
 import SwiftUI
@@ -8484,7 +8535,7 @@ struct SettingsView: View {
 
 
 ================================================================================
-  45. HausaufgabenApp/Views/Settings/TimetableSettingsView.swift
+  46. HausaufgabenApp/Views/Settings/TimetableSettingsView.swift
 ================================================================================
 
 import SwiftUI
@@ -8742,7 +8793,7 @@ struct TimetableSettingsView: View {
 
 
 ================================================================================
-  46. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
+  47. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -8931,7 +8982,7 @@ struct SubjectEditorView: View {
 
 
 ================================================================================
-  47. HausaufgabenApp/Views/Subjects/SubjectsView.swift
+  48. HausaufgabenApp/Views/Subjects/SubjectsView.swift
 ================================================================================
 
 import SwiftUI
@@ -9205,7 +9256,7 @@ struct SubjectRow: View {
 
 
 ================================================================================
-  48. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
+  49. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
 ================================================================================
 
 import SwiftUI
@@ -9260,7 +9311,7 @@ struct DocumentScannerView: UIViewControllerRepresentable {
 
 
 ================================================================================
-  49. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
+  50. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -9396,7 +9447,7 @@ struct LessonEditorView: View {
 
 
 ================================================================================
-  50. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
+  51. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
 ================================================================================
 
 import SwiftUI
@@ -9811,7 +9862,7 @@ struct ScanCellEditor: View {
 
 
 ================================================================================
-  51. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
+  52. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
 ================================================================================
 
 import SwiftUI
@@ -10029,7 +10080,7 @@ private struct Tipp: View {
 
 
 ================================================================================
-  52. HausaufgabenApp/Views/Timetable/TimetableView.swift
+  53. HausaufgabenApp/Views/Timetable/TimetableView.swift
 ================================================================================
 
 import SwiftUI
@@ -10347,7 +10398,7 @@ struct TimetableCell: View {
 
 
 ================================================================================
-  53. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
+  54. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
 ================================================================================
 
 {
@@ -10391,7 +10442,7 @@ struct TimetableCell: View {
 
 
 ================================================================================
-  54. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
+  55. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
 ================================================================================
 
 {
@@ -10411,7 +10462,7 @@ struct TimetableCell: View {
 
 
 ================================================================================
-  55. HausaufgabenApp/Assets.xcassets/Contents.json
+  56. HausaufgabenApp/Assets.xcassets/Contents.json
 ================================================================================
 
 {

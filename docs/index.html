@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Homy – Dein Hausaufgabenheft</title>
+<meta name="description" content="Homy ist ein Hausaufgabenheft für iPhone und iPad. Alles bleibt auf dem Gerät: kein Konto, kein Server, keine Werbung.">
+<style>
+  :root {
+    --grund: #F7F7FB;
+    --karte: #FFFFFF;
+    --text: #17171A;
+    --text2: #5B5B66;
+    --text3: #8A8A96;
+    --akzent: #3B72FF;
+    --akzent2: #7A5AF0;
+    --rand: rgba(60,60,67,.14);
+    --schatten: 0 1px 3px rgba(20,20,40,.07), 0 8px 24px rgba(20,20,40,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --grund: #0C0C0F; --karte: #17171C; --text: #F3F3F6;
+      --text2: #A0A0AC; --text3: #74747F;
+      --akzent: #7FA5FF; --akzent2: #A793FF;
+      --rand: rgba(235,235,245,.14);
+      --schatten: 0 1px 3px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --grund: #0C0C0F; --karte: #17171C; --text: #F3F3F6;
+    --text2: #A0A0AC; --text3: #74747F;
+    --akzent: #7FA5FF; --akzent2: #A793FF;
+    --rand: rgba(235,235,245,.14);
+    --schatten: 0 1px 3px rgba(0,0,0,.4);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--grund);
+    color: var(--text);
+    font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    padding: 0 16px 72px;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+
+  /* --- Kopf --- */
+  header { padding: 52px 0 8px; text-align: center; }
+  header svg.logo {
+    width: 88px; height: 88px; border-radius: 20px;
+    box-shadow: 0 8px 22px rgba(59,114,255,.28);
+  }
+  h1 {
+    font-size: clamp(34px, 8vw, 46px); margin: 18px 0 0;
+    letter-spacing: -.03em; text-wrap: balance;
+  }
+  .anriss {
+    font-size: 19px; color: var(--text2); margin: 10px auto 0;
+    max-width: 30em; text-wrap: balance;
+  }
+  .merkmale {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    margin-top: 20px;
+  }
+  .merkmale span {
+    font-size: 13px; font-weight: 600; color: var(--text2);
+    background: var(--karte); border: 1px solid var(--rand);
+    border-radius: 20px; padding: 6px 13px;
+  }
+
+  /* --- Knöpfe --- */
+  .knoepfe { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 26px; }
+  .knopf {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 22px; border-radius: 12px;
+    font-size: 16px; font-weight: 600; text-decoration: none;
+    background: linear-gradient(135deg, var(--akzent), var(--akzent2));
+    color: #fff; box-shadow: 0 4px 14px rgba(59,114,255,.3);
+  }
+  .knopf.stiller {
+    background: var(--karte); color: var(--text);
+    border: 1px solid var(--rand); box-shadow: var(--schatten);
+  }
+  .knopf svg { width: 18px; height: 18px; fill: currentColor; }
+
+  /* --- Abschnitte --- */
+  h2 {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--text3); font-weight: 600;
+    margin: 52px 0 14px;
+  }
+
+  .gitter { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .kachel {
+    background: var(--karte); border: 1px solid var(--rand);
+    border-radius: 14px; padding: 18px; box-shadow: var(--schatten);
+  }
+  .kachel h3 { font-size: 17px; margin: 0 0 5px; }
+  .kachel p { font-size: 15px; color: var(--text2); margin: 0; }
+
+  .liste { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .liste a {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--karte); border: 1px solid var(--rand);
+    border-radius: 14px; padding: 15px 18px;
+    text-decoration: none; color: inherit; box-shadow: var(--schatten);
+  }
+  .liste .t { font-weight: 600; font-size: 16px; }
+  .liste .n { font-size: 14px; color: var(--text2); margin-top: 2px; }
+  .liste .pfeil { margin-left: auto; color: var(--text3); font-size: 19px; }
+
+  .hinweis {
+    background: var(--karte); border: 1px solid var(--rand);
+    border-left: 4px solid var(--akzent);
+    border-radius: 12px; padding: 16px 18px; font-size: 15px;
+    color: var(--text2); margin-top: 14px;
+  }
+  .hinweis strong { color: var(--text); font-weight: 600; }
+
+  footer {
+    margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--rand);
+    color: var(--text3); font-size: 14px; text-align: center;
+  }
+  footer a { color: var(--text2); }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <svg class="logo" viewBox="0 0 100 100" aria-label="Homy">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B72FF"/><stop offset="1" stop-color="#7A5AF0"/>
+    </linearGradient></defs>
+    <rect width="100" height="100" rx="22.5" fill="url(#g)"/>
+    <path d="M 50 18 L 81 45.28 L 81 80 L 19 80 L 19 45.28 Z"
+          fill="none" stroke="#fff" stroke-width="7.5" stroke-linejoin="round"/>
+    <g transform="rotate(38 50 60)">
+      <path d="M 50 45 L 55.25 52.2 L 44.75 52.2 Z" fill="#4A3A22"/>
+      <path d="M 44.75 52.2 L 55.25 52.2 L 55.25 71.01 Q 55.25 75 51.26 75
+               L 48.74 75 Q 44.75 75 44.75 71.01 Z" fill="#FFC44D"/>
+      <rect x="44.75" y="54.6" width="10.5" height="2.1" fill="#F0A52E"/>
+    </g>
+  </svg>
+
+  <h1>Homy</h1>
+  <p class="anriss">
+    Das Hausaufgabenheft für iPhone und iPad. Eine Seite pro Woche, dein
+    Stundenplan, Termine mit Erinnerung – und alles bleibt auf deinem Gerät.
+  </p>
+
+  <div class="merkmale">
+    <span>Kein Konto</span>
+    <span>Kein Server</span>
+    <span>Keine Werbung</span>
+    <span>Offener Quelltext</span>
+  </div>
+
+  <div class="knoepfe">
+    <a class="knopf" href="vorschau.html">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      Homy ausprobieren
+    </a>
+    <a class="knopf stiller" href="quelltext.html">
+      <svg viewBox="0 0 24 24"><path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0 4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+      Quelltext ansehen
+    </a>
+  </div>
+
+  <div class="hinweis" style="text-align:left">
+    <strong>Die Vorschau ist eine Nachbildung im Browser.</strong> Sie zeigt und
+    bedient sich wie die App, kann aber drei Dinge nicht, die die gebaute App
+    kann: echte Mitteilungen, die Texterkennung beim Abfotografieren und das
+    Herunterladen der Sicherung. Deine Eingaben bleiben nur in deinem Browser.
+  </div>
+</header>
+
+<h2>Was Homy kann</h2>
+<div class="gitter">
+  <div class="kachel">
+    <h3>Hausaufgaben</h3>
+    <p>Eine Seite pro Woche. Die Kürzel deiner Fächer stehen schon da – gelb heißt
+       „nichts auf“, blau heißt „erledigt“. Suche über alle Wochen.</p>
+  </div>
+  <div class="kachel">
+    <h3>Kalender</h3>
+    <p>Arbeiten, Tests, Abgaben und Ferien mit Anfang und Ende. Die gesetzlichen
+       Feiertage deines Bundeslandes rechnet Homy selbst aus – ohne Internet.</p>
+  </div>
+  <div class="kachel">
+    <h3>Stundenplan</h3>
+    <p>Abfotografieren genügt: Die App liest die Kürzel, legt fehlende Fächer an
+       und übernimmt sogar die Unterrichtszeiten.</p>
+  </div>
+  <div class="kachel">
+    <h3>Erinnerungen</h3>
+    <p>Homy meldet sich vor einer Arbeit oder den Ferien – auch wenn die App zu
+       ist. Wann, stellst du je Eintrag ein.</p>
+  </div>
+  <div class="kachel">
+    <h3>Notizen</h3>
+    <p>Aufgebaut wie Apples Notizen: antippen, lostippen. Kein Titelfeld, kein
+       Sichern-Knopf.</p>
+  </div>
+  <div class="kachel">
+    <h3>Anmeldung</h3>
+    <p>Eigener Zahlencode, Schnellstart mit Face ID. Gespeichert wird nur ein
+       Prüfwert – nie der Code selbst.</p>
+  </div>
+</div>
+
+<h2>Zum Nachlesen und Mitnehmen</h2>
+<ul class="liste">
+  <li><a href="quelltext.html">
+    <div><div class="t">Quelltext mit Kopier-Knopf</div>
+         <div class="n">Jede Datei einzeln, dazu der ganze Bauplan als Prompt.</div></div>
+    <span class="pfeil">&#8250;</span></a></li>
+  <li><a href="Homy-Quelltext.zip">
+    <div><div class="t">Das ganze Projekt als ZIP</div>
+         <div class="n">Entpacken, <code>HausaufgabenApp.xcodeproj</code> in Xcode öffnen.</div></div>
+    <span class="pfeil">&#8250;</span></a></li>
+  <li><a href="Homy-Quelltext.txt">
+    <div><div class="t">Alles in einer Textdatei</div>
+         <div class="n">Zum Lesen am Stück.</div></div>
+    <span class="pfeil">&#8250;</span></a></li>
+  <li><a href="https://github.com/wolfiebu-ship-it/Hausaufgaben-App-designed-by-Ebu">
+    <div><div class="t">Das Repository auf GitHub</div>
+         <div class="n">Anleitung, Verlauf und alle Dateien.</div></div>
+    <span class="pfeil">&#8250;</span></a></li>
+  <li><a href="datenschutz.html">
+    <div><div class="t">Datenschutzerklärung</div>
+         <div class="n">Kurz gesagt: Homy erfasst nichts.</div></div>
+    <span class="pfeil">&#8250;</span></a></li>
+</ul>
+
+<h2>Auf dein eigenes Gerät</h2>
+<div class="hinweis">
+  Homy ist <strong>noch nicht im App Store</strong>. Auf ein iPhone oder iPad
+  kommt die App mit einem Mac und Xcode: Projekt öffnen, Gerät anstecken, auf
+  „Ausführen“ drücken. Mit einem kostenlosen Apple-Konto hält die Installation
+  sieben Tage und lässt sich mit einem Klick erneuern. Die Schritte stehen in
+  der <a href="https://github.com/wolfiebu-ship-it/Hausaufgaben-App-designed-by-Ebu#die-app-aufs-iphone-oder-ipad-bringen">Anleitung</a>.
+</div>
+
+<footer>
+  Homy – gebaut von Ebu. ·
+  <a href="datenschutz.html">Datenschutz</a> ·
+  <a href="https://github.com/wolfiebu-ship-it/Hausaufgaben-App-designed-by-Ebu">Quelltext</a>
+</footer>
+
+</main>
+</body>
+</html>

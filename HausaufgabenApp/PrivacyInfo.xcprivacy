@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Datenschutzbericht für den App Store.
+
+  Apple verlangt diese Datei seit 2024 von jeder App. Bei Homy ist sie so
+  kurz, wie eine solche Datei nur sein kann, und das ist keine Schönfärberei:
+
+  - NSPrivacyTracking = false: Homy verfolgt niemanden über andere Apps
+    oder Webseiten hinweg. Es gibt keine Werbe-Kennung, kein Tracking-SDK.
+  - NSPrivacyCollectedDataTypes leer: Homy erfasst keine Daten. Alles, was
+    eingetragen wird, liegt in einer Datei auf dem Gerät und wird nirgendwo
+    hingeschickt – die App öffnet überhaupt keine Netzwerkverbindung.
+  - NSPrivacyAccessedAPITypes leer: Homy benutzt keine der Schnittstellen,
+    für die Apple eine Begründung verlangt. Geprüft: keine UserDefaults,
+    keine Dateizeitstempel, keine Abfrage von Systemstartzeit, freiem
+    Speicherplatz oder aktiver Tastatur. Vom Dateisystem nur fileExists,
+    urls(for:in:) und moveItem – die stehen auf keiner dieser Listen.
+
+  Wird eine dieser Schnittstellen später doch benutzt, gehört sie hier
+  eingetragen. Sonst weist Apple die App beim Hochladen zurück.
+-->
+<plist version="1.0">
+<dict>
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array/>
+</dict>
+</plist>

@@ -261,7 +261,7 @@
     </svg>
     <div>
       <div class="leistenname">Homy</div>
-      <div class="leistenzahl">55 Dateien · 10.076 Zeilen</div>
+      <div class="leistenzahl">55 Dateien · 10.086 Zeilen</div>
     </div>
     <input type="search" id="suche" class="suchfeld" placeholder="Datei suchen …"
            aria-label="Datei suchen">
@@ -277,7 +277,7 @@
        hinterher wieder auseinandernehmen kannst.</p>
     <div class="zahlen">
       <span><b>55</b> Dateien</span>
-      <span><b>10.076</b> Zeilen</span>
+      <span><b>10.086</b> Zeilen</span>
       <span><b>Swift 5</b> · SwiftUI</span>
       <span><b>iOS 17</b> · iPhone und iPad</span>
     </div>
@@ -414,7 +414,7 @@ in die App und sag es mir – erfundene Daten sind schlimmer als gar keine.</cod
       <p class="pfad">HausaufgabenApp.xcodeproj/project.pbxproj</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Xcode-Projekt · 289 Zeilen</span>
+      <span class="marke">Xcode-Projekt · 291 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -627,6 +627,7 @@ in die App und sag es mir – erfundene Daten sind schlimmer als gar keine.</cod
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Homy;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = &quot;Zum Scannen deines Stundenplans wird die Kamera gebraucht. Das Foto bleibt auf dem Gerät.&quot;;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = &quot;Damit du Homy mit einem Blick öffnen kannst, statt jedes Mal deinen Code zu tippen.&quot;;
@@ -660,6 +661,7 @@ in die App und sag es mir – erfundene Daten sind schlimmer als gar keine.</cod
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Homy;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = &quot;Zum Scannen deines Stundenplans wird die Kamera gebraucht. Das Foto bleibt auf dem Gerät.&quot;;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = &quot;Damit du Homy mit einem Blick öffnen kannst, statt jedes Mal deinen Code zu tippen.&quot;;
@@ -10995,7 +10997,7 @@ struct TimetableSettingsView: View {
       <p class="pfad">README.md</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Markdown · 371 Zeilen</span>
+      <span class="marke">Markdown · 379 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -11315,6 +11317,14 @@ Bis hierher läuft Homy auf deinen eigenen Geräten. In den App Store zu kommen 
 ### Der kleinere Weg ohne Store
 
 Ohne Mitgliedschaft kannst du Homy weiterhin **mit Xcode auf deine eigenen Geräte laden** (siehe oben). Die Installation hält dann sieben Tage und wird mit einem Klick erneuert. Für dich und deine Familie reicht das völlig – und kostet nichts.
+
+### Die Arbeitsanleitung
+
+In **[`docs/VEROEFFENTLICHEN.md`](docs/VEROEFFENTLICHEN.md)** steht der ganze Weg Schritt für Schritt – mit allen Texten fertig zum Einfügen: Name, Untertitel, Schlüsselwörter, Beschreibung, die Antworten auf Altersfreigabe und Datenschutz-Fragebogen, die Bildschirmfoto-Größen und die Hinweise für die Prüfung.
+
+Darin auch **Weg A**: Homy sofort als Webseite veröffentlichen. Dafür liegen in `docs/` schon eine Startseite (`index.html`) und eine Datenschutzerklärung (`datenschutz.html`); eingeschaltet wird es mit sechs Klicks unter *Settings → Pages*. Die Datenschutz-Adresse daraus verlangt Apple ohnehin.
+
+Fürs Projekt selbst ist schon erledigt, was Apple verlangt: `HausaufgabenApp/PrivacyInfo.xcprivacy` (der Datenschutzbericht seit 2024, bei Homy leer – es wird nichts erfasst) und `ITSAppUsesNonExemptEncryption = NO` (die Ausfuhr-Erklärung; Homy verschlüsselt nichts, der Code wird nur gehasht).
 
 ---
 

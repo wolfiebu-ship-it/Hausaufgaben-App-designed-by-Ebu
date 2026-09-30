@@ -314,6 +314,14 @@ Bis hierher läuft Homy auf deinen eigenen Geräten. In den App Store zu kommen 
 
 Ohne Mitgliedschaft kannst du Homy weiterhin **mit Xcode auf deine eigenen Geräte laden** (siehe oben). Die Installation hält dann sieben Tage und wird mit einem Klick erneuert. Für dich und deine Familie reicht das völlig – und kostet nichts.
 
+### Die Arbeitsanleitung
+
+In **[`docs/VEROEFFENTLICHEN.md`](docs/VEROEFFENTLICHEN.md)** steht der ganze Weg Schritt für Schritt – mit allen Texten fertig zum Einfügen: Name, Untertitel, Schlüsselwörter, Beschreibung, die Antworten auf Altersfreigabe und Datenschutz-Fragebogen, die Bildschirmfoto-Größen und die Hinweise für die Prüfung.
+
+Darin auch **Weg A**: Homy sofort als Webseite veröffentlichen. Dafür liegen in `docs/` schon eine Startseite (`index.html`) und eine Datenschutzerklärung (`datenschutz.html`); eingeschaltet wird es mit sechs Klicks unter *Settings → Pages*. Die Datenschutz-Adresse daraus verlangt Apple ohnehin.
+
+Fürs Projekt selbst ist schon erledigt, was Apple verlangt: `HausaufgabenApp/PrivacyInfo.xcprivacy` (der Datenschutzbericht seit 2024, bei Homy leer – es wird nichts erfasst) und `ITSAppUsesNonExemptEncryption = NO` (die Ausfuhr-Erklärung; Homy verschlüsselt nichts, der Code wird nur gehasht).
+
 ---
 
 ## Den Quelltext zum Kopieren
