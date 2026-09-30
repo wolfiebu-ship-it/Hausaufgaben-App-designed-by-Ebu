@@ -1,8 +1,15 @@
 # Veröffentlicht den Ordner docs/ als Webseite unter
 # https://wolfiebu-ship-it.github.io/Hausaufgaben-App-designed-by-Ebu/
 #
-# "enablement: true" schaltet GitHub Pages beim ersten Lauf selbst ein –
-# man muss also nichts von Hand in den Einstellungen umstellen.
+# EINMAL von Hand nötig, danach nie wieder:
+#   Repository -> Settings -> Pages -> Source: "GitHub Actions"
+#
+# Selbst einschalten kann dieser Ablauf die Seite nicht. Versucht wurde es
+# mit configure-pages und "enablement: true"; GitHub antwortet darauf mit
+# "Resource not accessible by integration" – das Anlegen einer Pages-Seite
+# ist dem Token eines Ablaufs nicht erlaubt. Der eine Klick bleibt also.
+#
+# Danach läuft das hier bei jeder Änderung an docs/ von allein.
 name: Homy als Webseite veröffentlichen
 
 on:
@@ -33,8 +40,6 @@ jobs:
 
       - name: Pages einrichten
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Ordner docs einpacken
         uses: actions/upload-pages-artifact@v3

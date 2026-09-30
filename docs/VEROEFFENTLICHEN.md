@@ -30,15 +30,22 @@ Im Ordner `docs/` liegt dafür schon alles fertig:
 | `quelltext.html` | der Quelltext mit Kopier-Knopf |
 | `datenschutz.html` | die Datenschutzerklärung |
 
-**So schaltest du es ein** (dauert eine Minute):
+**So schaltest du es ein** (drei Klicks, einmalig):
 
 1. Öffne dein Repository auf GitHub.
-2. Oben auf **Settings**.
-3. Links in der Liste auf **Pages**.
-4. Bei *Source* **„Deploy from a branch“** wählen.
-5. Bei *Branch* den Zweig `claude/homework-schedule-app-y91c1u` wählen und
-   daneben den Ordner **`/docs`**.
-6. Auf **Save**.
+2. Oben auf **Settings**, links in der Liste auf **Pages**.
+3. Bei *Source* **„GitHub Actions“** wählen.
+
+Das war's. Den Rest erledigt der Ablauf `.github/workflows/pages.yml`, der
+schon im Repository liegt: Er packt bei jeder Änderung an `docs/` die Seite neu
+und veröffentlicht sie. Beim ersten Mal kannst du ihn unter *Actions* →
+*Homy als Webseite veröffentlichen* → *Run workflow* selbst anstoßen.
+
+> Diesen einen Klick kann kein Ablauf ersetzen: Ich habe es versucht
+> (`configure-pages` mit `enablement: true`), GitHub antwortet darauf mit
+> *„Resource not accessible by integration“*. Eine Pages-Seite anzulegen ist
+> dem Token eines Ablaufs nicht erlaubt – das muss der Besitzer des
+> Repositorys tun, und das bist du.
 
 Nach ein paar Minuten ist Homy erreichbar unter:
 
