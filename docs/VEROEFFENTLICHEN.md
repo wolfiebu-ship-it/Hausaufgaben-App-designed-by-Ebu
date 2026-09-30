@@ -30,22 +30,26 @@ Im Ordner `docs/` liegt dafür schon alles fertig:
 | `quelltext.html` | der Quelltext mit Kopier-Knopf |
 | `datenschutz.html` | die Datenschutzerklärung |
 
-**So schaltest du es ein** (drei Klicks, einmalig):
+**So schaltest du es ein** (einmalig, dauert eine Minute):
 
-1. Öffne dein Repository auf GitHub.
-2. Oben auf **Settings**, links in der Liste auf **Pages**.
-3. Bei *Source* **„GitHub Actions“** wählen.
+1. Diese Seite öffnen:
+   `https://github.com/wolfiebu-ship-it/Hausaufgaben-App-designed-by-Ebu/settings/pages`
+2. Bei *Source* **„Deploy from a branch“** wählen.
+3. Darunter bei *Branch* den Zweig `claude/homework-schedule-app-y91c1u`
+   wählen und daneben den Ordner **`/docs`**.
+4. Auf **Save**.
 
-Das war's. Den Rest erledigt der Ablauf `.github/workflows/pages.yml`, der
-schon im Repository liegt: Er packt bei jeder Änderung an `docs/` die Seite neu
-und veröffentlicht sie. Beim ersten Mal kannst du ihn unter *Actions* →
-*Homy als Webseite veröffentlichen* → *Run workflow* selbst anstoßen.
+Danach baut GitHub die Seite bei jedem Push von selbst neu – du musst das
+nie wieder anfassen.
 
-> Diesen einen Klick kann kein Ablauf ersetzen: Ich habe es versucht
-> (`configure-pages` mit `enablement: true`), GitHub antwortet darauf mit
-> *„Resource not accessible by integration“*. Eine Pages-Seite anzulegen ist
-> dem Token eines Ablaufs nicht erlaubt – das muss der Besitzer des
-> Repositorys tun, und das bist du.
+> **Diesen einen Klick kann ich dir nicht abnehmen, und ich habe es zweimal
+> versucht:** Einmal über einen Actions-Ablauf mit `configure-pages`
+> (`enablement: true`) – GitHub antwortet *„Resource not accessible by
+> integration“*, ein Ablauf-Token darf keine Pages-Seite anlegen. Und einmal
+> direkt über die GitHub-API mit meinen Push-Rechten – die Umgebung, in der
+> ich laufe, lässt den Pages-Pfad nicht durch (*„Access to this GitHub API
+> path is not permitted through this proxy“*). Eine Pages-Seite anzulegen ist
+> eine Einstellung am Repository, und die gehört dem Besitzer: dir.
 
 Nach ein paar Minuten ist Homy erreichbar unter:
 
