@@ -32,7 +32,7 @@ final class AppStore: ObservableObject {
         }
     }
 
-    /// Die Anmeldung: Code, Schnellstart und wann nachgefragt wird.
+    /// Die Anmeldung: Code und wann nachgefragt wird.
     /// Bleibt auf diesem Gerät – Sicherungen enthalten sie nicht.
     @Published var lock: LockSettings {
         didSet {

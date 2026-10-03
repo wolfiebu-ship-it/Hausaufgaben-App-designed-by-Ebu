@@ -283,7 +283,7 @@ struct SettingsView: View {
 
     // MARK: - Anmeldung
 
-    /// Die Anmeldung: ein Code für alle – und der Schnellstart für einen selbst.
+    /// Die Anmeldung: ein Zahlencode für alle, die Homy öffnen wollen.
     @ViewBuilder
     private var lockSection: some View {
         Section {
@@ -334,17 +334,6 @@ struct SettingsView: View {
                 .foregroundStyle(.green)
         }
 
-        if biometrics.isAvailable {
-            Toggle(isOn: biometricsBinding) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Schnellstart mit \(biometrics.title)")
-                    Text("Nur ansehen statt tippen – gilt für dich, nicht für andere.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-
         Picker(selection: timingBinding) {
             ForEach(LockTiming.allCases) { timing in
                 Text(timing.title).tag(timing)
@@ -358,19 +347,6 @@ struct SettingsView: View {
             }
         }
         .pickerStyle(.navigationLink)
-
-        Button {
-            var neu = store.lock
-            neu.useBiometrics = biometrics.isAvailable
-            neu.timing = .onlyOnLaunch
-            store.lock = neu
-            Haptics.success()
-            infoMessage = biometrics.isAvailable
-                ? "Schnellstart an: \(biometrics.title) genügt, und nur beim Neustart wird gefragt."
-                : "Homy fragt jetzt nur noch beim Neustart nach dem Code."
-        } label: {
-            Label("Schnellstart für mich einrichten", systemImage: "bolt.fill")
-        }
 
         Button {
             isChangingCode = true
@@ -392,13 +368,6 @@ struct SettingsView: View {
         }
     }
 
-    private var biometrics: BiometricKind { BiometricAuth.availableKind() }
-
-    private var biometricsBinding: Binding<Bool> {
-        Binding(get: { store.lock.useBiometrics },
-                set: { store.lock.useBiometrics = $0 })
-    }
-
     private var timingBinding: Binding<LockTiming> {
         Binding(get: { store.lock.timing },
                 set: { store.lock.timing = $0 })
@@ -406,14 +375,9 @@ struct SettingsView: View {
 
     private var lockFooter: String {
         if store.lock.isActive {
-            var text = "Ohne den Code kommt niemand an deine Hausaufgaben, Notizen und Daten. Mit dem Schnellstart musst du selbst so gut wie nie etwas eingeben."
-            if biometrics.isAvailable {
-                text += " \(biometrics.title) prüft iOS – Homy bekommt dein Gesicht bzw. deinen Finger nie zu sehen."
-            }
-            text += "\n\nDer Code steht nicht in den Sicherungsdateien: Eine Sicherung kann die Anmeldung weder setzen noch aufheben."
-            return text
+            return "Ohne den Code kommt niemand an deine Hausaufgaben, Notizen und Daten. Wie oft gefragt wird, stellst du unter „Code abfragen“ ein.\n\nDer Code steht nicht in den Sicherungsdateien: Eine Sicherung kann die Anmeldung weder setzen noch aufheben."
         }
-        return "Wenn du magst, verlangt Homy beim Öffnen einen Zahlencode. Für dich selbst lässt sich danach ein Schnellstart einstellen, damit du nicht jedes Mal tippen musst."
+        return "Wenn du magst, verlangt Homy beim Öffnen einen Zahlencode."
     }
 
     // MARK: - Abschnitte

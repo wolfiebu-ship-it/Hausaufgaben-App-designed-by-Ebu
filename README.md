@@ -146,23 +146,22 @@ Zu finden **im Stundenplan oben links** oder in den Einstellungen – seit dem K
 Damit nicht jeder, der das Gerät in die Hand nimmt, in deinen Sachen liest, kann Homy beim Öffnen einen **Zahlencode** verlangen. Eingeschaltet wird das in den Einstellungen unter *Anmeldung*; ab Werk ist es aus.
 
 - **Der Code** sind 4 bis 8 Ziffern. Auf dem Anmeldebild gibt es ein eigenes Tastenfeld – sobald die letzte Ziffer steht, prüft Homy von selbst.
-- **Schnellstart für dich.** Ein Knopf stellt in einem Rutsch das ein, was du für dich willst: mit **Face ID bzw. Touch ID** öffnen und nur **beim Neustart** überhaupt fragen. Du schaust die App also nur an und bist drin – den Code tippen müssen die anderen.
-- **Wann gefragt wird**, lässt sich auch einzeln wählen: jedes Mal, nach 5 Minuten, nach 1 Stunde oder nur beim Neustart.
+- **Wann gefragt wird**, stellst du selbst ein: jedes Mal, nach 5 Minuten, nach 1 Stunde oder nur beim Neustart.
 - **Nach fünf Fehlversuchen** gibt es eine halbe Minute Pause.
 - **„Homy jetzt zusperren“** macht die App sofort zu, etwa bevor du sie aus der Hand gibst.
-- Ein freiwilliger **Merkzettel** erscheint auf dem Anmeldebild unter „Code vergessen?“.
+- Ein freiwilliger **Merkzettel** erscheint auf dem Anmeldebild, wenn man auf „Code vergessen?“ tippt.
+- **Face ID und Touch ID gibt es nicht** – auch keinen Schnellstart-Knopf. Homy öffnet sich nur mit dem Code.
 
 Was dabei wichtig ist – ehrlich gesagt:
 
 - Der Code wird **nicht im Klartext gespeichert**, sondern nur als Prüfwert (SHA-256 mit Zufallsbeigabe). Die App kann ihn dir deshalb nie wieder anzeigen. **Vergisst du ihn, hilft nur Löschen und Neuladen der App** – und die Hausaufgaben sind weg, wenn du keine Sicherung hast.
-- Face ID und Touch ID prüft **iOS**, nicht Homy. Die App bekommt nie ein Gesicht oder einen Fingerabdruck zu sehen, sondern nur ein Ja oder Nein.
 - Der Code steht **nicht in den Sicherungsdateien**. Eine fremde Sicherung kann deine Anmeldung also weder setzen noch aufheben, und ein Zurücksetzen der Daten hebt sie auch nicht auf.
 - Das Ganze ist ein **Schloss vor der App**, keine Verschlüsselung der Datei. Wer den Code nicht kennt, kommt in der App nicht weiter – wer aber technisch an den Dateispeicher des Geräts kommt, ist damit nicht aufgehalten. Für ein Hausaufgabenheft ist das genau richtig, für Geheimnisse wäre es zu wenig.
 - Es ist eine Anmeldung **auf diesem Gerät**, kein Konto: Es gibt keinen Server, bei dem man sich anmelden könnte. Wer Homy auf seinem eigenen iPhone lädt, legt dort seinen eigenen Code fest.
 
 ### 8. Einstellungen
 
-- **Anmeldung** – Code einrichten, Schnellstart einschalten, sofort zusperren (siehe oben).
+- **Anmeldung** – Code einrichten oder ändern, einstellen wann gefragt wird, sofort zusperren (siehe oben).
 - **Erinnerungen** – an Termine und Ferien erinnern lassen, Voreinstellung für neue Einträge.
 - **Fächer** – der zweite Weg zur Fächerliste (der erste ist im Stundenplan oben links).
 - **Bundesland** – bestimmt die gesetzlichen Feiertage im Kalender (siehe oben).
@@ -229,7 +228,7 @@ Dafür brauchst du einen **Mac mit Xcode** (kostenlos im Mac App Store). Ohne Ma
 - **Mindestversion:** iOS 17.0 (iPhone und iPad, Hoch- und Querformat)
 - **Die fünf Tabs** sind Hausaufgaben, Kalender, Stundenplan, Notizen und Einstellungen. Die **Fächer** haben keinen eigenen Tab mehr: Sie sitzen jetzt beim Stundenplan (oben links) und stehen zusätzlich in den Einstellungen. Grund ist iOS: Ab dem sechsten Tab faltet das iPhone alles Weitere in ein „Mehr“-Menü, und das wäre umständlicher als ein Tipp mehr. Die Liste „welche Stunden habe ich heute“ findest du außerdem im Kalender unter dem gewählten Tag.
 - **Name auf dem Home-Bildschirm:** Homy (`CFBundleDisplayName`). Der Projekt- und Zielname im Xcode-Projekt heißt weiterhin `HausaufgabenApp`, ebenso die gespeicherte Datei – so bleiben vorhandene Installationen und Sicherungen lesbar.
-- **Anmeldung:** CryptoKit (SHA-256 für den Prüfwert des Codes) und LocalAuthentication (Face ID / Touch ID). Beides gehört zu iOS, es kommt nichts dazu.
+- **Anmeldung:** CryptoKit (SHA-256 für den Prüfwert des Codes). Gehört zu iOS, es kommt nichts dazu.
 - **Erinnerungen:** UserNotifications mit `UNCalendarNotificationTrigger`. Termine und Ferien werden vorher zu einer gemeinsamen Liste von `ReminderItem` gerechnet. Nach jeder Änderung und einmal beim Start werden alle vorgemerkten Erinnerungen verworfen und die anstehenden neu gestellt – so passt das, was iOS vorgemerkt hat, immer zu dem, was im Kalender steht.
 - **Mit Tastatur am iPad:** ⌘← und ⌘→ blättern durch die Wochen, ⌘F öffnet die Suche, ⌘N legt eine neue Notiz an.
 - Kleine haptische Rückmeldung beim Ankreuzen und Aufklappen (iPhone).
@@ -248,7 +247,7 @@ HausaufgabenApp/
 │   ├── Lesson.swift             Feld im Stundenplan
 │   ├── HomeworkEntry.swift      Eine Hausaufgabe
 │   ├── AppSettings.swift        Einstellungen, Unterrichtszeiten
-│   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Schnellstart
+│   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Merkzettel
 │   ├── CalendarEvent.swift      Ein Termin samt Erinnerungszeitpunkt
 │   ├── Holiday.swift            Ferien: Zeitraum von … bis …
 │   ├── FederalState.swift       Die 16 Bundesländer
@@ -261,7 +260,6 @@ HausaufgabenApp/
 │   ├── AppTheme.swift           Farben (je Fach ein heller und ein kräftiger Ton)
 │   ├── Haptics.swift            Kurze Rückmeldung beim Antippen
 │   ├── HomyLogo.swift           Das Zeichen von Homy, gezeichnet statt als Bild
-│   ├── BiometricAuth.swift      Face ID / Touch ID über LocalAuthentication
 │   ├── Reminders.swift          Benachrichtigungen bei iOS anmelden
 │   ├── PublicHolidays.swift     Feiertage ausrechnen (Osterformel je Land)
 │   ├── DoodleBackground.swift   Schulmotive blass hinter den Schreib-Seiten
@@ -301,7 +299,7 @@ Bis hierher läuft Homy auf deinen eigenen Geräten. In den App Store zu kommen 
 - Ein eigenes App-Symbol in 1024 px und einen eigenen Namen.
 - Keine fremden Bibliotheken – nichts, dessen Lizenz du angeben müsstest.
 - Keine Datenerfassung, also eine unkomplizierte Datenschutz-Auskunft.
-- Sinnvolle Texte für die Berechtigungen (Kamera, Fotos, Face ID) – die verlangt Apple, und sie stehen schon im Projekt.
+- Sinnvolle Texte für die Berechtigungen (Kamera, Fotos) – die verlangt Apple, und sie stehen schon im Projekt.
 
 ### Was du dafür noch brauchst
 
@@ -355,7 +353,7 @@ Darin funktioniert alles, was ein Browser kann:
 | Stundenplan ausfüllen, Fächer anlegen und ändern | |
 | Unterrichtszeiten einstellen | |
 | **Eigenen Code festlegen**, ändern, Anmeldung aus | Prüfwert statt Klartext (SHA-256) |
-| **Schnellstart** – versucht Face ID/Touch ID über WebAuthn, sonst merkt er sich den Browser | Immer echtes Face ID / Touch ID |
+| **Merkzettel** unter „Code vergessen?“ – erscheint direkt auf dem Anmeldebild | |
 | **Foto des Stundenplans** aufnehmen; es bleibt als Vorlage über dem Raster stehen | Automatische Texterkennung (Apple Vision) |
 | Sicherung herauskopieren und einspielen | Sicherung als Datei, z. B. in iCloud Drive |
 | Hell/dunkel, alle Erklärungen | Echte Benachrichtigungen von iOS |

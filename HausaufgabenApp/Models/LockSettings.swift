@@ -9,7 +9,7 @@ enum LockTiming: String, Codable, Hashable, CaseIterable, Identifiable {
     case afterFiveMinutes
     /// Erst, wenn die App eine Stunde weg war.
     case afterOneHour
-    /// Nur beim Neustart der App – der Schnellstart für einen selbst.
+    /// Nur beim Neustart der App.
     case onlyOnLaunch
 
     var id: String { rawValue }
@@ -48,7 +48,7 @@ enum LockTiming: String, Codable, Hashable, CaseIterable, Identifiable {
     }
 }
 
-/// Die Anmeldung: ein Zahlencode, dazu wahlweise Face ID oder Touch ID.
+/// Die Anmeldung: ein Zahlencode.
 ///
 /// Gespeichert wird nur ein Prüfwert des Codes (SHA-256 mit Zufallsbeigabe),
 /// nicht der Code selbst.
@@ -61,8 +61,6 @@ struct LockSettings: Codable, Hashable {
     var codeHash: String
     /// Wie viele Ziffern der Code hat (für die Punkte auf dem Anmeldebild).
     var codeLength: Int
-    /// Schnellstart mit Face ID oder Touch ID.
-    var useBiometrics: Bool
     /// Wann nachgefragt wird.
     var timing: LockTiming
     /// Freiwilliger Merkzettel, falls man den Code vergisst.
@@ -72,14 +70,12 @@ struct LockSettings: Codable, Hashable {
          salt: String = "",
          codeHash: String = "",
          codeLength: Int = 4,
-         useBiometrics: Bool = true,
          timing: LockTiming = .always,
          hint: String = "") {
         self.isEnabled = isEnabled
         self.salt = salt
         self.codeHash = codeHash
         self.codeLength = codeLength
-        self.useBiometrics = useBiometrics
         self.timing = timing
         self.hint = hint
     }
@@ -145,7 +141,8 @@ struct LockSettings: Codable, Hashable {
         salt = try container.decodeIfPresent(String.self, forKey: .salt) ?? ""
         codeHash = try container.decodeIfPresent(String.self, forKey: .codeHash) ?? ""
         codeLength = try container.decodeIfPresent(Int.self, forKey: .codeLength) ?? 4
-        useBiometrics = try container.decodeIfPresent(Bool.self, forKey: .useBiometrics) ?? true
+        // Ein früheres Feld "useBiometrics" (Face ID) wird beim Lesen einfach
+        // übergangen – ältere Daten bleiben dadurch lesbar.
         timing = try container.decodeIfPresent(LockTiming.self, forKey: .timing) ?? .always
         hint = try container.decodeIfPresent(String.self, forKey: .hint) ?? ""
     }

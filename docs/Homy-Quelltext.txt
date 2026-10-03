@@ -1,7 +1,7 @@
 ================================================================================
   HOMY – Dein Hausaufgabenheft
   Vollständiger Quelltext
-  Stand: 30.09.2026
+  Stand: 03.10.2026
 ================================================================================
 
 Das hier ist die ganze App zum Nachlesen. Zum Bauen brauchst du aber den
@@ -34,42 +34,41 @@ INHALT
   18. HausaufgabenApp/Store/LockController.swift
   19. HausaufgabenApp/Support/AppTheme.swift
   20. HausaufgabenApp/Support/BackupDocument.swift
-  21. HausaufgabenApp/Support/BiometricAuth.swift
-  22. HausaufgabenApp/Support/DoodleBackground.swift
-  23. HausaufgabenApp/Support/Haptics.swift
-  24. HausaufgabenApp/Support/HomyLogo.swift
-  25. HausaufgabenApp/Support/PublicHolidays.swift
-  26. HausaufgabenApp/Support/Reminders.swift
-  27. HausaufgabenApp/Support/SchoolCalendar.swift
-  28. HausaufgabenApp/Support/SubjectNames.swift
-  29. HausaufgabenApp/Support/TimetableRecognizer.swift
-  30. HausaufgabenApp/Views/Calendar/CalendarView.swift
-  31. HausaufgabenApp/Views/Calendar/EventEditorView.swift
-  32. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
-  33. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
-  34. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
-  35. HausaufgabenApp/Views/Homework/HomeworkRow.swift
-  36. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
-  37. HausaufgabenApp/Views/Homework/SearchView.swift
-  38. HausaufgabenApp/Views/Lock/AppGateView.swift
-  39. HausaufgabenApp/Views/Lock/LockSetupView.swift
-  40. HausaufgabenApp/Views/Lock/LockView.swift
-  41. HausaufgabenApp/Views/Notes/NoteDetailView.swift
-  42. HausaufgabenApp/Views/Notes/NotesView.swift
-  43. HausaufgabenApp/Views/RootView.swift
-  44. HausaufgabenApp/Views/Settings/ProfileView.swift
-  45. HausaufgabenApp/Views/Settings/SettingsView.swift
-  46. HausaufgabenApp/Views/Settings/TimetableSettingsView.swift
-  47. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
-  48. HausaufgabenApp/Views/Subjects/SubjectsView.swift
-  49. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
-  50. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
-  51. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
-  52. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
-  53. HausaufgabenApp/Views/Timetable/TimetableView.swift
-  54. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
-  55. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
-  56. HausaufgabenApp/Assets.xcassets/Contents.json
+  21. HausaufgabenApp/Support/DoodleBackground.swift
+  22. HausaufgabenApp/Support/Haptics.swift
+  23. HausaufgabenApp/Support/HomyLogo.swift
+  24. HausaufgabenApp/Support/PublicHolidays.swift
+  25. HausaufgabenApp/Support/Reminders.swift
+  26. HausaufgabenApp/Support/SchoolCalendar.swift
+  27. HausaufgabenApp/Support/SubjectNames.swift
+  28. HausaufgabenApp/Support/TimetableRecognizer.swift
+  29. HausaufgabenApp/Views/Calendar/CalendarView.swift
+  30. HausaufgabenApp/Views/Calendar/EventEditorView.swift
+  31. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
+  32. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
+  33. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
+  34. HausaufgabenApp/Views/Homework/HomeworkRow.swift
+  35. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
+  36. HausaufgabenApp/Views/Homework/SearchView.swift
+  37. HausaufgabenApp/Views/Lock/AppGateView.swift
+  38. HausaufgabenApp/Views/Lock/LockSetupView.swift
+  39. HausaufgabenApp/Views/Lock/LockView.swift
+  40. HausaufgabenApp/Views/Notes/NoteDetailView.swift
+  41. HausaufgabenApp/Views/Notes/NotesView.swift
+  42. HausaufgabenApp/Views/RootView.swift
+  43. HausaufgabenApp/Views/Settings/ProfileView.swift
+  44. HausaufgabenApp/Views/Settings/SettingsView.swift
+  45. HausaufgabenApp/Views/Settings/TimetableSettingsView.swift
+  46. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
+  47. HausaufgabenApp/Views/Subjects/SubjectsView.swift
+  48. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
+  49. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
+  50. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
+  51. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
+  52. HausaufgabenApp/Views/Timetable/TimetableView.swift
+  53. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
+  54. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
+  55. HausaufgabenApp/Assets.xcassets/Contents.json
 
 
 ================================================================================
@@ -224,23 +223,22 @@ Zu finden **im Stundenplan oben links** oder in den Einstellungen – seit dem K
 Damit nicht jeder, der das Gerät in die Hand nimmt, in deinen Sachen liest, kann Homy beim Öffnen einen **Zahlencode** verlangen. Eingeschaltet wird das in den Einstellungen unter *Anmeldung*; ab Werk ist es aus.
 
 - **Der Code** sind 4 bis 8 Ziffern. Auf dem Anmeldebild gibt es ein eigenes Tastenfeld – sobald die letzte Ziffer steht, prüft Homy von selbst.
-- **Schnellstart für dich.** Ein Knopf stellt in einem Rutsch das ein, was du für dich willst: mit **Face ID bzw. Touch ID** öffnen und nur **beim Neustart** überhaupt fragen. Du schaust die App also nur an und bist drin – den Code tippen müssen die anderen.
-- **Wann gefragt wird**, lässt sich auch einzeln wählen: jedes Mal, nach 5 Minuten, nach 1 Stunde oder nur beim Neustart.
+- **Wann gefragt wird**, stellst du selbst ein: jedes Mal, nach 5 Minuten, nach 1 Stunde oder nur beim Neustart.
 - **Nach fünf Fehlversuchen** gibt es eine halbe Minute Pause.
 - **„Homy jetzt zusperren“** macht die App sofort zu, etwa bevor du sie aus der Hand gibst.
-- Ein freiwilliger **Merkzettel** erscheint auf dem Anmeldebild unter „Code vergessen?“.
+- Ein freiwilliger **Merkzettel** erscheint auf dem Anmeldebild, wenn man auf „Code vergessen?“ tippt.
+- **Face ID und Touch ID gibt es nicht** – auch keinen Schnellstart-Knopf. Homy öffnet sich nur mit dem Code.
 
 Was dabei wichtig ist – ehrlich gesagt:
 
 - Der Code wird **nicht im Klartext gespeichert**, sondern nur als Prüfwert (SHA-256 mit Zufallsbeigabe). Die App kann ihn dir deshalb nie wieder anzeigen. **Vergisst du ihn, hilft nur Löschen und Neuladen der App** – und die Hausaufgaben sind weg, wenn du keine Sicherung hast.
-- Face ID und Touch ID prüft **iOS**, nicht Homy. Die App bekommt nie ein Gesicht oder einen Fingerabdruck zu sehen, sondern nur ein Ja oder Nein.
 - Der Code steht **nicht in den Sicherungsdateien**. Eine fremde Sicherung kann deine Anmeldung also weder setzen noch aufheben, und ein Zurücksetzen der Daten hebt sie auch nicht auf.
 - Das Ganze ist ein **Schloss vor der App**, keine Verschlüsselung der Datei. Wer den Code nicht kennt, kommt in der App nicht weiter – wer aber technisch an den Dateispeicher des Geräts kommt, ist damit nicht aufgehalten. Für ein Hausaufgabenheft ist das genau richtig, für Geheimnisse wäre es zu wenig.
 - Es ist eine Anmeldung **auf diesem Gerät**, kein Konto: Es gibt keinen Server, bei dem man sich anmelden könnte. Wer Homy auf seinem eigenen iPhone lädt, legt dort seinen eigenen Code fest.
 
 ### 8. Einstellungen
 
-- **Anmeldung** – Code einrichten, Schnellstart einschalten, sofort zusperren (siehe oben).
+- **Anmeldung** – Code einrichten oder ändern, einstellen wann gefragt wird, sofort zusperren (siehe oben).
 - **Erinnerungen** – an Termine und Ferien erinnern lassen, Voreinstellung für neue Einträge.
 - **Fächer** – der zweite Weg zur Fächerliste (der erste ist im Stundenplan oben links).
 - **Bundesland** – bestimmt die gesetzlichen Feiertage im Kalender (siehe oben).
@@ -307,7 +305,7 @@ Dafür brauchst du einen **Mac mit Xcode** (kostenlos im Mac App Store). Ohne Ma
 - **Mindestversion:** iOS 17.0 (iPhone und iPad, Hoch- und Querformat)
 - **Die fünf Tabs** sind Hausaufgaben, Kalender, Stundenplan, Notizen und Einstellungen. Die **Fächer** haben keinen eigenen Tab mehr: Sie sitzen jetzt beim Stundenplan (oben links) und stehen zusätzlich in den Einstellungen. Grund ist iOS: Ab dem sechsten Tab faltet das iPhone alles Weitere in ein „Mehr“-Menü, und das wäre umständlicher als ein Tipp mehr. Die Liste „welche Stunden habe ich heute“ findest du außerdem im Kalender unter dem gewählten Tag.
 - **Name auf dem Home-Bildschirm:** Homy (`CFBundleDisplayName`). Der Projekt- und Zielname im Xcode-Projekt heißt weiterhin `HausaufgabenApp`, ebenso die gespeicherte Datei – so bleiben vorhandene Installationen und Sicherungen lesbar.
-- **Anmeldung:** CryptoKit (SHA-256 für den Prüfwert des Codes) und LocalAuthentication (Face ID / Touch ID). Beides gehört zu iOS, es kommt nichts dazu.
+- **Anmeldung:** CryptoKit (SHA-256 für den Prüfwert des Codes). Gehört zu iOS, es kommt nichts dazu.
 - **Erinnerungen:** UserNotifications mit `UNCalendarNotificationTrigger`. Termine und Ferien werden vorher zu einer gemeinsamen Liste von `ReminderItem` gerechnet. Nach jeder Änderung und einmal beim Start werden alle vorgemerkten Erinnerungen verworfen und die anstehenden neu gestellt – so passt das, was iOS vorgemerkt hat, immer zu dem, was im Kalender steht.
 - **Mit Tastatur am iPad:** ⌘← und ⌘→ blättern durch die Wochen, ⌘F öffnet die Suche, ⌘N legt eine neue Notiz an.
 - Kleine haptische Rückmeldung beim Ankreuzen und Aufklappen (iPhone).
@@ -326,7 +324,7 @@ HausaufgabenApp/
 │   ├── Lesson.swift             Feld im Stundenplan
 │   ├── HomeworkEntry.swift      Eine Hausaufgabe
 │   ├── AppSettings.swift        Einstellungen, Unterrichtszeiten
-│   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Schnellstart
+│   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Merkzettel
 │   ├── CalendarEvent.swift      Ein Termin samt Erinnerungszeitpunkt
 │   ├── Holiday.swift            Ferien: Zeitraum von … bis …
 │   ├── FederalState.swift       Die 16 Bundesländer
@@ -339,7 +337,6 @@ HausaufgabenApp/
 │   ├── AppTheme.swift           Farben (je Fach ein heller und ein kräftiger Ton)
 │   ├── Haptics.swift            Kurze Rückmeldung beim Antippen
 │   ├── HomyLogo.swift           Das Zeichen von Homy, gezeichnet statt als Bild
-│   ├── BiometricAuth.swift      Face ID / Touch ID über LocalAuthentication
 │   ├── Reminders.swift          Benachrichtigungen bei iOS anmelden
 │   ├── PublicHolidays.swift     Feiertage ausrechnen (Osterformel je Land)
 │   ├── DoodleBackground.swift   Schulmotive blass hinter den Schreib-Seiten
@@ -379,7 +376,7 @@ Bis hierher läuft Homy auf deinen eigenen Geräten. In den App Store zu kommen 
 - Ein eigenes App-Symbol in 1024 px und einen eigenen Namen.
 - Keine fremden Bibliotheken – nichts, dessen Lizenz du angeben müsstest.
 - Keine Datenerfassung, also eine unkomplizierte Datenschutz-Auskunft.
-- Sinnvolle Texte für die Berechtigungen (Kamera, Fotos, Face ID) – die verlangt Apple, und sie stehen schon im Projekt.
+- Sinnvolle Texte für die Berechtigungen (Kamera, Fotos) – die verlangt Apple, und sie stehen schon im Projekt.
 
 ### Was du dafür noch brauchst
 
@@ -433,7 +430,7 @@ Darin funktioniert alles, was ein Browser kann:
 | Stundenplan ausfüllen, Fächer anlegen und ändern | |
 | Unterrichtszeiten einstellen | |
 | **Eigenen Code festlegen**, ändern, Anmeldung aus | Prüfwert statt Klartext (SHA-256) |
-| **Schnellstart** – versucht Face ID/Touch ID über WebAuthn, sonst merkt er sich den Browser | Immer echtes Face ID / Touch ID |
+| **Merkzettel** unter „Code vergessen?“ – erscheint direkt auf dem Anmeldebild | |
 | **Foto des Stundenplans** aufnehmen; es bleibt als Vorlage über dem Raster stehen | Automatische Texterkennung (Apple Vision) |
 | Sicherung herauskopieren und einspielen | Sicherung als Datei, z. B. in iCloud Drive |
 | Hell/dunkel, alle Erklärungen | Echte Benachrichtigungen von iOS |
@@ -672,7 +669,6 @@ Drei Dinge kann ein Browser prinzipiell nicht, und die sind deshalb nachgestellt
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Zum Scannen deines Stundenplans wird die Kamera gebraucht. Das Foto bleibt auf dem Gerät.";
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Damit du Homy mit einem Blick öffnen kannst, statt jedes Mal deinen Code zu tippen.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Damit kannst du ein bereits aufgenommenes Foto deines Stundenplans auswählen.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -706,7 +702,6 @@ Drei Dinge kann ein Browser prinzipiell nicht, und die sind deshalb nachgestellt
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Zum Scannen deines Stundenplans wird die Kamera gebraucht. Das Foto bleibt auf dem Gerät.";
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Damit du Homy mit einem Blick öffnen kannst, statt jedes Mal deinen Code zu tippen.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Damit kannst du ein bereits aufgenommenes Foto deines Stundenplans auswählen.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -857,7 +852,7 @@ struct AppData: Codable {
     /// Die eigenen Angaben (Name, Klasse, Telefon …).
     var profile: Profile
     var settings: AppSettings
-    /// Die Anmeldung (Code, Schnellstart). Enthält nur einen Prüfwert des Codes.
+    /// Die Anmeldung. Enthält nur einen Prüfwert des Codes.
     var lock: LockSettings
 
     static let currentVersion = 1
@@ -1711,7 +1706,7 @@ enum LockTiming: String, Codable, Hashable, CaseIterable, Identifiable {
     case afterFiveMinutes
     /// Erst, wenn die App eine Stunde weg war.
     case afterOneHour
-    /// Nur beim Neustart der App – der Schnellstart für einen selbst.
+    /// Nur beim Neustart der App.
     case onlyOnLaunch
 
     var id: String { rawValue }
@@ -1750,7 +1745,7 @@ enum LockTiming: String, Codable, Hashable, CaseIterable, Identifiable {
     }
 }
 
-/// Die Anmeldung: ein Zahlencode, dazu wahlweise Face ID oder Touch ID.
+/// Die Anmeldung: ein Zahlencode.
 ///
 /// Gespeichert wird nur ein Prüfwert des Codes (SHA-256 mit Zufallsbeigabe),
 /// nicht der Code selbst.
@@ -1763,8 +1758,6 @@ struct LockSettings: Codable, Hashable {
     var codeHash: String
     /// Wie viele Ziffern der Code hat (für die Punkte auf dem Anmeldebild).
     var codeLength: Int
-    /// Schnellstart mit Face ID oder Touch ID.
-    var useBiometrics: Bool
     /// Wann nachgefragt wird.
     var timing: LockTiming
     /// Freiwilliger Merkzettel, falls man den Code vergisst.
@@ -1774,14 +1767,12 @@ struct LockSettings: Codable, Hashable {
          salt: String = "",
          codeHash: String = "",
          codeLength: Int = 4,
-         useBiometrics: Bool = true,
          timing: LockTiming = .always,
          hint: String = "") {
         self.isEnabled = isEnabled
         self.salt = salt
         self.codeHash = codeHash
         self.codeLength = codeLength
-        self.useBiometrics = useBiometrics
         self.timing = timing
         self.hint = hint
     }
@@ -1847,7 +1838,8 @@ struct LockSettings: Codable, Hashable {
         salt = try container.decodeIfPresent(String.self, forKey: .salt) ?? ""
         codeHash = try container.decodeIfPresent(String.self, forKey: .codeHash) ?? ""
         codeLength = try container.decodeIfPresent(Int.self, forKey: .codeLength) ?? 4
-        useBiometrics = try container.decodeIfPresent(Bool.self, forKey: .useBiometrics) ?? true
+        // Ein früheres Feld "useBiometrics" (Face ID) wird beim Lesen einfach
+        // übergangen – ältere Daten bleiben dadurch lesbar.
         timing = try container.decodeIfPresent(LockTiming.self, forKey: .timing) ?? .always
         hint = try container.decodeIfPresent(String.self, forKey: .hint) ?? ""
     }
@@ -2117,7 +2109,7 @@ final class AppStore: ObservableObject {
         }
     }
 
-    /// Die Anmeldung: Code, Schnellstart und wann nachgefragt wird.
+    /// Die Anmeldung: Code und wann nachgefragt wird.
     /// Bleibt auf diesem Gerät – Sicherungen enthalten sie nicht.
     @Published var lock: LockSettings {
         didSet {
@@ -3259,87 +3251,7 @@ struct BackupDocument: FileDocument {
 
 
 ================================================================================
-  21. HausaufgabenApp/Support/BiometricAuth.swift
-================================================================================
-
-import Foundation
-import LocalAuthentication
-
-/// Womit sich das Gerät entsperren lässt.
-enum BiometricKind {
-    case faceID
-    case touchID
-    case opticID
-    case none
-
-    var title: String {
-        switch self {
-        case .faceID:  return "Face ID"
-        case .touchID: return "Touch ID"
-        case .opticID: return "Optic ID"
-        case .none:    return "Schnellstart"
-        }
-    }
-
-    var symbol: String {
-        switch self {
-        case .faceID:  return "faceid"
-        case .touchID: return "touchid"
-        case .opticID: return "opticid"
-        case .none:    return "bolt.fill"
-        }
-    }
-
-    var isAvailable: Bool { self != .none }
-}
-
-/// Der Schnellstart: mit dem Gesicht oder dem Finger öffnen, statt den Code zu tippen.
-///
-/// Die App bekommt dabei nie das Gesicht oder den Fingerabdruck zu sehen –
-/// iOS prüft das selbst und sagt nur Ja oder Nein.
-enum BiometricAuth {
-
-    /// Was dieses Gerät kann. Ist nichts eingerichtet, kommt `.none` zurück.
-    static func availableKind() -> BiometricKind {
-        let context = LAContext()
-        var error: NSError?
-        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
-                                        error: &error) else {
-            return .none
-        }
-        switch context.biometryType {
-        case .faceID:  return .faceID
-        case .touchID: return .touchID
-        default:
-            // Neuere Geräte (Vision Pro) melden Typen, die dieses SDK
-            // noch nicht namentlich kennt – der Schnellstart geht trotzdem.
-            return .opticID
-        }
-    }
-
-    /// Fragt iOS nach der Entsperrung. Liefert `true`, wenn es geklappt hat.
-    static func authenticate(reason: String) async -> Bool {
-        let context = LAContext()
-        context.localizedCancelTitle = "Code eingeben"
-
-        var error: NSError?
-        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
-                                        error: &error) else {
-            return false
-        }
-
-        return await withCheckedContinuation { continuation in
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
-                                   localizedReason: reason) { success, _ in
-                continuation.resume(returning: success)
-            }
-        }
-    }
-}
-
-
-================================================================================
-  22. HausaufgabenApp/Support/DoodleBackground.swift
+  21. HausaufgabenApp/Support/DoodleBackground.swift
 ================================================================================
 
 import SwiftUI
@@ -3416,7 +3328,7 @@ struct DoodleCanvas: View {
 
 
 ================================================================================
-  23. HausaufgabenApp/Support/Haptics.swift
+  22. HausaufgabenApp/Support/Haptics.swift
 ================================================================================
 
 import UIKit
@@ -3448,7 +3360,7 @@ enum Haptics {
 
 
 ================================================================================
-  24. HausaufgabenApp/Support/HomyLogo.swift
+  23. HausaufgabenApp/Support/HomyLogo.swift
 ================================================================================
 
 import SwiftUI
@@ -3581,7 +3493,7 @@ struct HomyWordmark: View {
 
 
 ================================================================================
-  25. HausaufgabenApp/Support/PublicHolidays.swift
+  24. HausaufgabenApp/Support/PublicHolidays.swift
 ================================================================================
 
 import Foundation
@@ -3776,7 +3688,7 @@ enum PublicHolidays {
 
 
 ================================================================================
-  26. HausaufgabenApp/Support/Reminders.swift
+  25. HausaufgabenApp/Support/Reminders.swift
 ================================================================================
 
 import Foundation
@@ -3954,7 +3866,7 @@ extension Holiday {
 
 
 ================================================================================
-  27. HausaufgabenApp/Support/SchoolCalendar.swift
+  26. HausaufgabenApp/Support/SchoolCalendar.swift
 ================================================================================
 
 import Foundation
@@ -4141,7 +4053,7 @@ enum SchoolCalendar {
 
 
 ================================================================================
-  28. HausaufgabenApp/Support/SubjectNames.swift
+  27. HausaufgabenApp/Support/SubjectNames.swift
 ================================================================================
 
 import Foundation
@@ -4231,7 +4143,7 @@ enum SubjectNames {
 
 
 ================================================================================
-  29. HausaufgabenApp/Support/TimetableRecognizer.swift
+  28. HausaufgabenApp/Support/TimetableRecognizer.swift
 ================================================================================
 
 import Foundation
@@ -4642,7 +4554,7 @@ extension UIImage {
 
 
 ================================================================================
-  30. HausaufgabenApp/Views/Calendar/CalendarView.swift
+  29. HausaufgabenApp/Views/Calendar/CalendarView.swift
 ================================================================================
 
 import SwiftUI
@@ -5498,7 +5410,7 @@ struct HolidayRow: View {
 
 
 ================================================================================
-  31. HausaufgabenApp/Views/Calendar/EventEditorView.swift
+  30. HausaufgabenApp/Views/Calendar/EventEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -5729,7 +5641,7 @@ struct EventEditorView: View {
 
 
 ================================================================================
-  32. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
+  31. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -5968,7 +5880,7 @@ struct HolidayEditorView: View {
 
 
 ================================================================================
-  33. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
+  32. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
 ================================================================================
 
 import SwiftUI
@@ -6308,7 +6220,7 @@ struct HomeworkDayCard: View {
 
 
 ================================================================================
-  34. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
+  33. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
 ================================================================================
 
 import SwiftUI
@@ -6489,7 +6401,7 @@ struct HomeworkPagerView: View {
 
 
 ================================================================================
-  35. HausaufgabenApp/Views/Homework/HomeworkRow.swift
+  34. HausaufgabenApp/Views/Homework/HomeworkRow.swift
 ================================================================================
 
 import SwiftUI
@@ -6685,7 +6597,7 @@ struct SubjectBadge: View {
 
 
 ================================================================================
-  36. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
+  35. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
 ================================================================================
 
 import SwiftUI
@@ -6841,7 +6753,7 @@ struct HintBox: View {
 
 
 ================================================================================
-  37. HausaufgabenApp/Views/Homework/SearchView.swift
+  36. HausaufgabenApp/Views/Homework/SearchView.swift
 ================================================================================
 
 import SwiftUI
@@ -6991,7 +6903,7 @@ struct SearchResultRow: View {
 
 
 ================================================================================
-  38. HausaufgabenApp/Views/Lock/AppGateView.swift
+  37. HausaufgabenApp/Views/Lock/AppGateView.swift
 ================================================================================
 
 import SwiftUI
@@ -7034,7 +6946,7 @@ struct AppGateView: View {
 
 
 ================================================================================
-  39. HausaufgabenApp/Views/Lock/LockSetupView.swift
+  38. HausaufgabenApp/Views/Lock/LockSetupView.swift
 ================================================================================
 
 import SwiftUI
@@ -7052,8 +6964,6 @@ struct LockSetupView: View {
     @State private var repeated = ""
     @State private var hint = ""
     @State private var problem: String?
-
-    private var biometrics: BiometricKind { BiometricAuth.availableKind() }
 
     var body: some View {
         NavigationStack {
@@ -7115,11 +7025,7 @@ struct LockSetupView: View {
     }
 
     private var warningText: String {
-        var text = "Der Code wird nicht im Klartext gespeichert – die App kann ihn dir später nicht mehr zeigen. Vergisst du ihn, hilft nur noch, Homy zu löschen und neu zu laden; die Hausaufgaben sind dann weg, falls du keine Sicherung hast."
-        if biometrics.isAvailable {
-            text += "\n\nDanach kannst du den Schnellstart mit \(biometrics.title) einschalten, damit du selbst nicht jedes Mal tippen musst."
-        }
-        return text
+        "Der Code wird nicht im Klartext gespeichert – die App kann ihn dir später nicht mehr zeigen. Vergisst du ihn, hilft nur noch, Homy zu löschen und neu zu laden; die Hausaufgaben sind dann weg, falls du keine Sicherung hast."
     }
 
     private func save() {
@@ -7143,10 +7049,6 @@ struct LockSetupView: View {
         lock.setCode(new)
         lock.isEnabled = true
         lock.hint = hint.trimmingCharacters(in: .whitespacesAndNewlines)
-        // Beim allerersten Einrichten den Schnellstart gleich anbieten.
-        if !isChanging, biometrics.isAvailable {
-            lock.useBiometrics = true
-        }
         store.lock = lock
 
         Haptics.success()
@@ -7156,15 +7058,12 @@ struct LockSetupView: View {
 
 
 ================================================================================
-  40. HausaufgabenApp/Views/Lock/LockView.swift
+  39. HausaufgabenApp/Views/Lock/LockView.swift
 ================================================================================
 
 import SwiftUI
 
 /// Das Anmeldebild: ohne den richtigen Code kommt man nicht in die App.
-///
-/// Wer den Schnellstart eingeschaltet hat, wird gleich beim Öffnen von
-/// Face ID bzw. Touch ID begrüßt und muss gar nichts tippen.
 struct LockView: View {
     @EnvironmentObject private var store: AppStore
     @EnvironmentObject private var lock: LockController
@@ -7173,15 +7072,11 @@ struct LockView: View {
     @State private var wobble = 0
     @State private var message: String?
     @State private var showsHint = false
-    @State private var isAskingBiometrics = false
-    @State private var didAskAutomatically = false
     @State private var now = Date()
 
     private let clock = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var settings: LockSettings { store.lock }
-    private var biometrics: BiometricKind { BiometricAuth.availableKind() }
-    private var usesBiometrics: Bool { settings.useBiometrics && biometrics.isAvailable }
 
     private var greeting: String {
         let name = store.profile.firstName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -7227,13 +7122,6 @@ struct LockView: View {
             guard lock.isPaused else { return }
             now = value
             lock.clearExpiredPause()
-        }
-        .task {
-            // Beim Öffnen einmal von selbst nach Face ID fragen.
-            guard !didAskAutomatically else { return }
-            didAskAutomatically = true
-            guard usesBiometrics, !lock.isPaused else { return }
-            await askBiometrics()
         }
         .alert("Code vergessen?", isPresented: $showsHint) {
             Button("Verstanden", role: .cancel) { }
@@ -7304,7 +7192,8 @@ struct LockView: View {
             }
 
             HStack(spacing: 18) {
-                biometricKey
+                // Links unten bleibt frei, damit die 0 mittig unter der 8 steht.
+                Color.clear.frame(width: 74, height: 74)
                 digitKey("0")
                 deleteKey
             }
@@ -7326,27 +7215,6 @@ struct LockView: View {
         .disabled(lock.isPaused)
         .opacity(lock.isPaused ? 0.45 : 1)
         .accessibilityLabel("Ziffer \(digit)")
-    }
-
-    @ViewBuilder
-    private var biometricKey: some View {
-        if usesBiometrics {
-            Button {
-                Task { await askBiometrics() }
-            } label: {
-                Image(systemName: biometrics.symbol)
-                    .font(.system(size: 28))
-                    .foregroundStyle(.tint)
-                    .frame(width: 74, height: 74)
-                    .contentShape(Circle())
-            }
-            .buttonStyle(.plain)
-            .disabled(lock.isPaused || isAskingBiometrics)
-            .opacity(lock.isPaused ? 0.45 : 1)
-            .accessibilityLabel("Mit \(biometrics.title) öffnen")
-        } else {
-            Color.clear.frame(width: 74, height: 74)
-        }
     }
 
     private var deleteKey: some View {
@@ -7411,24 +7279,11 @@ struct LockView: View {
             }
         }
     }
-
-    private func askBiometrics() async {
-        guard !isAskingBiometrics, !lock.isPaused else { return }
-        isAskingBiometrics = true
-        let reason = "Homy öffnen"
-        let ok = await BiometricAuth.authenticate(reason: reason)
-        isAskingBiometrics = false
-        if ok {
-            Haptics.success()
-            code = ""
-            lock.unlock()
-        }
-    }
 }
 
 
 ================================================================================
-  41. HausaufgabenApp/Views/Notes/NoteDetailView.swift
+  40. HausaufgabenApp/Views/Notes/NoteDetailView.swift
 ================================================================================
 
 import SwiftUI
@@ -7511,7 +7366,7 @@ struct NoteDetailView: View {
 
 
 ================================================================================
-  42. HausaufgabenApp/Views/Notes/NotesView.swift
+  41. HausaufgabenApp/Views/Notes/NotesView.swift
 ================================================================================
 
 import SwiftUI
@@ -7651,7 +7506,7 @@ struct NoteRow: View {
 
 
 ================================================================================
-  43. HausaufgabenApp/Views/RootView.swift
+  42. HausaufgabenApp/Views/RootView.swift
 ================================================================================
 
 import SwiftUI
@@ -7707,7 +7562,7 @@ struct RootView: View {
 
 
 ================================================================================
-  44. HausaufgabenApp/Views/Settings/ProfileView.swift
+  43. HausaufgabenApp/Views/Settings/ProfileView.swift
 ================================================================================
 
 import SwiftUI
@@ -7840,7 +7695,7 @@ struct LabeledField: View {
 
 
 ================================================================================
-  45. HausaufgabenApp/Views/Settings/SettingsView.swift
+  44. HausaufgabenApp/Views/Settings/SettingsView.swift
 ================================================================================
 
 import SwiftUI
@@ -8128,7 +7983,7 @@ struct SettingsView: View {
 
     // MARK: - Anmeldung
 
-    /// Die Anmeldung: ein Code für alle – und der Schnellstart für einen selbst.
+    /// Die Anmeldung: ein Zahlencode für alle, die Homy öffnen wollen.
     @ViewBuilder
     private var lockSection: some View {
         Section {
@@ -8179,17 +8034,6 @@ struct SettingsView: View {
                 .foregroundStyle(.green)
         }
 
-        if biometrics.isAvailable {
-            Toggle(isOn: biometricsBinding) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Schnellstart mit \(biometrics.title)")
-                    Text("Nur ansehen statt tippen – gilt für dich, nicht für andere.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-
         Picker(selection: timingBinding) {
             ForEach(LockTiming.allCases) { timing in
                 Text(timing.title).tag(timing)
@@ -8203,19 +8047,6 @@ struct SettingsView: View {
             }
         }
         .pickerStyle(.navigationLink)
-
-        Button {
-            var neu = store.lock
-            neu.useBiometrics = biometrics.isAvailable
-            neu.timing = .onlyOnLaunch
-            store.lock = neu
-            Haptics.success()
-            infoMessage = biometrics.isAvailable
-                ? "Schnellstart an: \(biometrics.title) genügt, und nur beim Neustart wird gefragt."
-                : "Homy fragt jetzt nur noch beim Neustart nach dem Code."
-        } label: {
-            Label("Schnellstart für mich einrichten", systemImage: "bolt.fill")
-        }
 
         Button {
             isChangingCode = true
@@ -8237,13 +8068,6 @@ struct SettingsView: View {
         }
     }
 
-    private var biometrics: BiometricKind { BiometricAuth.availableKind() }
-
-    private var biometricsBinding: Binding<Bool> {
-        Binding(get: { store.lock.useBiometrics },
-                set: { store.lock.useBiometrics = $0 })
-    }
-
     private var timingBinding: Binding<LockTiming> {
         Binding(get: { store.lock.timing },
                 set: { store.lock.timing = $0 })
@@ -8251,14 +8075,9 @@ struct SettingsView: View {
 
     private var lockFooter: String {
         if store.lock.isActive {
-            var text = "Ohne den Code kommt niemand an deine Hausaufgaben, Notizen und Daten. Mit dem Schnellstart musst du selbst so gut wie nie etwas eingeben."
-            if biometrics.isAvailable {
-                text += " \(biometrics.title) prüft iOS – Homy bekommt dein Gesicht bzw. deinen Finger nie zu sehen."
-            }
-            text += "\n\nDer Code steht nicht in den Sicherungsdateien: Eine Sicherung kann die Anmeldung weder setzen noch aufheben."
-            return text
+            return "Ohne den Code kommt niemand an deine Hausaufgaben, Notizen und Daten. Wie oft gefragt wird, stellst du unter „Code abfragen“ ein.\n\nDer Code steht nicht in den Sicherungsdateien: Eine Sicherung kann die Anmeldung weder setzen noch aufheben."
         }
-        return "Wenn du magst, verlangt Homy beim Öffnen einen Zahlencode. Für dich selbst lässt sich danach ein Schnellstart einstellen, damit du nicht jedes Mal tippen musst."
+        return "Wenn du magst, verlangt Homy beim Öffnen einen Zahlencode."
     }
 
     // MARK: - Abschnitte
@@ -8535,7 +8354,7 @@ struct SettingsView: View {
 
 
 ================================================================================
-  46. HausaufgabenApp/Views/Settings/TimetableSettingsView.swift
+  45. HausaufgabenApp/Views/Settings/TimetableSettingsView.swift
 ================================================================================
 
 import SwiftUI
@@ -8793,7 +8612,7 @@ struct TimetableSettingsView: View {
 
 
 ================================================================================
-  47. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
+  46. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -8982,7 +8801,7 @@ struct SubjectEditorView: View {
 
 
 ================================================================================
-  48. HausaufgabenApp/Views/Subjects/SubjectsView.swift
+  47. HausaufgabenApp/Views/Subjects/SubjectsView.swift
 ================================================================================
 
 import SwiftUI
@@ -9256,7 +9075,7 @@ struct SubjectRow: View {
 
 
 ================================================================================
-  49. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
+  48. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
 ================================================================================
 
 import SwiftUI
@@ -9311,7 +9130,7 @@ struct DocumentScannerView: UIViewControllerRepresentable {
 
 
 ================================================================================
-  50. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
+  49. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -9447,7 +9266,7 @@ struct LessonEditorView: View {
 
 
 ================================================================================
-  51. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
+  50. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
 ================================================================================
 
 import SwiftUI
@@ -9862,7 +9681,7 @@ struct ScanCellEditor: View {
 
 
 ================================================================================
-  52. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
+  51. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
 ================================================================================
 
 import SwiftUI
@@ -10080,7 +9899,7 @@ private struct Tipp: View {
 
 
 ================================================================================
-  53. HausaufgabenApp/Views/Timetable/TimetableView.swift
+  52. HausaufgabenApp/Views/Timetable/TimetableView.swift
 ================================================================================
 
 import SwiftUI
@@ -10398,7 +10217,7 @@ struct TimetableCell: View {
 
 
 ================================================================================
-  54. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
+  53. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
 ================================================================================
 
 {
@@ -10442,7 +10261,7 @@ struct TimetableCell: View {
 
 
 ================================================================================
-  55. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
+  54. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
 ================================================================================
 
 {
@@ -10462,7 +10281,7 @@ struct TimetableCell: View {
 
 
 ================================================================================
-  56. HausaufgabenApp/Assets.xcassets/Contents.json
+  55. HausaufgabenApp/Assets.xcassets/Contents.json
 ================================================================================
 
 {

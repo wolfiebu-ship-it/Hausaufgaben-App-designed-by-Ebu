@@ -1,9 +1,6 @@
 import SwiftUI
 
 /// Das Anmeldebild: ohne den richtigen Code kommt man nicht in die App.
-///
-/// Wer den Schnellstart eingeschaltet hat, wird gleich beim Öffnen von
-/// Face ID bzw. Touch ID begrüßt und muss gar nichts tippen.
 struct LockView: View {
     @EnvironmentObject private var store: AppStore
     @EnvironmentObject private var lock: LockController
@@ -12,15 +9,11 @@ struct LockView: View {
     @State private var wobble = 0
     @State private var message: String?
     @State private var showsHint = false
-    @State private var isAskingBiometrics = false
-    @State private var didAskAutomatically = false
     @State private var now = Date()
 
     private let clock = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var settings: LockSettings { store.lock }
-    private var biometrics: BiometricKind { BiometricAuth.availableKind() }
-    private var usesBiometrics: Bool { settings.useBiometrics && biometrics.isAvailable }
 
     private var greeting: String {
         let name = store.profile.firstName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -66,13 +59,6 @@ struct LockView: View {
             guard lock.isPaused else { return }
             now = value
             lock.clearExpiredPause()
-        }
-        .task {
-            // Beim Öffnen einmal von selbst nach Face ID fragen.
-            guard !didAskAutomatically else { return }
-            didAskAutomatically = true
-            guard usesBiometrics, !lock.isPaused else { return }
-            await askBiometrics()
         }
         .alert("Code vergessen?", isPresented: $showsHint) {
             Button("Verstanden", role: .cancel) { }
@@ -143,7 +129,8 @@ struct LockView: View {
             }
 
             HStack(spacing: 18) {
-                biometricKey
+                // Links unten bleibt frei, damit die 0 mittig unter der 8 steht.
+                Color.clear.frame(width: 74, height: 74)
                 digitKey("0")
                 deleteKey
             }
@@ -165,27 +152,6 @@ struct LockView: View {
         .disabled(lock.isPaused)
         .opacity(lock.isPaused ? 0.45 : 1)
         .accessibilityLabel("Ziffer \(digit)")
-    }
-
-    @ViewBuilder
-    private var biometricKey: some View {
-        if usesBiometrics {
-            Button {
-                Task { await askBiometrics() }
-            } label: {
-                Image(systemName: biometrics.symbol)
-                    .font(.system(size: 28))
-                    .foregroundStyle(.tint)
-                    .frame(width: 74, height: 74)
-                    .contentShape(Circle())
-            }
-            .buttonStyle(.plain)
-            .disabled(lock.isPaused || isAskingBiometrics)
-            .opacity(lock.isPaused ? 0.45 : 1)
-            .accessibilityLabel("Mit \(biometrics.title) öffnen")
-        } else {
-            Color.clear.frame(width: 74, height: 74)
-        }
     }
 
     private var deleteKey: some View {
@@ -248,19 +214,6 @@ struct LockView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                 code = ""
             }
-        }
-    }
-
-    private func askBiometrics() async {
-        guard !isAskingBiometrics, !lock.isPaused else { return }
-        isAskingBiometrics = true
-        let reason = "Homy öffnen"
-        let ok = await BiometricAuth.authenticate(reason: reason)
-        isAskingBiometrics = false
-        if ok {
-            Haptics.success()
-            code = ""
-            lock.unlock()
         }
     }
 }

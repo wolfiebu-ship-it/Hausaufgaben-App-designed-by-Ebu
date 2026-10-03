@@ -97,11 +97,10 @@ ANMELDUNG
 Homy kann beim Öffnen einen Zahlencode verlangen (4 bis 8 Ziffern, ab Werk aus).
 Eigenes Tastenfeld auf dem Anmeldebild, deckend, damit nichts durchscheint.
 Gespeichert wird nur ein Prüfwert (SHA-256 mit Zufallsbeigabe über CryptoKit),
-nie der Code. Ein Knopf "Schnellstart für mich einrichten" stellt Face ID bzw.
-Touch ID (LocalAuthentication) ein und fragt nur noch beim Neustart nach; wann
-gefragt wird, ist auch einzeln wählbar (jedes Mal, 5 Minuten, 1 Stunde, nur beim
-Neustart). Nach fünf Fehlversuchen eine halbe Minute Pause. Freiwilliger Merkzettel
-unter "Code vergessen?". Der Code steht nicht in den Sicherungsdateien, und ein
+nie der Code. Kein Face ID, kein Touch ID, kein Schnellstart – nur der Code.
+Wann gefragt wird, ist wählbar (jedes Mal, 5 Minuten, 1 Stunde, nur beim
+Neustart). Nach fünf Fehlversuchen eine halbe Minute Pause. Freiwilliger Merkzettel:
+Tippt man auf "Code vergessen?", steht er direkt auf dem Anmeldebild. Der Code steht nicht in den Sicherungsdateien, und ein
 Zurücksetzen der Daten hebt die Anmeldung nicht auf.
 
 ERINNERUNGEN
@@ -130,7 +129,7 @@ das Raster ableiten: Spalten sind die Wochentage, Zeilen die Stunden. Danach IMM
 ein Prüfschritt, in dem das Ergebnis als Raster gezeigt wird und falsch Gelesenes
 angetippt und korrigiert werden kann; unbekannte Kürzel lassen sich als neue Fächer
 anlegen. Erst dann übernehmen. Das Foto bleibt auf dem Gerät. Die Info.plist braucht
-Texte für Kamera, Fotos und Face ID.
+Texte für Kamera und Fotos.
 
 AUSSEHEN
 Freundlich und bunt. Je Fach ein kräftiger Ton für die Schrift und eine helle Fläche

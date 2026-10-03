@@ -89,7 +89,7 @@ https://wolfiebu-ship-it.github.io/Hausaufgaben-App-designed-by-Ebu/datenschutz.
 - App-Symbol in 1024 px, eigener Name „Homy“
 - `MARKETING_VERSION = 1.0`, `CURRENT_PROJECT_VERSION = 1`
 - Bundle-Kennung `de.ebu.HausaufgabenApp`
-- Texte für Kamera, Fotos und Face ID (verlangt Apple, sonst Ablehnung)
+- Texte für Kamera und Fotos (verlangt Apple, sonst Ablehnung)
 - `PrivacyInfo.xcprivacy` – der Datenschutzbericht, den Apple seit 2024 verlangt
 - `ITSAppUsesNonExemptEncryption = NO` – die Ausfuhr-Erklärung, damit du nicht
   bei jedem Hochladen danach gefragt wirst
@@ -190,7 +190,7 @@ Aufgebaut wie die Notizen, die du kennst: antippen, lostippen. Kein Titelfeld,
 kein Sichern-Knopf.
 
 ANMELDUNG
-Wenn du willst, öffnet sich Homy nur mit deinem Zahlencode – oder mit Face ID.
+Wenn du willst, öffnet sich Homy nur mit deinem Zahlencode.
 Gespeichert wird dabei nie dein Code, sondern nur ein Prüfwert daraus.
 
 DATENSCHUTZ, EHRLICH

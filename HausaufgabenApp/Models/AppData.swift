@@ -21,7 +21,7 @@ struct AppData: Codable {
     /// Die eigenen Angaben (Name, Klasse, Telefon …).
     var profile: Profile
     var settings: AppSettings
-    /// Die Anmeldung (Code, Schnellstart). Enthält nur einen Prüfwert des Codes.
+    /// Die Anmeldung. Enthält nur einen Prüfwert des Codes.
     var lock: LockSettings
 
     static let currentVersion = 1

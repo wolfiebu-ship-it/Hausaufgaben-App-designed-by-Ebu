@@ -14,8 +14,6 @@ struct LockSetupView: View {
     @State private var hint = ""
     @State private var problem: String?
 
-    private var biometrics: BiometricKind { BiometricAuth.availableKind() }
-
     var body: some View {
         NavigationStack {
             Form {
@@ -76,11 +74,7 @@ struct LockSetupView: View {
     }
 
     private var warningText: String {
-        var text = "Der Code wird nicht im Klartext gespeichert – die App kann ihn dir später nicht mehr zeigen. Vergisst du ihn, hilft nur noch, Homy zu löschen und neu zu laden; die Hausaufgaben sind dann weg, falls du keine Sicherung hast."
-        if biometrics.isAvailable {
-            text += "\n\nDanach kannst du den Schnellstart mit \(biometrics.title) einschalten, damit du selbst nicht jedes Mal tippen musst."
-        }
-        return text
+        "Der Code wird nicht im Klartext gespeichert – die App kann ihn dir später nicht mehr zeigen. Vergisst du ihn, hilft nur noch, Homy zu löschen und neu zu laden; die Hausaufgaben sind dann weg, falls du keine Sicherung hast."
     }
 
     private func save() {
@@ -104,10 +98,6 @@ struct LockSetupView: View {
         lock.setCode(new)
         lock.isEnabled = true
         lock.hint = hint.trimmingCharacters(in: .whitespacesAndNewlines)
-        // Beim allerersten Einrichten den Schnellstart gleich anbieten.
-        if !isChanging, biometrics.isAvailable {
-            lock.useBiometrics = true
-        }
         store.lock = lock
 
         Haptics.success()

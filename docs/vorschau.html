@@ -759,6 +759,39 @@
     background: none; border: 0; font: inherit; font-size: 13px;
     color: var(--text2); cursor: pointer; text-decoration: underline;
   }
+  /* Merkzettel unter "Code vergessen?" – direkt auf dem Bild, ohne Pop-up. */
+  .merkhinweis {
+    font-size: 14px; color: var(--text); background: var(--karte);
+    border-radius: 10px; padding: 10px 14px; text-align: center; max-width: 300px;
+    border: 1px solid var(--trenner);
+  }
+  .merkhinweis .klein { display: block; font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+  /* Eigene Rückfragen: Die eingebettete Seite auf claude.ai unterdrückt
+     alert() und confirm() – confirm() antwortet dort immer mit "Nein". */
+  .dialogschleier {
+    position: fixed; inset: 0; z-index: 80;
+    background: rgba(0,0,0,.42);
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .dialogschleier[hidden] { display: none !important; }
+  .dialogkarte {
+    background: var(--karte); color: var(--text);
+    border-radius: 14px; width: 100%; max-width: 300px;
+    text-align: center; overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,.3);
+  }
+  .dialogkarte .dtext { padding: 18px 18px 16px; font-size: 14px; line-height: 1.4; white-space: pre-line; }
+  .dialogkarte .dtitel { display: block; font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+  .dialogknoepfe { display: flex; border-top: .5px solid var(--trenner); }
+  .dialogknoepfe button {
+    flex: 1; border: 0; background: none; cursor: pointer;
+    padding: 12px 8px; font: inherit; font-size: 17px; color: var(--akzent);
+  }
+  .dialogknoepfe button + button { border-left: .5px solid var(--trenner); }
+  .dialogknoepfe button.stark { font-weight: 600; }
+  .dialogknoepfe button.rot { color: #D93025; font-weight: 600; }
+
   .demohinweis {
     font-size: 13px; color: var(--text2); background: var(--karte);
     border: 1px dashed color-mix(in srgb, var(--akzent) 40%, transparent);
@@ -978,6 +1011,7 @@
   <div class="tasten" id="sperrTasten"></div>
   <div class="sperrfuss">
     <button class="sperrlink" id="sperrVergessen">Code vergessen?</button>
+    <div class="merkhinweis" id="merkHinweis" hidden></div>
     <div class="demohinweis" id="demohinweis"></div>
   </div>
 </div>
@@ -1020,6 +1054,8 @@
     </button>
   </div>
 </div>
+
+<div class="dialogschleier" id="dialog" hidden></div>
 
 <div class="schleier" id="modal" hidden>
   <div class="blatt" id="blatt"></div>
@@ -1070,8 +1106,7 @@ const BEISPIEL = {
   einstellungen: { stunden: 9, samstag: false, zeiten: true, alleFaecher: true,
                    darstellung: "system", erinnerungen: true, standardErinnerung: "abend",
                    bundesland: "", zeitenListe: [] },
-  anmeldung: { an: true, code: "1234", istBeispielCode: true, merkzettel: "",
-               schnellstart: true, gemerkt: true, webauthnId: "", wann: "immer" }
+  anmeldung: { an: true, code: "1234", istBeispielCode: true, merkzettel: "", wann: "immer" }
 };
 
 /* Unterrichtszeiten wie PeriodTime.defaultTimes(): 45 Minuten,
@@ -1936,25 +1971,6 @@ function zeichneEinstellungen() {
         </span>
         <span class="wert" style="color:var(--text3)">&#8250;</span>
       </button>
-      <div class="eintrag">
-        <span>
-          <span class="haupt">Schnellstart für mich</span>
-          <div class="neben">${daten.anmeldung.schnellstart
-            ? sicher(schnellstartName()) + " – öffnet ohne Code."
-            : "Öffnen ohne Code zu tippen. Homy versucht Face ID bzw. Touch ID; geht das im Browser nicht, merkt es sich diesen Browser."}</div>
-        </span>
-        <button class="schalter" role="switch" data-schnellstart="1"
-          aria-checked="${daten.anmeldung.schnellstart}" aria-label="Schnellstart"></button>
-      </div>
-      ${daten.anmeldung.schnellstart && !daten.anmeldung.webauthnId ? `
-      <button class="eintrag" data-biometrie="1">
-        <span>
-          <span class="haupt" style="color:var(--akzent)">Mit Face ID / Touch ID öffnen</span>
-          <div class="neben">Statt nur diesen Browser zu merken. Klappt nur, wenn dein Gerät
-            das anbietet und diese eingebettete Seite es zulässt.</div>
-        </span>
-        <span class="wert" style="color:var(--text3)">&#8250;</span>
-      </button>` : ``}
       <div class="feldzeile">
         <label for="wannWahl">Code abfragen</label>
         <select id="wannWahl" data-wannwahl="1">
@@ -1971,7 +1987,6 @@ function zeichneEinstellungen() {
       </button>` : ``}
     </div>
     <div class="fuss">Der Code gilt für alle, die das Gerät in die Hand nehmen.
-      Nur du stellst dir den Schnellstart ein und musst dann so gut wie nie etwas eintippen.
       In der gebauten App wird der Code nicht im Klartext gespeichert, sondern nur ein Prüfwert –
       und er steht auch nicht in den Sicherungsdateien.</div>
 
@@ -2972,9 +2987,11 @@ function fachBearbeiten(id) {
     document.getElementById("faFarben").innerHTML = zeichneFarben();
   });
 
-  blatt.onclick = ev => {
+  blatt.onclick = async ev => {
     if (ev.target.closest("[data-fachweg]")) {
-      if (!confirm("Fach „" + (f.name || "") + "“ löschen? Stunden und Hausaufgaben dazu gehen mit.")) return;
+      if (!(await frage("Fach „" + (f.name || "") + "“ löschen?",
+            "Die Stunden und Hausaufgaben dazu gehen mit.",
+            { ja: "Löschen", gefaehrlich: true }))) return;
       daten.faecher = daten.faecher.filter(x => x.id !== f.id);
       Object.keys(daten.stunden).forEach(wt =>
         Object.keys(daten.stunden[wt]).forEach(st => {
@@ -3168,12 +3185,13 @@ function stundenplanBearbeiten() {
     });
   };
 
-  blatt.onclick = ev => {
+  blatt.onclick = async ev => {
     const zu = s => ev.target.closest(s);
 
     if (zu("[data-ePlanAb]")) {
-      if (geaendert() && !confirm("Was du hier eingestellt hast, ist noch nicht "
-        + "gespeichert. Änderungen verwerfen?")) return;
+      if (geaendert() && !(await frage("Änderungen verwerfen?",
+            "Was du hier eingestellt hast, ist noch nicht gespeichert.",
+            { ja: "Verwerfen", nein: "Weiter bearbeiten", gefaehrlich: true }))) return;
       modal.hidden = true;
       return;
     }
@@ -3307,7 +3325,9 @@ function sicherungOeffnen() {
         problem.textContent = "Das sieht nicht nach einer Homy-Sicherung aus.";
         return;
       }
-      if (!confirm("Alles durch die eingefügte Sicherung ersetzen?")) return;
+      if (!(await frage("Alles ersetzen?",
+            "Alles in Homy wird durch die eingefügte Sicherung ersetzt.",
+            { ja: "Ersetzen", gefaehrlich: true }))) return;
 
       // Die Anmeldung bleibt, wie sie hier eingestellt ist.
       const anmeldungBleibt = daten.anmeldung;
@@ -3384,6 +3404,38 @@ function codeBearbeiten() {
   };
 }
 
+/* --- Eigene Rückfragen ---------------------------------------------
+   Die eingebettete Seite auf claude.ai unterdrückt alert() und confirm():
+   alert() zeigt nichts, confirm() antwortet immer mit "Nein". Deshalb fragt
+   Homy selbst – sieht aus wie eine Rückfrage auf dem iPhone. */
+const dialogEl = document.getElementById("dialog");
+
+function frage(titel, text, { ja = "OK", nein = "Abbrechen", gefaehrlich = false } = {}) {
+  return new Promise(fertig => {
+    dialogEl.innerHTML = `<div class="dialogkarte" role="alertdialog" aria-modal="true"
+        aria-label="${sicher(titel)}">
+      <div class="dtext"><span class="dtitel">${sicher(titel)}</span>${text ? sicher(text) : ""}</div>
+      <div class="dialogknoepfe">
+        ${nein ? `<button type="button" data-dnein="1">${sicher(nein)}</button>` : ""}
+        <button type="button" data-dja="1" class="${gefaehrlich ? "rot" : "stark"}">${sicher(ja)}</button>
+      </div>
+    </div>`;
+    dialogEl.hidden = false;
+    dialogEl.querySelector("[data-dja]").focus();
+    dialogEl.onclick = ev => {
+      const jaKnopf = ev.target.closest("[data-dja]");
+      const neinKnopf = ev.target.closest("[data-dnein]");
+      if (!jaKnopf && !neinKnopf) return;
+      ev.stopPropagation();
+      dialogEl.hidden = true;
+      dialogEl.onclick = null;
+      fertig(!!jaKnopf);
+    };
+  });
+}
+
+const meldung = (titel, text) => frage(titel, text, { ja: "OK", nein: null });
+
 /* --- Die nachgestellte Benachrichtigung --- */
 const mitteilung = document.getElementById("mitteilung");
 let mitteilungTimer = null;
@@ -3443,88 +3495,9 @@ const sperrGruss   = document.getElementById("sperrGruss");
 let   eingabe      = "";
 let   fehlversuche = 0;
 
-const SYM_SCHNELL = `<svg viewBox="0 0 24 24"><path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"/></svg>`;
-/* Das Face-ID-Zeichen, wenn wirklich Biometrie eingerichtet ist. */
-const SYM_GESICHT = `<svg viewBox="0 0 24 24"><path d="M4 4h4V2H2v6h2V4zm16 0v4h2V2h-6v2h4zM4 20v-4H2v6h6v-2H4zm16 0h-4v2h6v-6h-2v4zM9 9.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM12 9v4h-1.5M8.5 15.5c1 1 5 1 6 0"
-  fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
 const SYM_WEG     = `<svg viewBox="0 0 24 24"><path d="M22 3H7L1 12l6 9h15a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-3.7 12.3-1.4 1.4L14 13.9l-2.9 2.8-1.4-1.4 2.8-2.9-2.8-2.9 1.4-1.4 2.9 2.8 2.9-2.8 1.4 1.4-2.8 2.9 2.8 2.9z"/></svg>`;
 
 function sperrenNoetig() { return daten.anmeldung.an && !!daten.anmeldung.code; }
-
-/* --- Schnellstart ---------------------------------------------------
-   Erst wird echte Biometrie versucht (WebAuthn: Face ID, Touch ID,
-   Windows Hello). Eingebettete Seiten dürfen das oft nicht – dann merkt
-   sich Homy stattdessen diesen Browser. Beides öffnet ohne Code.
-   In der gebauten iOS-App ist es immer echtes Face ID bzw. Touch ID. */
-
-const zufallsBytes = n => crypto.getRandomValues(new Uint8Array(n));
-const zuText = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
-const zuBytes = txt => Uint8Array.from(atob(txt), c => c.charCodeAt(0));
-
-async function biometrieMoeglich() {
-  try {
-    return !!(window.PublicKeyCredential
-      && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable());
-  } catch (e) { return false; }
-}
-
-/* Richtet den Schnellstart ein. Gibt zurück, was daraus geworden ist. */
-async function schnellstartEinrichten() {
-  if (await biometrieMoeglich()) {
-    try {
-      const cred = await navigator.credentials.create({
-        publicKey: {
-          challenge: zufallsBytes(32),
-          rp: { name: "Homy" },
-          user: { id: zufallsBytes(16), name: "homy", displayName: "Homy" },
-          pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
-          authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
-          timeout: 60000
-        }
-      });
-      if (cred) {
-        daten.anmeldung.webauthnId = zuText(cred.rawId);
-        daten.anmeldung.gemerkt = false;
-        daten.anmeldung.schnellstart = true;
-        sichern();
-        return "biometrie";
-      }
-    } catch (e) {
-      // Abgebrochen oder in dieser Umgebung nicht erlaubt – dann eben merken.
-    }
-  }
-  daten.anmeldung.webauthnId = "";
-  daten.anmeldung.gemerkt = true;
-  daten.anmeldung.schnellstart = true;
-  sichern();
-  return "gemerkt";
-}
-
-/* Öffnet per Schnellstart. Gibt true zurück, wenn es geklappt hat. */
-async function schnellstartOeffnen() {
-  if (daten.anmeldung.webauthnId) {
-    try {
-      const ok = await navigator.credentials.get({
-        publicKey: {
-          challenge: zufallsBytes(32),
-          allowCredentials: [{ type: "public-key", id: zuBytes(daten.anmeldung.webauthnId) }],
-          userVerification: "required",
-          timeout: 60000
-        }
-      });
-      return !!ok;
-    } catch (e) {
-      return false;   // abgebrochen oder fehlgeschlagen
-    }
-  }
-  return !!daten.anmeldung.gemerkt;
-}
-
-function schnellstartName() {
-  if (daten.anmeldung.webauthnId) return "Face ID / Touch ID";
-  if (daten.anmeldung.gemerkt) return "Dieser Browser ist gemerkt";
-  return "Schnellstart";
-}
 
 function sperreZeigen() {
   if (!sperrenNoetig()) { sperre.hidden = true; return; }
@@ -3533,6 +3506,7 @@ function sperreZeigen() {
   const name = (daten.profil.vorname || "").trim();
   sperrGruss.textContent = name ? "Hallo, " + name + "!" : "Willkommen zurück";
   sperre.hidden = false;
+  document.getElementById("merkHinweis").hidden = true;
   const hinweis = document.getElementById("demohinweis");
   hinweis.hidden = !daten.anmeldung.istBeispielCode;
   hinweis.innerHTML = "Zum Ausprobieren: Code <strong>1234</strong>. "
@@ -3547,10 +3521,7 @@ function sperreZeichnen() {
 
   const tasten = [];
   for (let i = 1; i <= 9; i++) tasten.push(`<button class="taste" data-ziffer="${i}">${i}</button>`);
-  tasten.push(daten.anmeldung.schnellstart
-    ? `<button class="taste still" data-schnell="1" aria-label="Mit ${schnellstartName()} öffnen">${
-        daten.anmeldung.webauthnId ? SYM_GESICHT : SYM_SCHNELL}</button>`
-    : `<span class="taste leer"></span>`);
+  tasten.push(`<span class="taste leer"></span>`);
   tasten.push(`<button class="taste" data-ziffer="0">0</button>`);
   tasten.push(`<button class="taste still loeschen" data-weg="1" aria-label="Letzte Ziffer löschen">${SYM_WEG}</button>`);
   sperrTasten.innerHTML = tasten.join("");
@@ -3587,17 +3558,6 @@ function aufsperren() {
 sperrTasten.addEventListener("click", ev => {
   const z = ev.target.closest("[data-ziffer]");
   if (z) { sperrZiffer(z.dataset.ziffer); return; }
-  if (ev.target.closest("[data-schnell]")) {
-    sperrStatus.textContent = daten.anmeldung.webauthnId
-      ? "Warte auf Face ID / Touch ID …" : "Schnellstart …";
-    sperrStatus.classList.remove("rot");
-    schnellstartOeffnen().then(ok => {
-      if (ok) { aufsperren(); return; }
-      sperrStatus.textContent = "Schnellstart hat nicht geklappt – tipp deinen Code.";
-      sperrStatus.classList.add("rot");
-    });
-    return;
-  }
   if (ev.target.closest("[data-weg]")) {
     eingabe = eingabe.slice(0, -1);
     sperrStatus.textContent = "Code eingeben";
@@ -3606,13 +3566,17 @@ sperrTasten.addEventListener("click", ev => {
   }
 });
 
+/* "Code vergessen?" zeigt den Merkzettel direkt auf dem Anmeldebild.
+   Kein Pop-up: Die eingebettete Seite auf claude.ai lässt keine zu. */
 document.getElementById("sperrVergessen").addEventListener("click", () => {
+  const feld = document.getElementById("merkHinweis");
+  if (!feld.hidden) { feld.hidden = true; return; }      // zweimal tippen = zu
   const m = (daten.anmeldung.merkzettel || "").trim();
-  let text = m ? "Dein Merkzettel: „" + m + "“" : "Für diesen Code ist kein Merkzettel hinterlegt.";
-  text += "\n\nIn der gebauten App ist der Code nirgends im Klartext gespeichert und lässt "
-        + "sich deshalb nicht anzeigen.";
-  if (daten.anmeldung.istBeispielCode) text += "\n\nIn dieser Vorschau lautet er noch 1234.";
-  alert(text);
+  feld.innerHTML = m
+    ? `Dein Merkzettel: <strong>„${sicher(m)}“</strong>`
+    : `Für diesen Code hast du keinen Merkzettel hinterlegt.
+       <span class="klein">Den legst du in den Einstellungen unter „Code ändern“ fest.</span>`;
+  feld.hidden = false;
 });
 
 document.addEventListener("keydown", ev => {
@@ -3743,51 +3707,19 @@ el.addEventListener("click", ev => {
   if (ev.target.closest("[data-codeaendern]")) { codeBearbeiten(); return; }
   if (ev.target.closest("[data-sicherung]")) { sicherungOeffnen(); return; }
 
-  if (ev.target.closest("[data-biometrie]")) {
-    schnellstartEinrichten().then(art => {
-      zeichne();
-      alert(art === "biometrie"
-        ? "Geschafft: Homy öffnet sich jetzt mit Face ID bzw. Touch ID.\n\n"
-          + "Tipp beim Anmelden auf das Gesicht-Symbol unten links."
-        : "Echtes Face ID lässt sich hier nicht einrichten – eingebettete Seiten dürfen "
-          + "das meistens nicht.\n\nDer Schnellstart merkt sich weiterhin diesen Browser "
-          + "und öffnet ohne Code. In der gebauten iOS-App ist es immer Face ID bzw. Touch ID.");
-    });
-    return;
-  }
   if (ev.target.closest("[data-planbearbeiten]")) { stundenplanBearbeiten(); return; }
   if (ev.target.closest("[data-neuesfach]")) { fachBearbeiten(null); return; }
 
   const fachKnopf = ev.target.closest("[data-fach]");
   if (fachKnopf) { fachBearbeiten(fachKnopf.dataset.fach); return; }
 
-  if (ev.target.closest("[data-schnellstart]")) {
-    if (daten.anmeldung.schnellstart) {
-      daten.anmeldung.schnellstart = false;
-      daten.anmeldung.gemerkt = false;
-      daten.anmeldung.webauthnId = "";
-      sichern(); zeichne();
-    } else {
-      schnellstartEinrichten().then(art => {
-        zeichne();
-        alert(art === "biometrie"
-          ? "Schnellstart eingerichtet: Homy öffnet sich jetzt mit Face ID bzw. Touch ID."
-          : "Schnellstart eingerichtet: Homy merkt sich diesen Browser und öffnet ohne Code.\n\n"
-            + "Echtes Face ID lässt diese eingebettete Seite nicht zu – in der gebauten "
-            + "iOS-App ist es immer Face ID bzw. Touch ID.");
-      });
-    }
-    return;
-  }
-
   if (ev.target.closest("[data-anmeldungaus]")) {
-    if (confirm("Anmeldung ausschalten? Danach kann jeder Homy öffnen.")) {
+    frage("Anmeldung ausschalten?", "Danach kann jeder Homy öffnen.",
+          { ja: "Ausschalten", gefaehrlich: true }).then(ok => {
+      if (!ok) return;
       daten.anmeldung.an = false;
-      daten.anmeldung.schnellstart = false;
-      daten.anmeldung.gemerkt = false;
-      daten.anmeldung.webauthnId = "";
       sichern(); zeichne();
-    }
+    });
     return;
   }
 
@@ -3878,15 +3810,19 @@ el.addEventListener("click", ev => {
   }
 
   if (ev.target.closest("[data-zuruecksetzen]")) {
-    if (!confirm("Wirklich alles leeren? Stundenplan, Hausaufgaben, Notizen, "
-               + "Termine und Ferien werden gelöscht.")) return;
-    const anmeldungBleibt = daten.anmeldung;
-    daten = leereDaten();
-    daten.anmeldung = anmeldungBleibt;
-    sichern();
-    planFoto = null;
-    aufgeklappt = {};
-    zeichne();
+    frage("Wirklich alles leeren?",
+          "Stundenplan, Hausaufgaben, Notizen, Termine und Ferien werden gelöscht.",
+          { ja: "Leeren", gefaehrlich: true }).then(ok => {
+      if (!ok) return;
+      const anmeldungBleibt = daten.anmeldung;
+      daten = leereDaten();
+      daten.anmeldung = anmeldungBleibt;
+      sichern();
+      planFoto = null;
+      aufgeklappt = {};
+      zeichne();
+    });
+    return;
   }
 });
 
@@ -4179,7 +4115,8 @@ function fotoWaehlen() {
       zeichne();
       window.scrollTo(0, 0);
     };
-    leser.onerror = () => alert("Das Bild konnte nicht gelesen werden.");
+    leser.onerror = () => meldung("Das Bild konnte nicht gelesen werden.",
+                                  "Versuch es mit einem anderen Foto.");
     leser.readAsDataURL(datei);
   });
 

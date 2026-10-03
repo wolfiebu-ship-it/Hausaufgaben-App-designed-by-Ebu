@@ -261,7 +261,7 @@
     </svg>
     <div>
       <div class="leistenname">Homy</div>
-      <div class="leistenzahl">55 Dateien · 10.086 Zeilen</div>
+      <div class="leistenzahl">54 Dateien · 9.911 Zeilen</div>
     </div>
     <input type="search" id="suche" class="suchfeld" placeholder="Datei suchen …"
            aria-label="Datei suchen">
@@ -276,8 +276,8 @@
        komplette Projekt auf einmal – mit Dateinamen als Trenner, damit du es
        hinterher wieder auseinandernehmen kannst.</p>
     <div class="zahlen">
-      <span><b>55</b> Dateien</span>
-      <span><b>10.086</b> Zeilen</span>
+      <span><b>54</b> Dateien</span>
+      <span><b>9.911</b> Zeilen</span>
       <span><b>Swift 5</b> · SwiftUI</span>
       <span><b>iOS 17</b> · iPhone und iPad</span>
     </div>
@@ -352,11 +352,10 @@ ANMELDUNG
 Homy kann beim Öffnen einen Zahlencode verlangen (4 bis 8 Ziffern, ab Werk aus).
 Eigenes Tastenfeld auf dem Anmeldebild, deckend, damit nichts durchscheint.
 Gespeichert wird nur ein Prüfwert (SHA-256 mit Zufallsbeigabe über CryptoKit),
-nie der Code. Ein Knopf &quot;Schnellstart für mich einrichten&quot; stellt Face ID bzw.
-Touch ID (LocalAuthentication) ein und fragt nur noch beim Neustart nach; wann
-gefragt wird, ist auch einzeln wählbar (jedes Mal, 5 Minuten, 1 Stunde, nur beim
-Neustart). Nach fünf Fehlversuchen eine halbe Minute Pause. Freiwilliger Merkzettel
-unter &quot;Code vergessen?&quot;. Der Code steht nicht in den Sicherungsdateien, und ein
+nie der Code. Kein Face ID, kein Touch ID, kein Schnellstart – nur der Code.
+Wann gefragt wird, ist wählbar (jedes Mal, 5 Minuten, 1 Stunde, nur beim
+Neustart). Nach fünf Fehlversuchen eine halbe Minute Pause. Freiwilliger Merkzettel:
+Tippt man auf &quot;Code vergessen?&quot;, steht er direkt auf dem Anmeldebild. Der Code steht nicht in den Sicherungsdateien, und ein
 Zurücksetzen der Daten hebt die Anmeldung nicht auf.
 
 ERINNERUNGEN
@@ -385,7 +384,7 @@ das Raster ableiten: Spalten sind die Wochentage, Zeilen die Stunden. Danach IMM
 ein Prüfschritt, in dem das Ergebnis als Raster gezeigt wird und falsch Gelesenes
 angetippt und korrigiert werden kann; unbekannte Kürzel lassen sich als neue Fächer
 anlegen. Erst dann übernehmen. Das Foto bleibt auf dem Gerät. Die Info.plist braucht
-Texte für Kamera, Fotos und Face ID.
+Texte für Kamera und Fotos.
 
 AUSSEHEN
 Freundlich und bunt. Je Fach ein kräftiger Ton für die Schrift und eine helle Fläche
@@ -414,7 +413,7 @@ in die App und sag es mir – erfundene Daten sind schlimmer als gar keine.</cod
       <p class="pfad">HausaufgabenApp.xcodeproj/project.pbxproj</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Xcode-Projekt · 291 Zeilen</span>
+      <span class="marke">Xcode-Projekt · 289 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -630,7 +629,6 @@ in die App und sag es mir – erfundene Daten sind schlimmer als gar keine.</cod
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = &quot;Zum Scannen deines Stundenplans wird die Kamera gebraucht. Das Foto bleibt auf dem Gerät.&quot;;
-				INFOPLIST_KEY_NSFaceIDUsageDescription = &quot;Damit du Homy mit einem Blick öffnen kannst, statt jedes Mal deinen Code zu tippen.&quot;;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = &quot;Damit kannst du ein bereits aufgenommenes Foto deines Stundenplans auswählen.&quot;;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -664,7 +662,6 @@ in die App und sag es mir – erfundene Daten sind schlimmer als gar keine.</cod
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = &quot;Zum Scannen deines Stundenplans wird die Kamera gebraucht. Das Foto bleibt auf dem Gerät.&quot;;
-				INFOPLIST_KEY_NSFaceIDUsageDescription = &quot;Damit du Homy mit einem Blick öffnen kannst, statt jedes Mal deinen Code zu tippen.&quot;;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = &quot;Damit kannst du ein bereits aufgenommenes Foto deines Stundenplans auswählen.&quot;;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -809,7 +806,7 @@ struct AppData: Codable {
     /// Die eigenen Angaben (Name, Klasse, Telefon …).
     var profile: Profile
     var settings: AppSettings
-    /// Die Anmeldung (Code, Schnellstart). Enthält nur einen Prüfwert des Codes.
+    /// Die Anmeldung. Enthält nur einen Prüfwert des Codes.
     var lock: LockSettings
 
     static let currentVersion = 1
@@ -1724,7 +1721,7 @@ struct Lesson: Identifiable, Codable, Hashable {
       <p class="pfad">HausaufgabenApp/Models/LockSettings.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 152 Zeilen</span>
+      <span class="marke">Swift · 149 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -1740,7 +1737,7 @@ enum LockTiming: String, Codable, Hashable, CaseIterable, Identifiable {
     case afterFiveMinutes
     /// Erst, wenn die App eine Stunde weg war.
     case afterOneHour
-    /// Nur beim Neustart der App – der Schnellstart für einen selbst.
+    /// Nur beim Neustart der App.
     case onlyOnLaunch
 
     var id: String { rawValue }
@@ -1779,7 +1776,7 @@ enum LockTiming: String, Codable, Hashable, CaseIterable, Identifiable {
     }
 }
 
-/// Die Anmeldung: ein Zahlencode, dazu wahlweise Face ID oder Touch ID.
+/// Die Anmeldung: ein Zahlencode.
 ///
 /// Gespeichert wird nur ein Prüfwert des Codes (SHA-256 mit Zufallsbeigabe),
 /// nicht der Code selbst.
@@ -1792,8 +1789,6 @@ struct LockSettings: Codable, Hashable {
     var codeHash: String
     /// Wie viele Ziffern der Code hat (für die Punkte auf dem Anmeldebild).
     var codeLength: Int
-    /// Schnellstart mit Face ID oder Touch ID.
-    var useBiometrics: Bool
     /// Wann nachgefragt wird.
     var timing: LockTiming
     /// Freiwilliger Merkzettel, falls man den Code vergisst.
@@ -1803,14 +1798,12 @@ struct LockSettings: Codable, Hashable {
          salt: String = &quot;&quot;,
          codeHash: String = &quot;&quot;,
          codeLength: Int = 4,
-         useBiometrics: Bool = true,
          timing: LockTiming = .always,
          hint: String = &quot;&quot;) {
         self.isEnabled = isEnabled
         self.salt = salt
         self.codeHash = codeHash
         self.codeLength = codeLength
-        self.useBiometrics = useBiometrics
         self.timing = timing
         self.hint = hint
     }
@@ -1876,7 +1869,8 @@ struct LockSettings: Codable, Hashable {
         salt = try container.decodeIfPresent(String.self, forKey: .salt) ?? &quot;&quot;
         codeHash = try container.decodeIfPresent(String.self, forKey: .codeHash) ?? &quot;&quot;
         codeLength = try container.decodeIfPresent(Int.self, forKey: .codeLength) ?? 4
-        useBiometrics = try container.decodeIfPresent(Bool.self, forKey: .useBiometrics) ?? true
+        // Ein früheres Feld &quot;useBiometrics&quot; (Face ID) wird beim Lesen einfach
+        // übergangen – ältere Daten bleiben dadurch lesbar.
         timing = try container.decodeIfPresent(LockTiming.self, forKey: .timing) ?? .always
         hint = try container.decodeIfPresent(String.self, forKey: .hint) ?? &quot;&quot;
     }
@@ -2191,7 +2185,7 @@ final class AppStore: ObservableObject {
         }
     }
 
-    /// Die Anmeldung: Code, Schnellstart und wann nachgefragt wird.
+    /// Die Anmeldung: Code und wann nachgefragt wird.
     /// Bleibt auf diesem Gerät – Sicherungen enthalten sie nicht.
     @Published var lock: LockSettings {
         didSet {
@@ -3198,7 +3192,7 @@ final class LockController: ObservableObject {
     <button type="button" class="mehr" data-mehr>Ganz anzeigen</button>
   </div>
 </article>
-<h2 class="gruppe">Support – Helfer<span class="gruppenzahl">11</span></h2>
+<h2 class="gruppe">Support – Helfer<span class="gruppenzahl">10</span></h2>
 <article class="datei" data-suche="hausaufgabenapp/support/apptheme.swift">
   <header class="dateikopf">
     <div class="dateiname">
@@ -3368,101 +3362,10 @@ struct BackupDocument: FileDocument {
     <button type="button" class="mehr" data-mehr>Ganz anzeigen</button>
   </div>
 </article>
-<article class="datei" data-suche="hausaufgabenapp/support/biometricauth.swift">
-  <header class="dateikopf">
-    <div class="dateiname">
-      <span class="nummer">19</span>
-      <h3>BiometricAuth.swift</h3>
-      <p class="pfad">HausaufgabenApp/Support/BiometricAuth.swift</p>
-    </div>
-    <div class="dateitat">
-      <span class="marke">Swift · 74 Zeilen</span>
-      <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
-    </div>
-  </header>
-  <div class="codehuelle">
-    <pre class="code"><code>import Foundation
-import LocalAuthentication
-
-/// Womit sich das Gerät entsperren lässt.
-enum BiometricKind {
-    case faceID
-    case touchID
-    case opticID
-    case none
-
-    var title: String {
-        switch self {
-        case .faceID:  return &quot;Face ID&quot;
-        case .touchID: return &quot;Touch ID&quot;
-        case .opticID: return &quot;Optic ID&quot;
-        case .none:    return &quot;Schnellstart&quot;
-        }
-    }
-
-    var symbol: String {
-        switch self {
-        case .faceID:  return &quot;faceid&quot;
-        case .touchID: return &quot;touchid&quot;
-        case .opticID: return &quot;opticid&quot;
-        case .none:    return &quot;bolt.fill&quot;
-        }
-    }
-
-    var isAvailable: Bool { self != .none }
-}
-
-/// Der Schnellstart: mit dem Gesicht oder dem Finger öffnen, statt den Code zu tippen.
-///
-/// Die App bekommt dabei nie das Gesicht oder den Fingerabdruck zu sehen –
-/// iOS prüft das selbst und sagt nur Ja oder Nein.
-enum BiometricAuth {
-
-    /// Was dieses Gerät kann. Ist nichts eingerichtet, kommt `.none` zurück.
-    static func availableKind() -&gt; BiometricKind {
-        let context = LAContext()
-        var error: NSError?
-        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
-                                        error: &amp;error) else {
-            return .none
-        }
-        switch context.biometryType {
-        case .faceID:  return .faceID
-        case .touchID: return .touchID
-        default:
-            // Neuere Geräte (Vision Pro) melden Typen, die dieses SDK
-            // noch nicht namentlich kennt – der Schnellstart geht trotzdem.
-            return .opticID
-        }
-    }
-
-    /// Fragt iOS nach der Entsperrung. Liefert `true`, wenn es geklappt hat.
-    static func authenticate(reason: String) async -&gt; Bool {
-        let context = LAContext()
-        context.localizedCancelTitle = &quot;Code eingeben&quot;
-
-        var error: NSError?
-        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
-                                        error: &amp;error) else {
-            return false
-        }
-
-        return await withCheckedContinuation { continuation in
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
-                                   localizedReason: reason) { success, _ in
-                continuation.resume(returning: success)
-            }
-        }
-    }
-}
-</code></pre>
-    <button type="button" class="mehr" data-mehr>Ganz anzeigen</button>
-  </div>
-</article>
 <article class="datei" data-suche="hausaufgabenapp/support/doodlebackground.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">20</span>
+      <span class="nummer">19</span>
       <h3>DoodleBackground.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/DoodleBackground.swift</p>
     </div>
@@ -3550,7 +3453,7 @@ struct DoodleCanvas: View {
 <article class="datei" data-suche="hausaufgabenapp/support/haptics.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">21</span>
+      <span class="nummer">20</span>
       <h3>Haptics.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/Haptics.swift</p>
     </div>
@@ -3593,7 +3496,7 @@ enum Haptics {
 <article class="datei" data-suche="hausaufgabenapp/support/homylogo.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">22</span>
+      <span class="nummer">21</span>
       <h3>HomyLogo.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/HomyLogo.swift</p>
     </div>
@@ -3737,7 +3640,7 @@ struct HomyWordmark: View {
 <article class="datei" data-suche="hausaufgabenapp/support/publicholidays.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">23</span>
+      <span class="nummer">22</span>
       <h3>PublicHolidays.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/PublicHolidays.swift</p>
     </div>
@@ -3943,7 +3846,7 @@ enum PublicHolidays {
 <article class="datei" data-suche="hausaufgabenapp/support/reminders.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">24</span>
+      <span class="nummer">23</span>
       <h3>Reminders.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/Reminders.swift</p>
     </div>
@@ -4132,7 +4035,7 @@ extension Holiday {
 <article class="datei" data-suche="hausaufgabenapp/support/schoolcalendar.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">25</span>
+      <span class="nummer">24</span>
       <h3>SchoolCalendar.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/SchoolCalendar.swift</p>
     </div>
@@ -4330,7 +4233,7 @@ enum SchoolCalendar {
 <article class="datei" data-suche="hausaufgabenapp/support/subjectnames.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">26</span>
+      <span class="nummer">25</span>
       <h3>SubjectNames.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/SubjectNames.swift</p>
     </div>
@@ -4431,7 +4334,7 @@ enum SubjectNames {
 <article class="datei" data-suche="hausaufgabenapp/support/timetablerecognizer.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">27</span>
+      <span class="nummer">26</span>
       <h3>TimetableRecognizer.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/TimetableRecognizer.swift</p>
     </div>
@@ -4854,7 +4757,7 @@ extension UIImage {
 <article class="datei" data-suche="hausaufgabenapp/views/rootview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">28</span>
+      <span class="nummer">27</span>
       <h3>RootView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/RootView.swift</p>
     </div>
@@ -4922,7 +4825,7 @@ struct RootView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/lock/appgateview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">29</span>
+      <span class="nummer">28</span>
       <h3>AppGateView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Lock/AppGateView.swift</p>
     </div>
@@ -4976,12 +4879,12 @@ struct AppGateView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/lock/locksetupview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">30</span>
+      <span class="nummer">29</span>
       <h3>LockSetupView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Lock/LockSetupView.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 116 Zeilen</span>
+      <span class="marke">Swift · 106 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -5001,8 +4904,6 @@ struct LockSetupView: View {
     @State private var repeated = &quot;&quot;
     @State private var hint = &quot;&quot;
     @State private var problem: String?
-
-    private var biometrics: BiometricKind { BiometricAuth.availableKind() }
 
     var body: some View {
         NavigationStack {
@@ -5064,11 +4965,7 @@ struct LockSetupView: View {
     }
 
     private var warningText: String {
-        var text = &quot;Der Code wird nicht im Klartext gespeichert – die App kann ihn dir später nicht mehr zeigen. Vergisst du ihn, hilft nur noch, Homy zu löschen und neu zu laden; die Hausaufgaben sind dann weg, falls du keine Sicherung hast.&quot;
-        if biometrics.isAvailable {
-            text += &quot;\n\nDanach kannst du den Schnellstart mit \(biometrics.title) einschalten, damit du selbst nicht jedes Mal tippen musst.&quot;
-        }
-        return text
+        &quot;Der Code wird nicht im Klartext gespeichert – die App kann ihn dir später nicht mehr zeigen. Vergisst du ihn, hilft nur noch, Homy zu löschen und neu zu laden; die Hausaufgaben sind dann weg, falls du keine Sicherung hast.&quot;
     }
 
     private func save() {
@@ -5092,10 +4989,6 @@ struct LockSetupView: View {
         lock.setCode(new)
         lock.isEnabled = true
         lock.hint = hint.trimmingCharacters(in: .whitespacesAndNewlines)
-        // Beim allerersten Einrichten den Schnellstart gleich anbieten.
-        if !isChanging, biometrics.isAvailable {
-            lock.useBiometrics = true
-        }
         store.lock = lock
 
         Haptics.success()
@@ -5109,12 +5002,12 @@ struct LockSetupView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/lock/lockview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">31</span>
+      <span class="nummer">30</span>
       <h3>LockView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Lock/LockView.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 266 Zeilen</span>
+      <span class="marke">Swift · 219 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -5122,9 +5015,6 @@ struct LockSetupView: View {
     <pre class="code"><code>import SwiftUI
 
 /// Das Anmeldebild: ohne den richtigen Code kommt man nicht in die App.
-///
-/// Wer den Schnellstart eingeschaltet hat, wird gleich beim Öffnen von
-/// Face ID bzw. Touch ID begrüßt und muss gar nichts tippen.
 struct LockView: View {
     @EnvironmentObject private var store: AppStore
     @EnvironmentObject private var lock: LockController
@@ -5133,15 +5023,11 @@ struct LockView: View {
     @State private var wobble = 0
     @State private var message: String?
     @State private var showsHint = false
-    @State private var isAskingBiometrics = false
-    @State private var didAskAutomatically = false
     @State private var now = Date()
 
     private let clock = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var settings: LockSettings { store.lock }
-    private var biometrics: BiometricKind { BiometricAuth.availableKind() }
-    private var usesBiometrics: Bool { settings.useBiometrics &amp;&amp; biometrics.isAvailable }
 
     private var greeting: String {
         let name = store.profile.firstName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -5187,13 +5073,6 @@ struct LockView: View {
             guard lock.isPaused else { return }
             now = value
             lock.clearExpiredPause()
-        }
-        .task {
-            // Beim Öffnen einmal von selbst nach Face ID fragen.
-            guard !didAskAutomatically else { return }
-            didAskAutomatically = true
-            guard usesBiometrics, !lock.isPaused else { return }
-            await askBiometrics()
         }
         .alert(&quot;Code vergessen?&quot;, isPresented: $showsHint) {
             Button(&quot;Verstanden&quot;, role: .cancel) { }
@@ -5264,7 +5143,8 @@ struct LockView: View {
             }
 
             HStack(spacing: 18) {
-                biometricKey
+                // Links unten bleibt frei, damit die 0 mittig unter der 8 steht.
+                Color.clear.frame(width: 74, height: 74)
                 digitKey(&quot;0&quot;)
                 deleteKey
             }
@@ -5286,27 +5166,6 @@ struct LockView: View {
         .disabled(lock.isPaused)
         .opacity(lock.isPaused ? 0.45 : 1)
         .accessibilityLabel(&quot;Ziffer \(digit)&quot;)
-    }
-
-    @ViewBuilder
-    private var biometricKey: some View {
-        if usesBiometrics {
-            Button {
-                Task { await askBiometrics() }
-            } label: {
-                Image(systemName: biometrics.symbol)
-                    .font(.system(size: 28))
-                    .foregroundStyle(.tint)
-                    .frame(width: 74, height: 74)
-                    .contentShape(Circle())
-            }
-            .buttonStyle(.plain)
-            .disabled(lock.isPaused || isAskingBiometrics)
-            .opacity(lock.isPaused ? 0.45 : 1)
-            .accessibilityLabel(&quot;Mit \(biometrics.title) öffnen&quot;)
-        } else {
-            Color.clear.frame(width: 74, height: 74)
-        }
     }
 
     private var deleteKey: some View {
@@ -5371,19 +5230,6 @@ struct LockView: View {
             }
         }
     }
-
-    private func askBiometrics() async {
-        guard !isAskingBiometrics, !lock.isPaused else { return }
-        isAskingBiometrics = true
-        let reason = &quot;Homy öffnen&quot;
-        let ok = await BiometricAuth.authenticate(reason: reason)
-        isAskingBiometrics = false
-        if ok {
-            Haptics.success()
-            code = &quot;&quot;
-            lock.unlock()
-        }
-    }
 }
 </code></pre>
     <button type="button" class="mehr" data-mehr>Ganz anzeigen</button>
@@ -5393,7 +5239,7 @@ struct LockView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/homeworkdaycard.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">32</span>
+      <span class="nummer">31</span>
       <h3>HomeworkDayCard.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/HomeworkDayCard.swift</p>
     </div>
@@ -5744,7 +5590,7 @@ struct HomeworkDayCard: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/homeworkpagerview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">33</span>
+      <span class="nummer">32</span>
       <h3>HomeworkPagerView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/HomeworkPagerView.swift</p>
     </div>
@@ -5936,7 +5782,7 @@ struct HomeworkPagerView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/homeworkrow.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">34</span>
+      <span class="nummer">33</span>
       <h3>HomeworkRow.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/HomeworkRow.swift</p>
     </div>
@@ -6143,7 +5989,7 @@ struct SubjectBadge: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/homeworkweekview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">35</span>
+      <span class="nummer">34</span>
       <h3>HomeworkWeekView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/HomeworkWeekView.swift</p>
     </div>
@@ -6310,7 +6156,7 @@ struct HintBox: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/searchview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">36</span>
+      <span class="nummer">35</span>
       <h3>SearchView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/SearchView.swift</p>
     </div>
@@ -6472,7 +6318,7 @@ struct SearchResultRow: View {
 <article class="datei" data-suche="hausaufgabenapp/views/calendar/calendarview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">37</span>
+      <span class="nummer">36</span>
       <h3>CalendarView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Calendar/CalendarView.swift</p>
     </div>
@@ -7339,7 +7185,7 @@ struct HolidayRow: View {
 <article class="datei" data-suche="hausaufgabenapp/views/calendar/eventeditorview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">38</span>
+      <span class="nummer">37</span>
       <h3>EventEditorView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Calendar/EventEditorView.swift</p>
     </div>
@@ -7581,7 +7427,7 @@ struct EventEditorView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/calendar/holidayeditorview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">39</span>
+      <span class="nummer">38</span>
       <h3>HolidayEditorView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Calendar/HolidayEditorView.swift</p>
     </div>
@@ -7832,7 +7678,7 @@ struct HolidayEditorView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/notes/notedetailview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">40</span>
+      <span class="nummer">39</span>
       <h3>NoteDetailView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Notes/NoteDetailView.swift</p>
     </div>
@@ -7926,7 +7772,7 @@ struct NoteDetailView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/notes/notesview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">41</span>
+      <span class="nummer">40</span>
       <h3>NotesView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Notes/NotesView.swift</p>
     </div>
@@ -8078,7 +7924,7 @@ struct NoteRow: View {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/documentscannerview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">42</span>
+      <span class="nummer">41</span>
       <h3>DocumentScannerView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/DocumentScannerView.swift</p>
     </div>
@@ -8144,7 +7990,7 @@ struct DocumentScannerView: UIViewControllerRepresentable {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/lessoneditorview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">43</span>
+      <span class="nummer">42</span>
       <h3>LessonEditorView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/LessonEditorView.swift</p>
     </div>
@@ -8291,7 +8137,7 @@ struct LessonEditorView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/scanreviewview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">44</span>
+      <span class="nummer">43</span>
       <h3>ScanReviewView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/ScanReviewView.swift</p>
     </div>
@@ -8717,7 +8563,7 @@ struct ScanCellEditor: View {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/timetablescanflow.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">45</span>
+      <span class="nummer">44</span>
       <h3>TimetableScanFlow.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift</p>
     </div>
@@ -8946,7 +8792,7 @@ private struct Tipp: View {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/timetableview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">46</span>
+      <span class="nummer">45</span>
       <h3>TimetableView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/TimetableView.swift</p>
     </div>
@@ -9276,7 +9122,7 @@ struct TimetableCell: View {
 <article class="datei" data-suche="hausaufgabenapp/views/subjects/subjecteditorview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">47</span>
+      <span class="nummer">46</span>
       <h3>SubjectEditorView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Subjects/SubjectEditorView.swift</p>
     </div>
@@ -9476,7 +9322,7 @@ struct SubjectEditorView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/subjects/subjectsview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">48</span>
+      <span class="nummer">47</span>
       <h3>SubjectsView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Subjects/SubjectsView.swift</p>
     </div>
@@ -9762,7 +9608,7 @@ struct SubjectRow: View {
 <article class="datei" data-suche="hausaufgabenapp/views/settings/profileview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">49</span>
+      <span class="nummer">48</span>
       <h3>ProfileView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Settings/ProfileView.swift</p>
     </div>
@@ -9906,12 +9752,12 @@ struct LabeledField: View {
 <article class="datei" data-suche="hausaufgabenapp/views/settings/settingsview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">50</span>
+      <span class="nummer">49</span>
       <h3>SettingsView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Settings/SettingsView.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 689 Zeilen</span>
+      <span class="marke">Swift · 653 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -10201,7 +10047,7 @@ struct SettingsView: View {
 
     // MARK: - Anmeldung
 
-    /// Die Anmeldung: ein Code für alle – und der Schnellstart für einen selbst.
+    /// Die Anmeldung: ein Zahlencode für alle, die Homy öffnen wollen.
     @ViewBuilder
     private var lockSection: some View {
         Section {
@@ -10252,17 +10098,6 @@ struct SettingsView: View {
                 .foregroundStyle(.green)
         }
 
-        if biometrics.isAvailable {
-            Toggle(isOn: biometricsBinding) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(&quot;Schnellstart mit \(biometrics.title)&quot;)
-                    Text(&quot;Nur ansehen statt tippen – gilt für dich, nicht für andere.&quot;)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-
         Picker(selection: timingBinding) {
             ForEach(LockTiming.allCases) { timing in
                 Text(timing.title).tag(timing)
@@ -10276,19 +10111,6 @@ struct SettingsView: View {
             }
         }
         .pickerStyle(.navigationLink)
-
-        Button {
-            var neu = store.lock
-            neu.useBiometrics = biometrics.isAvailable
-            neu.timing = .onlyOnLaunch
-            store.lock = neu
-            Haptics.success()
-            infoMessage = biometrics.isAvailable
-                ? &quot;Schnellstart an: \(biometrics.title) genügt, und nur beim Neustart wird gefragt.&quot;
-                : &quot;Homy fragt jetzt nur noch beim Neustart nach dem Code.&quot;
-        } label: {
-            Label(&quot;Schnellstart für mich einrichten&quot;, systemImage: &quot;bolt.fill&quot;)
-        }
 
         Button {
             isChangingCode = true
@@ -10310,13 +10132,6 @@ struct SettingsView: View {
         }
     }
 
-    private var biometrics: BiometricKind { BiometricAuth.availableKind() }
-
-    private var biometricsBinding: Binding&lt;Bool&gt; {
-        Binding(get: { store.lock.useBiometrics },
-                set: { store.lock.useBiometrics = $0 })
-    }
-
     private var timingBinding: Binding&lt;LockTiming&gt; {
         Binding(get: { store.lock.timing },
                 set: { store.lock.timing = $0 })
@@ -10324,14 +10139,9 @@ struct SettingsView: View {
 
     private var lockFooter: String {
         if store.lock.isActive {
-            var text = &quot;Ohne den Code kommt niemand an deine Hausaufgaben, Notizen und Daten. Mit dem Schnellstart musst du selbst so gut wie nie etwas eingeben.&quot;
-            if biometrics.isAvailable {
-                text += &quot; \(biometrics.title) prüft iOS – Homy bekommt dein Gesicht bzw. deinen Finger nie zu sehen.&quot;
-            }
-            text += &quot;\n\nDer Code steht nicht in den Sicherungsdateien: Eine Sicherung kann die Anmeldung weder setzen noch aufheben.&quot;
-            return text
+            return &quot;Ohne den Code kommt niemand an deine Hausaufgaben, Notizen und Daten. Wie oft gefragt wird, stellst du unter „Code abfragen“ ein.\n\nDer Code steht nicht in den Sicherungsdateien: Eine Sicherung kann die Anmeldung weder setzen noch aufheben.&quot;
         }
-        return &quot;Wenn du magst, verlangt Homy beim Öffnen einen Zahlencode. Für dich selbst lässt sich danach ein Schnellstart einstellen, damit du nicht jedes Mal tippen musst.&quot;
+        return &quot;Wenn du magst, verlangt Homy beim Öffnen einen Zahlencode.&quot;
     }
 
     // MARK: - Abschnitte
@@ -10612,7 +10422,7 @@ struct SettingsView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/settings/timetablesettingsview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">51</span>
+      <span class="nummer">50</span>
       <h3>TimetableSettingsView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Settings/TimetableSettingsView.swift</p>
     </div>
@@ -10882,7 +10692,7 @@ struct TimetableSettingsView: View {
 <article class="datei" data-suche="hausaufgabenapp/assets.xcassets/accentcolor.colorset/contents.json">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">52</span>
+      <span class="nummer">51</span>
       <h3>Contents.json</h3>
       <p class="pfad">HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json</p>
     </div>
@@ -10937,7 +10747,7 @@ struct TimetableSettingsView: View {
 <article class="datei" data-suche="hausaufgabenapp/assets.xcassets/appicon.appiconset/contents.json">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">53</span>
+      <span class="nummer">52</span>
       <h3>Contents.json</h3>
       <p class="pfad">HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json</p>
     </div>
@@ -10968,7 +10778,7 @@ struct TimetableSettingsView: View {
 <article class="datei" data-suche="hausaufgabenapp/assets.xcassets/contents.json">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">54</span>
+      <span class="nummer">53</span>
       <h3>Contents.json</h3>
       <p class="pfad">HausaufgabenApp/Assets.xcassets/Contents.json</p>
     </div>
@@ -10992,12 +10802,12 @@ struct TimetableSettingsView: View {
 <article class="datei" data-suche="readme.md">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">55</span>
+      <span class="nummer">54</span>
       <h3>README.md</h3>
       <p class="pfad">README.md</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Markdown · 379 Zeilen</span>
+      <span class="marke">Markdown · 377 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -11150,23 +10960,22 @@ Zu finden **im Stundenplan oben links** oder in den Einstellungen – seit dem K
 Damit nicht jeder, der das Gerät in die Hand nimmt, in deinen Sachen liest, kann Homy beim Öffnen einen **Zahlencode** verlangen. Eingeschaltet wird das in den Einstellungen unter *Anmeldung*; ab Werk ist es aus.
 
 - **Der Code** sind 4 bis 8 Ziffern. Auf dem Anmeldebild gibt es ein eigenes Tastenfeld – sobald die letzte Ziffer steht, prüft Homy von selbst.
-- **Schnellstart für dich.** Ein Knopf stellt in einem Rutsch das ein, was du für dich willst: mit **Face ID bzw. Touch ID** öffnen und nur **beim Neustart** überhaupt fragen. Du schaust die App also nur an und bist drin – den Code tippen müssen die anderen.
-- **Wann gefragt wird**, lässt sich auch einzeln wählen: jedes Mal, nach 5 Minuten, nach 1 Stunde oder nur beim Neustart.
+- **Wann gefragt wird**, stellst du selbst ein: jedes Mal, nach 5 Minuten, nach 1 Stunde oder nur beim Neustart.
 - **Nach fünf Fehlversuchen** gibt es eine halbe Minute Pause.
 - **„Homy jetzt zusperren“** macht die App sofort zu, etwa bevor du sie aus der Hand gibst.
-- Ein freiwilliger **Merkzettel** erscheint auf dem Anmeldebild unter „Code vergessen?“.
+- Ein freiwilliger **Merkzettel** erscheint auf dem Anmeldebild, wenn man auf „Code vergessen?“ tippt.
+- **Face ID und Touch ID gibt es nicht** – auch keinen Schnellstart-Knopf. Homy öffnet sich nur mit dem Code.
 
 Was dabei wichtig ist – ehrlich gesagt:
 
 - Der Code wird **nicht im Klartext gespeichert**, sondern nur als Prüfwert (SHA-256 mit Zufallsbeigabe). Die App kann ihn dir deshalb nie wieder anzeigen. **Vergisst du ihn, hilft nur Löschen und Neuladen der App** – und die Hausaufgaben sind weg, wenn du keine Sicherung hast.
-- Face ID und Touch ID prüft **iOS**, nicht Homy. Die App bekommt nie ein Gesicht oder einen Fingerabdruck zu sehen, sondern nur ein Ja oder Nein.
 - Der Code steht **nicht in den Sicherungsdateien**. Eine fremde Sicherung kann deine Anmeldung also weder setzen noch aufheben, und ein Zurücksetzen der Daten hebt sie auch nicht auf.
 - Das Ganze ist ein **Schloss vor der App**, keine Verschlüsselung der Datei. Wer den Code nicht kennt, kommt in der App nicht weiter – wer aber technisch an den Dateispeicher des Geräts kommt, ist damit nicht aufgehalten. Für ein Hausaufgabenheft ist das genau richtig, für Geheimnisse wäre es zu wenig.
 - Es ist eine Anmeldung **auf diesem Gerät**, kein Konto: Es gibt keinen Server, bei dem man sich anmelden könnte. Wer Homy auf seinem eigenen iPhone lädt, legt dort seinen eigenen Code fest.
 
 ### 8. Einstellungen
 
-- **Anmeldung** – Code einrichten, Schnellstart einschalten, sofort zusperren (siehe oben).
+- **Anmeldung** – Code einrichten oder ändern, einstellen wann gefragt wird, sofort zusperren (siehe oben).
 - **Erinnerungen** – an Termine und Ferien erinnern lassen, Voreinstellung für neue Einträge.
 - **Fächer** – der zweite Weg zur Fächerliste (der erste ist im Stundenplan oben links).
 - **Bundesland** – bestimmt die gesetzlichen Feiertage im Kalender (siehe oben).
@@ -11233,7 +11042,7 @@ Dafür brauchst du einen **Mac mit Xcode** (kostenlos im Mac App Store). Ohne Ma
 - **Mindestversion:** iOS 17.0 (iPhone und iPad, Hoch- und Querformat)
 - **Die fünf Tabs** sind Hausaufgaben, Kalender, Stundenplan, Notizen und Einstellungen. Die **Fächer** haben keinen eigenen Tab mehr: Sie sitzen jetzt beim Stundenplan (oben links) und stehen zusätzlich in den Einstellungen. Grund ist iOS: Ab dem sechsten Tab faltet das iPhone alles Weitere in ein „Mehr“-Menü, und das wäre umständlicher als ein Tipp mehr. Die Liste „welche Stunden habe ich heute“ findest du außerdem im Kalender unter dem gewählten Tag.
 - **Name auf dem Home-Bildschirm:** Homy (`CFBundleDisplayName`). Der Projekt- und Zielname im Xcode-Projekt heißt weiterhin `HausaufgabenApp`, ebenso die gespeicherte Datei – so bleiben vorhandene Installationen und Sicherungen lesbar.
-- **Anmeldung:** CryptoKit (SHA-256 für den Prüfwert des Codes) und LocalAuthentication (Face ID / Touch ID). Beides gehört zu iOS, es kommt nichts dazu.
+- **Anmeldung:** CryptoKit (SHA-256 für den Prüfwert des Codes). Gehört zu iOS, es kommt nichts dazu.
 - **Erinnerungen:** UserNotifications mit `UNCalendarNotificationTrigger`. Termine und Ferien werden vorher zu einer gemeinsamen Liste von `ReminderItem` gerechnet. Nach jeder Änderung und einmal beim Start werden alle vorgemerkten Erinnerungen verworfen und die anstehenden neu gestellt – so passt das, was iOS vorgemerkt hat, immer zu dem, was im Kalender steht.
 - **Mit Tastatur am iPad:** ⌘← und ⌘→ blättern durch die Wochen, ⌘F öffnet die Suche, ⌘N legt eine neue Notiz an.
 - Kleine haptische Rückmeldung beim Ankreuzen und Aufklappen (iPhone).
@@ -11252,7 +11061,7 @@ HausaufgabenApp/
 │   ├── Lesson.swift             Feld im Stundenplan
 │   ├── HomeworkEntry.swift      Eine Hausaufgabe
 │   ├── AppSettings.swift        Einstellungen, Unterrichtszeiten
-│   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Schnellstart
+│   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Merkzettel
 │   ├── CalendarEvent.swift      Ein Termin samt Erinnerungszeitpunkt
 │   ├── Holiday.swift            Ferien: Zeitraum von … bis …
 │   ├── FederalState.swift       Die 16 Bundesländer
@@ -11265,7 +11074,6 @@ HausaufgabenApp/
 │   ├── AppTheme.swift           Farben (je Fach ein heller und ein kräftiger Ton)
 │   ├── Haptics.swift            Kurze Rückmeldung beim Antippen
 │   ├── HomyLogo.swift           Das Zeichen von Homy, gezeichnet statt als Bild
-│   ├── BiometricAuth.swift      Face ID / Touch ID über LocalAuthentication
 │   ├── Reminders.swift          Benachrichtigungen bei iOS anmelden
 │   ├── PublicHolidays.swift     Feiertage ausrechnen (Osterformel je Land)
 │   ├── DoodleBackground.swift   Schulmotive blass hinter den Schreib-Seiten
@@ -11305,7 +11113,7 @@ Bis hierher läuft Homy auf deinen eigenen Geräten. In den App Store zu kommen 
 - Ein eigenes App-Symbol in 1024 px und einen eigenen Namen.
 - Keine fremden Bibliotheken – nichts, dessen Lizenz du angeben müsstest.
 - Keine Datenerfassung, also eine unkomplizierte Datenschutz-Auskunft.
-- Sinnvolle Texte für die Berechtigungen (Kamera, Fotos, Face ID) – die verlangt Apple, und sie stehen schon im Projekt.
+- Sinnvolle Texte für die Berechtigungen (Kamera, Fotos) – die verlangt Apple, und sie stehen schon im Projekt.
 
 ### Was du dafür noch brauchst
 
@@ -11359,7 +11167,7 @@ Darin funktioniert alles, was ein Browser kann:
 | Stundenplan ausfüllen, Fächer anlegen und ändern | |
 | Unterrichtszeiten einstellen | |
 | **Eigenen Code festlegen**, ändern, Anmeldung aus | Prüfwert statt Klartext (SHA-256) |
-| **Schnellstart** – versucht Face ID/Touch ID über WebAuthn, sonst merkt er sich den Browser | Immer echtes Face ID / Touch ID |
+| **Merkzettel** unter „Code vergessen?“ – erscheint direkt auf dem Anmeldebild | |
 | **Foto des Stundenplans** aufnehmen; es bleibt als Vorlage über dem Raster stehen | Automatische Texterkennung (Apple Vision) |
 | Sicherung herauskopieren und einspielen | Sicherung als Datei, z. B. in iCloud Drive |
 | Hell/dunkel, alle Erklärungen | Echte Benachrichtigungen von iOS |
