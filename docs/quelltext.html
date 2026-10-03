@@ -261,7 +261,7 @@
     </svg>
     <div>
       <div class="leistenname">Homy</div>
-      <div class="leistenzahl">54 Dateien · 9.911 Zeilen</div>
+      <div class="leistenzahl">55 Dateien · 10.270 Zeilen</div>
     </div>
     <input type="search" id="suche" class="suchfeld" placeholder="Datei suchen …"
            aria-label="Datei suchen">
@@ -276,8 +276,8 @@
        komplette Projekt auf einmal – mit Dateinamen als Trenner, damit du es
        hinterher wieder auseinandernehmen kannst.</p>
     <div class="zahlen">
-      <span><b>54</b> Dateien</span>
-      <span><b>9.911</b> Zeilen</span>
+      <span><b>55</b> Dateien</span>
+      <span><b>10.270</b> Zeilen</span>
       <span><b>Swift 5</b> · SwiftUI</span>
       <span><b>iOS 17</b> · iPhone und iPad</span>
     </div>
@@ -339,7 +339,12 @@ DIE FÜNF TABS
    Feld tippen wählt das Fach; Raum und Lehrkraft lassen sich je Stunde abweichend
    setzen. Einstellbar: 1 bis 14 Stunden pro Tag, Samstag als sechster Schultag,
    Unterrichtszeiten je Stunde. Oben links führt ein Weg zu den Fächern, oben rechts
-   das Abfotografieren.
+   das Abfotografieren. Über dem Raster ein Weg zu den NOTEN: Note eintragen mit
+   Fach, Datum, &quot;Wofür&quot;, schriftlich oder mündlich und der Note von 1+ bis 6
+   (1+ = 0,7, 1- = 1,3 …). Je Fach schriftlich und mündlich getrennt gemittelt,
+   dann gewichtet (je Fach einstellbar, ab Werk 50/50; fehlt eine Seite, zählt die
+   andere). Gesamtschnitt: jedes Fach gleich. Halbjahre aus dem Datum (August bis
+   Januar, Februar bis Juli), mit Pfeilen blätterbar. Kaufmännisch runden.
 4. Notizen – aufgebaut wie Apples Notizen: oben ein Feld &quot;Notiz schreiben …&quot;,
    antippen, lostippen. Kein Titelfeld, kein Sichern-Knopf; die erste beschriebene
    Zeile wird der Titel, gespeichert wird beim Schreiben. Keine Beispielnotizen.
@@ -769,7 +774,7 @@ struct HausaufgabenApp: App {
     <button type="button" class="mehr" data-mehr>Ganz anzeigen</button>
   </div>
 </article>
-<h2 class="gruppe">Models – die Daten<span class="gruppenzahl">11</span></h2>
+<h2 class="gruppe">Models – die Daten<span class="gruppenzahl">12</span></h2>
 <article class="datei" data-suche="hausaufgabenapp/models/appdata.swift">
   <header class="dateikopf">
     <div class="dateiname">
@@ -778,7 +783,7 @@ struct HausaufgabenApp: App {
       <p class="pfad">HausaufgabenApp/Models/AppData.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 130 Zeilen</span>
+      <span class="marke">Swift · 153 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -803,6 +808,11 @@ struct AppData: Codable {
     var events: [CalendarEvent]
     /// Ferien mit Anfang und Ende.
     var holidays: [Holiday]
+    /// Noten, schriftlich und mündlich.
+    var grades: [Grade]
+    /// Wie viel Prozent die schriftlichen Noten je Fach zählen.
+    /// Schlüssel: Kennung des Fachs. Fehlt ein Fach, gilt halb und halb.
+    var gradeWeights: [String: Int]
     /// Die eigenen Angaben (Name, Klasse, Telefon …).
     var profile: Profile
     var settings: AppSettings
@@ -820,6 +830,8 @@ struct AppData: Codable {
          notes: [Note] = [],
          events: [CalendarEvent] = [],
          holidays: [Holiday] = [],
+         grades: [Grade] = [],
+         gradeWeights: [String: Int] = [:],
          profile: Profile = Profile(),
          settings: AppSettings = AppSettings(),
          lock: LockSettings = LockSettings()) {
@@ -832,6 +844,8 @@ struct AppData: Codable {
         self.notes = notes
         self.events = events
         self.holidays = holidays
+        self.grades = grades
+        self.gradeWeights = gradeWeights
         self.profile = profile
         self.settings = settings
         self.lock = lock
@@ -848,6 +862,9 @@ struct AppData: Codable {
         notes = try container.decodeIfPresent([Note].self, forKey: .notes) ?? []
         events = try container.decodeIfPresent([CalendarEvent].self, forKey: .events) ?? []
         holidays = try container.decodeIfPresent([Holiday].self, forKey: .holidays) ?? []
+        // Noten gibt es erst seit dieser Fassung – ältere Sicherungen haben keine.
+        grades = try container.decodeIfPresent([Grade].self, forKey: .grades) ?? []
+        gradeWeights = try container.decodeIfPresent([String: Int].self, forKey: .gradeWeights) ?? [:]
         profile = try container.decodeIfPresent(Profile.self, forKey: .profile) ?? Profile()
         settings = try container.decodeIfPresent(AppSettings.self, forKey: .settings) ?? AppSettings()
         lock = try container.decodeIfPresent(LockSettings.self, forKey: .lock) ?? LockSettings()
@@ -900,6 +917,17 @@ struct AppData: Codable {
                 event.startMinutes = nil
             }
             return event
+        }
+
+        // Noten nur zu vorhandenen Fächern, mit gültigem Wert und Datum.
+        grades = grades.filter { grade in
+            validIDs.contains(grade.subjectID)
+                &amp;&amp; GradeScale.validValues.contains(grade.value)
+                &amp;&amp; SchoolCalendar.date(fromDayKey: grade.dayKey) != nil
+        }
+        let gueltigeKennungen = Set(validIDs.map(\.uuidString))
+        gradeWeights = gradeWeights.filter { kennung, prozent in
+            gueltigeKennungen.contains(kennung) &amp;&amp; (0...100).contains(prozent)
         }
 
         // Ferien ohne gültigen Zeitraum wären nur verwirrend.
@@ -1426,10 +1454,217 @@ enum FederalState: String, Codable, Hashable, CaseIterable, Identifiable {
     <button type="button" class="mehr" data-mehr>Ganz anzeigen</button>
   </div>
 </article>
-<article class="datei" data-suche="hausaufgabenapp/models/holiday.swift">
+<article class="datei" data-suche="hausaufgabenapp/models/grade.swift">
   <header class="dateikopf">
     <div class="dateiname">
       <span class="nummer">08</span>
+      <h3>Grade.swift</h3>
+      <p class="pfad">HausaufgabenApp/Models/Grade.swift</p>
+    </div>
+    <div class="dateitat">
+      <span class="marke">Swift · 190 Zeilen</span>
+      <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
+    </div>
+  </header>
+  <div class="codehuelle">
+    <pre class="code"><code>import Foundation
+
+/// Schriftlich oder mündlich.
+enum GradeKind: String, Codable, Hashable, CaseIterable, Identifiable {
+    case written
+    case oral
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .written: return &quot;Schriftlich&quot;
+        case .oral:    return &quot;Mündlich&quot;
+        }
+    }
+
+    var examples: String {
+        switch self {
+        case .written: return &quot;Klassenarbeiten, Tests, Lernkontrollen&quot;
+        case .oral:    return &quot;Mitarbeit, Referate, Abfragen&quot;
+        }
+    }
+}
+
+/// Eine Note in einem Fach.
+struct Grade: Codable, Hashable, Identifiable {
+    var id: UUID
+    var subjectID: UUID
+    var kind: GradeKind
+    /// Der Notenwert: 1+ ist 0,7, 1 ist 1,0, 1- ist 1,3 … 6 ist 6,0.
+    var value: Double
+    /// Der Tag (&quot;yyyy-MM-dd&quot;). Danach richtet sich auch das Halbjahr.
+    var dayKey: String
+    /// Wofür es die Note gab, z. B. „Klassenarbeit 2“. Freiwillig.
+    var title: String
+
+    init(id: UUID = UUID(),
+         subjectID: UUID,
+         kind: GradeKind,
+         value: Double,
+         dayKey: String,
+         title: String = &quot;&quot;) {
+        self.id = id
+        self.subjectID = subjectID
+        self.kind = kind
+        self.value = value
+        self.dayKey = dayKey
+        self.title = title
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        subjectID = try container.decode(UUID.self, forKey: .subjectID)
+        kind = try container.decodeIfPresent(GradeKind.self, forKey: .kind) ?? .written
+        value = try container.decodeIfPresent(Double.self, forKey: .value) ?? 3
+        dayKey = try container.decodeIfPresent(String.self, forKey: .dayKey) ?? &quot;&quot;
+        title = try container.decodeIfPresent(String.self, forKey: .title) ?? &quot;&quot;
+    }
+
+    var halfYear: SchoolHalfYear? { SchoolHalfYear(dayKey: dayKey) }
+
+    var trimmedTitle: String { title.trimmingCharacters(in: .whitespacesAndNewlines) }
+}
+
+/// Eine Stufe der Notenskala, z. B. „2-“ mit dem Wert 2,3.
+struct GradeStep: Hashable, Identifiable {
+    let name: String
+    let value: Double
+    var id: String { name }
+}
+
+/// Die übliche Notenskala von 1+ bis 6.
+enum GradeScale {
+    static let steps: [GradeStep] = [
+        GradeStep(name: &quot;1+&quot;, value: 0.7), GradeStep(name: &quot;1&quot;, value: 1.0), GradeStep(name: &quot;1-&quot;, value: 1.3),
+        GradeStep(name: &quot;2+&quot;, value: 1.7), GradeStep(name: &quot;2&quot;, value: 2.0), GradeStep(name: &quot;2-&quot;, value: 2.3),
+        GradeStep(name: &quot;3+&quot;, value: 2.7), GradeStep(name: &quot;3&quot;, value: 3.0), GradeStep(name: &quot;3-&quot;, value: 3.3),
+        GradeStep(name: &quot;4+&quot;, value: 3.7), GradeStep(name: &quot;4&quot;, value: 4.0), GradeStep(name: &quot;4-&quot;, value: 4.3),
+        GradeStep(name: &quot;5+&quot;, value: 4.7), GradeStep(name: &quot;5&quot;, value: 5.0), GradeStep(name: &quot;5-&quot;, value: 5.3),
+        GradeStep(name: &quot;6&quot;, value: 6.0)
+    ]
+
+    static let validValues: ClosedRange&lt;Double&gt; = 0.7...6.0
+
+    /// „2-“ für 2,3 usw.
+    static func name(for value: Double) -&gt; String {
+        steps.first { abs($0.value - value) &lt; 0.01 }?.name ?? averageText(value)
+    }
+
+    /// Ein Schnitt mit einer Nachkommastelle, kaufmännisch gerundet: 1,65 wird 1,7.
+    /// Ohne das kleine Plus landet 1,65 wegen der Rechengenauigkeit bei 1,6.
+    static func averageText(_ value: Double) -&gt; String {
+        let gerundet = (value * 10 + 1e-9).rounded() / 10
+        return String(format: &quot;%.1f&quot;, gerundet).replacingOccurrences(of: &quot;.&quot;, with: &quot;,&quot;)
+    }
+
+    /// Wie viel Prozent die schriftlichen Noten zählen – zur Auswahl.
+    static let writtenShares: [Int] = [70, 60, 50, 40, 30]
+    static let defaultWrittenShare = 50
+}
+
+/// Ein Schulhalbjahr: August bis Januar ist das erste, Februar bis Juli das zweite.
+///
+/// `year` ist das Jahr, in dem das Schuljahr beginnt – 2026 steht für 2026/27.
+struct SchoolHalfYear: Hashable, Comparable {
+    var year: Int
+    var half: Int
+
+    init(year: Int, half: Int) {
+        self.year = year
+        self.half = half
+    }
+
+    init?(dayKey: String) {
+        let teile = dayKey.split(separator: &quot;-&quot;).compactMap { Int($0) }
+        guard teile.count == 3 else { return nil }
+        self.init(year: teile[0], month: teile[1])
+    }
+
+    init(date: Date) {
+        let komponenten = Calendar(identifier: .gregorian).dateComponents([.year, .month], from: date)
+        self.init(year: komponenten.year ?? 2000, month: komponenten.month ?? 1)
+    }
+
+    private init(year: Int, month: Int) {
+        if month &gt;= 8 {
+            self.year = year; half = 1
+        } else if month == 1 {
+            self.year = year - 1; half = 1
+        } else {
+            self.year = year - 1; half = 2
+        }
+    }
+
+    static var current: SchoolHalfYear { SchoolHalfYear(date: Date()) }
+
+    /// „1. Halbjahr 2026/27“
+    var title: String {
+        let folgejahr = String(year + 1).suffix(2)
+        return &quot;\(half). Halbjahr \(year)/\(folgejahr)&quot;
+    }
+
+    var next: SchoolHalfYear {
+        half == 1 ? SchoolHalfYear(year: year, half: 2) : SchoolHalfYear(year: year + 1, half: 1)
+    }
+
+    var previous: SchoolHalfYear {
+        half == 2 ? SchoolHalfYear(year: year, half: 1) : SchoolHalfYear(year: year - 1, half: 2)
+    }
+
+    static func &lt; (lhs: SchoolHalfYear, rhs: SchoolHalfYear) -&gt; Bool {
+        (lhs.year, lhs.half) &lt; (rhs.year, rhs.half)
+    }
+}
+
+/// Der Stand eines Fachs in einem Halbjahr.
+struct SubjectGradeSummary {
+    var grades: [Grade]
+    var writtenAverage: Double?
+    var oralAverage: Double?
+    /// Anteil der schriftlichen Noten am Schnitt, 0…1.
+    var writtenShare: Double
+
+    /// Schriftlich und mündlich getrennt gemittelt, dann gewichtet.
+    /// Fehlt eine Seite, zählt nur die andere.
+    var total: Double? {
+        switch (writtenAverage, oralAverage) {
+        case let (s?, m?): return s * writtenShare + m * (1 - writtenShare)
+        case let (s?, nil): return s
+        case let (nil, m?): return m
+        default: return nil
+        }
+    }
+
+    func grades(of kind: GradeKind) -&gt; [Grade] {
+        grades.filter { $0.kind == kind }.sorted { $0.dayKey &lt; $1.dayKey }
+    }
+
+    static func average(_ values: [Double]) -&gt; Double? {
+        values.isEmpty ? nil : values.reduce(0, +) / Double(values.count)
+    }
+}
+
+/// Ein Fach mit seinen Noten in einem Halbjahr – für Listen in der Oberfläche.
+struct SubjectGrades: Identifiable {
+    let subject: Subject
+    let summary: SubjectGradeSummary
+    var id: UUID { subject.id }
+}
+</code></pre>
+    <button type="button" class="mehr" data-mehr>Ganz anzeigen</button>
+  </div>
+</article>
+<article class="datei" data-suche="hausaufgabenapp/models/holiday.swift">
+  <header class="dateikopf">
+    <div class="dateiname">
+      <span class="nummer">09</span>
       <h3>Holiday.swift</h3>
       <p class="pfad">HausaufgabenApp/Models/Holiday.swift</p>
     </div>
@@ -1610,7 +1845,7 @@ struct Holiday: Identifiable, Codable, Hashable {
 <article class="datei" data-suche="hausaufgabenapp/models/homeworkentry.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">09</span>
+      <span class="nummer">10</span>
       <h3>HomeworkEntry.swift</h3>
       <p class="pfad">HausaufgabenApp/Models/HomeworkEntry.swift</p>
     </div>
@@ -1663,7 +1898,7 @@ struct HomeworkEntry: Identifiable, Codable, Hashable {
 <article class="datei" data-suche="hausaufgabenapp/models/lesson.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">10</span>
+      <span class="nummer">11</span>
       <h3>Lesson.swift</h3>
       <p class="pfad">HausaufgabenApp/Models/Lesson.swift</p>
     </div>
@@ -1716,7 +1951,7 @@ struct Lesson: Identifiable, Codable, Hashable {
 <article class="datei" data-suche="hausaufgabenapp/models/locksettings.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">11</span>
+      <span class="nummer">12</span>
       <h3>LockSettings.swift</h3>
       <p class="pfad">HausaufgabenApp/Models/LockSettings.swift</p>
     </div>
@@ -1882,7 +2117,7 @@ struct LockSettings: Codable, Hashable {
 <article class="datei" data-suche="hausaufgabenapp/models/note.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">12</span>
+      <span class="nummer">13</span>
       <h3>Note.swift</h3>
       <p class="pfad">HausaufgabenApp/Models/Note.swift</p>
     </div>
@@ -1966,7 +2201,7 @@ struct Note: Identifiable, Codable, Hashable {
 <article class="datei" data-suche="hausaufgabenapp/models/profile.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">13</span>
+      <span class="nummer">14</span>
       <h3>Profile.swift</h3>
       <p class="pfad">HausaufgabenApp/Models/Profile.swift</p>
     </div>
@@ -2055,7 +2290,7 @@ struct Profile: Codable, Hashable {
 <article class="datei" data-suche="hausaufgabenapp/models/subject.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">14</span>
+      <span class="nummer">15</span>
       <h3>Subject.swift</h3>
       <p class="pfad">HausaufgabenApp/Models/Subject.swift</p>
     </div>
@@ -2141,12 +2376,12 @@ extension Subject {
 <article class="datei" data-suche="hausaufgabenapp/store/appstore.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">15</span>
+      <span class="nummer">16</span>
       <h3>AppStore.swift</h3>
       <p class="pfad">HausaufgabenApp/Store/AppStore.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 898 Zeilen</span>
+      <span class="marke">Swift · 968 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -2170,6 +2405,10 @@ final class AppStore: ObservableObject {
     @Published private(set) var events: [CalendarEvent]
     /// Ferien mit Anfang und Ende.
     @Published private(set) var holidays: [Holiday]
+    /// Noten, schriftlich und mündlich.
+    @Published private(set) var grades: [Grade]
+    /// Prozent, die die schriftlichen Noten je Fach zählen (Schlüssel: Fach-Kennung).
+    @Published private(set) var gradeWeights: [String: Int]
     /// Die eigenen Angaben – frei änderbar, deshalb ohne private(set).
     @Published var profile: Profile {
         didSet {
@@ -2222,6 +2461,8 @@ final class AppStore: ObservableObject {
         self.notes = data.notes
         self.events = data.events
         self.holidays = data.holidays
+        self.grades = data.grades
+        self.gradeWeights = data.gradeWeights
         self.profile = data.profile
         self.settings = data.settings
         self.lock = data.lock
@@ -2269,6 +2510,8 @@ final class AppStore: ObservableObject {
         subjects.removeAll { $0.id == id }
         lessons.removeAll { $0.subjectID == id }
         homework.removeAll { $0.subjectID == id }
+        grades.removeAll { $0.subjectID == id }
+        gradeWeights.removeValue(forKey: id.uuidString)
         scheduleSave()
     }
 
@@ -2930,6 +3173,64 @@ final class AppStore: ObservableObject {
         }
     }
 
+    // MARK: - Noten
+
+    /// Legt eine Note an oder ersetzt sie, wenn es sie schon gibt.
+    func saveGrade(_ grade: Grade) {
+        guard subjects.contains(where: { $0.id == grade.subjectID }),
+              GradeScale.validValues.contains(grade.value),
+              SchoolCalendar.date(fromDayKey: grade.dayKey) != nil else { return }
+        var grade = grade
+        grade.title = grade.trimmedTitle
+        if let index = grades.firstIndex(where: { $0.id == grade.id }) {
+            grades[index] = grade
+        } else {
+            grades.append(grade)
+        }
+        scheduleSave()
+    }
+
+    func deleteGrade(id: UUID) {
+        grades.removeAll { $0.id == id }
+        scheduleSave()
+    }
+
+    /// Wie viel Prozent die schriftlichen Noten in einem Fach zählen.
+    func writtenShare(forSubject id: UUID) -&gt; Int {
+        gradeWeights[id.uuidString] ?? GradeScale.defaultWrittenShare
+    }
+
+    func setWrittenShare(_ percent: Int, forSubject id: UUID) {
+        guard (0...100).contains(percent) else { return }
+        gradeWeights[id.uuidString] = percent
+        scheduleSave()
+    }
+
+    /// Schnitt eines Fachs in einem Halbjahr.
+    func gradeSummary(forSubject id: UUID, in halfYear: SchoolHalfYear) -&gt; SubjectGradeSummary {
+        let liste = grades.filter { $0.subjectID == id &amp;&amp; $0.halfYear == halfYear }
+        return SubjectGradeSummary(
+            grades: liste,
+            writtenAverage: SubjectGradeSummary.average(liste.filter { $0.kind == .written }.map(\.value)),
+            oralAverage: SubjectGradeSummary.average(liste.filter { $0.kind == .oral }.map(\.value)),
+            writtenShare: Double(writtenShare(forSubject: id)) / 100)
+    }
+
+    /// Fächer mit mindestens einer Note im Halbjahr, in der Reihenfolge der Fächerliste.
+    func subjectsWithGrades(in halfYear: SchoolHalfYear) -&gt; [SubjectGrades] {
+        sortedSubjects.compactMap { subject in
+            let summary = gradeSummary(forSubject: subject.id, in: halfYear)
+            return summary.grades.isEmpty ? nil : SubjectGrades(subject: subject, summary: summary)
+        }
+    }
+
+    /// Gesamtschnitt: jedes Fach mit Noten zählt gleich viel.
+    func overallAverage(in halfYear: SchoolHalfYear) -&gt; (value: Double, subjectCount: Int)? {
+        let schnitte = subjectsWithGrades(in: halfYear).compactMap { $0.summary.total }
+        guard let wert = SubjectGradeSummary.average(schnitte) else { return nil }
+        return (wert, schnitte.count)
+    }
+
     // MARK: - Daten ersetzen
 
     func replaceAll(with data: AppData) {
@@ -2943,6 +3244,8 @@ final class AppStore: ObservableObject {
         notes = data.notes
         events = data.events
         holidays = data.holidays
+        grades = data.grades
+        gradeWeights = data.gradeWeights
         profile = data.profile
         settings = data.settings
         // Die Anmeldung bleibt, wie sie auf diesem Gerät eingestellt ist:
@@ -2974,6 +3277,8 @@ final class AppStore: ObservableObject {
                 notes: notes,
                 events: events,
                 holidays: holidays,
+                grades: grades,
+                gradeWeights: gradeWeights,
                 profile: profile,
                 settings: settings,
                 lock: lock)
@@ -3056,7 +3361,7 @@ final class AppStore: ObservableObject {
 <article class="datei" data-suche="hausaufgabenapp/store/lockcontroller.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">16</span>
+      <span class="nummer">17</span>
       <h3>LockController.swift</h3>
       <p class="pfad">HausaufgabenApp/Store/LockController.swift</p>
     </div>
@@ -3196,7 +3501,7 @@ final class LockController: ObservableObject {
 <article class="datei" data-suche="hausaufgabenapp/support/apptheme.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">17</span>
+      <span class="nummer">18</span>
       <h3>AppTheme.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/AppTheme.swift</p>
     </div>
@@ -3323,7 +3628,7 @@ func hideKeyboard() {
 <article class="datei" data-suche="hausaufgabenapp/support/backupdocument.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">18</span>
+      <span class="nummer">19</span>
       <h3>BackupDocument.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/BackupDocument.swift</p>
     </div>
@@ -3365,7 +3670,7 @@ struct BackupDocument: FileDocument {
 <article class="datei" data-suche="hausaufgabenapp/support/doodlebackground.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">19</span>
+      <span class="nummer">20</span>
       <h3>DoodleBackground.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/DoodleBackground.swift</p>
     </div>
@@ -3453,7 +3758,7 @@ struct DoodleCanvas: View {
 <article class="datei" data-suche="hausaufgabenapp/support/haptics.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">20</span>
+      <span class="nummer">21</span>
       <h3>Haptics.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/Haptics.swift</p>
     </div>
@@ -3496,7 +3801,7 @@ enum Haptics {
 <article class="datei" data-suche="hausaufgabenapp/support/homylogo.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">21</span>
+      <span class="nummer">22</span>
       <h3>HomyLogo.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/HomyLogo.swift</p>
     </div>
@@ -3640,7 +3945,7 @@ struct HomyWordmark: View {
 <article class="datei" data-suche="hausaufgabenapp/support/publicholidays.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">22</span>
+      <span class="nummer">23</span>
       <h3>PublicHolidays.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/PublicHolidays.swift</p>
     </div>
@@ -3846,7 +4151,7 @@ enum PublicHolidays {
 <article class="datei" data-suche="hausaufgabenapp/support/reminders.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">23</span>
+      <span class="nummer">24</span>
       <h3>Reminders.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/Reminders.swift</p>
     </div>
@@ -4035,7 +4340,7 @@ extension Holiday {
 <article class="datei" data-suche="hausaufgabenapp/support/schoolcalendar.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">24</span>
+      <span class="nummer">25</span>
       <h3>SchoolCalendar.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/SchoolCalendar.swift</p>
     </div>
@@ -4233,7 +4538,7 @@ enum SchoolCalendar {
 <article class="datei" data-suche="hausaufgabenapp/support/subjectnames.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">25</span>
+      <span class="nummer">26</span>
       <h3>SubjectNames.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/SubjectNames.swift</p>
     </div>
@@ -4334,7 +4639,7 @@ enum SubjectNames {
 <article class="datei" data-suche="hausaufgabenapp/support/timetablerecognizer.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">26</span>
+      <span class="nummer">27</span>
       <h3>TimetableRecognizer.swift</h3>
       <p class="pfad">HausaufgabenApp/Support/TimetableRecognizer.swift</p>
     </div>
@@ -4757,7 +5062,7 @@ extension UIImage {
 <article class="datei" data-suche="hausaufgabenapp/views/rootview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">27</span>
+      <span class="nummer">28</span>
       <h3>RootView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/RootView.swift</p>
     </div>
@@ -4825,7 +5130,7 @@ struct RootView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/lock/appgateview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">28</span>
+      <span class="nummer">29</span>
       <h3>AppGateView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Lock/AppGateView.swift</p>
     </div>
@@ -4879,7 +5184,7 @@ struct AppGateView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/lock/locksetupview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">29</span>
+      <span class="nummer">30</span>
       <h3>LockSetupView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Lock/LockSetupView.swift</p>
     </div>
@@ -5002,7 +5307,7 @@ struct LockSetupView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/lock/lockview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">30</span>
+      <span class="nummer">31</span>
       <h3>LockView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Lock/LockView.swift</p>
     </div>
@@ -5239,7 +5544,7 @@ struct LockView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/homeworkdaycard.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">31</span>
+      <span class="nummer">32</span>
       <h3>HomeworkDayCard.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/HomeworkDayCard.swift</p>
     </div>
@@ -5590,7 +5895,7 @@ struct HomeworkDayCard: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/homeworkpagerview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">32</span>
+      <span class="nummer">33</span>
       <h3>HomeworkPagerView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/HomeworkPagerView.swift</p>
     </div>
@@ -5782,7 +6087,7 @@ struct HomeworkPagerView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/homeworkrow.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">33</span>
+      <span class="nummer">34</span>
       <h3>HomeworkRow.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/HomeworkRow.swift</p>
     </div>
@@ -5989,7 +6294,7 @@ struct SubjectBadge: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/homeworkweekview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">34</span>
+      <span class="nummer">35</span>
       <h3>HomeworkWeekView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/HomeworkWeekView.swift</p>
     </div>
@@ -6156,7 +6461,7 @@ struct HintBox: View {
 <article class="datei" data-suche="hausaufgabenapp/views/homework/searchview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">35</span>
+      <span class="nummer">36</span>
       <h3>SearchView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Homework/SearchView.swift</p>
     </div>
@@ -6318,7 +6623,7 @@ struct SearchResultRow: View {
 <article class="datei" data-suche="hausaufgabenapp/views/calendar/calendarview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">36</span>
+      <span class="nummer">37</span>
       <h3>CalendarView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Calendar/CalendarView.swift</p>
     </div>
@@ -7185,7 +7490,7 @@ struct HolidayRow: View {
 <article class="datei" data-suche="hausaufgabenapp/views/calendar/eventeditorview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">37</span>
+      <span class="nummer">38</span>
       <h3>EventEditorView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Calendar/EventEditorView.swift</p>
     </div>
@@ -7427,7 +7732,7 @@ struct EventEditorView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/calendar/holidayeditorview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">38</span>
+      <span class="nummer">39</span>
       <h3>HolidayEditorView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Calendar/HolidayEditorView.swift</p>
     </div>
@@ -7678,7 +7983,7 @@ struct HolidayEditorView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/notes/notedetailview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">39</span>
+      <span class="nummer">40</span>
       <h3>NoteDetailView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Notes/NoteDetailView.swift</p>
     </div>
@@ -7772,7 +8077,7 @@ struct NoteDetailView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/notes/notesview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">40</span>
+      <span class="nummer">41</span>
       <h3>NotesView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Notes/NotesView.swift</p>
     </div>
@@ -7924,7 +8229,7 @@ struct NoteRow: View {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/documentscannerview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">41</span>
+      <span class="nummer">42</span>
       <h3>DocumentScannerView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/DocumentScannerView.swift</p>
     </div>
@@ -7990,7 +8295,7 @@ struct DocumentScannerView: UIViewControllerRepresentable {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/lessoneditorview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">42</span>
+      <span class="nummer">43</span>
       <h3>LessonEditorView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/LessonEditorView.swift</p>
     </div>
@@ -8137,7 +8442,7 @@ struct LessonEditorView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/scanreviewview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">43</span>
+      <span class="nummer">44</span>
       <h3>ScanReviewView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/ScanReviewView.swift</p>
     </div>
@@ -8563,7 +8868,7 @@ struct ScanCellEditor: View {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/timetablescanflow.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">44</span>
+      <span class="nummer">45</span>
       <h3>TimetableScanFlow.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift</p>
     </div>
@@ -8792,12 +9097,12 @@ private struct Tipp: View {
 <article class="datei" data-suche="hausaufgabenapp/views/timetable/timetableview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">45</span>
+      <span class="nummer">46</span>
       <h3>TimetableView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Timetable/TimetableView.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 312 Zeilen</span>
+      <span class="marke">Swift · 361 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -8888,6 +9193,51 @@ struct TimetableView: View {
         }
     }
 
+    /// Der Weg zu den Noten – mit dem Schnitt des laufenden Halbjahrs.
+    private var gradesBanner: some View {
+        NavigationLink {
+            GradesView()
+                .environmentObject(store)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: &quot;list.number&quot;)
+                    .font(.title2)
+                    .foregroundStyle(.tint)
+                    .frame(width: 32)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(&quot;Noten&quot;)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text(gradesSubtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: &quot;chevron.right&quot;)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var gradesSubtitle: String {
+        guard let gesamt = store.overallAverage(in: .current) else {
+            return &quot;Schriftliche und mündliche Noten, Schnitt je Fach.&quot;
+        }
+        let faecher = gesamt.subjectCount == 1 ? &quot;Fach&quot; : &quot;Fächern&quot;
+        return &quot;Schnitt \(GradeScale.averageText(gesamt.value)) aus \(gesamt.subjectCount) \(faecher).&quot;
+    }
+
     /// Hinweis über dem Raster: den eigenen Plan abfotografieren statt tippen.
     private var scanBanner: some View {
         Button {
@@ -8940,9 +9290,13 @@ struct TimetableView: View {
 
     private var grid: some View {
         VStack(spacing: 0) {
-            scanBanner
+            gradesBanner
                 .padding(.horizontal, Self.outerPadding)
                 .padding(.top, Self.outerPadding)
+
+            scanBanner
+                .padding(.horizontal, Self.outerPadding)
+                .padding(.top, 8)
 
             GeometryReader { geometry in
                 ScrollView([.horizontal, .vertical]) {
@@ -9122,7 +9476,7 @@ struct TimetableCell: View {
 <article class="datei" data-suche="hausaufgabenapp/views/subjects/subjecteditorview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">46</span>
+      <span class="nummer">47</span>
       <h3>SubjectEditorView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Subjects/SubjectEditorView.swift</p>
     </div>
@@ -9322,12 +9676,12 @@ struct SubjectEditorView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/subjects/subjectsview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">47</span>
+      <span class="nummer">48</span>
       <h3>SubjectsView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Subjects/SubjectsView.swift</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Swift · 268 Zeilen</span>
+      <span class="marke">Swift · 278 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -9500,8 +9854,9 @@ struct SubjectsView: View {
     private func deleteMessage(for subject: Subject) -&gt; String {
         let lessons = store.lessonCount(forSubject: subject.id)
         let homework = store.homeworkCount(forSubject: subject.id)
+        let grades = store.grades.filter { $0.subjectID == subject.id }.count
 
-        if lessons == 0 &amp;&amp; homework == 0 {
+        if lessons == 0 &amp;&amp; homework == 0 &amp;&amp; grades == 0 {
             return &quot;Das Fach wird entfernt.&quot;
         }
 
@@ -9512,7 +9867,16 @@ struct SubjectsView: View {
         if homework &gt; 0 {
             parts.append(homework == 1 ? &quot;1 Hausaufgabe&quot; : &quot;\(homework) Hausaufgaben&quot;)
         }
-        return &quot;Dabei werden auch \(parts.joined(separator: &quot; und &quot;)) gelöscht. Das lässt sich nicht rückgängig machen.&quot;
+        if grades &gt; 0 {
+            parts.append(grades == 1 ? &quot;1 Note&quot; : &quot;\(grades) Noten&quot;)
+        }
+        let liste: String
+        if parts.count &gt; 1 {
+            liste = parts.dropLast().joined(separator: &quot;, &quot;) + &quot; und &quot; + parts[parts.count - 1]
+        } else {
+            liste = parts[0]
+        }
+        return &quot;Dabei werden auch \(liste) gelöscht. Das lässt sich nicht rückgängig machen.&quot;
     }
 }
 
@@ -9608,7 +9972,7 @@ struct SubjectRow: View {
 <article class="datei" data-suche="hausaufgabenapp/views/settings/profileview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">48</span>
+      <span class="nummer">49</span>
       <h3>ProfileView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Settings/ProfileView.swift</p>
     </div>
@@ -9752,7 +10116,7 @@ struct LabeledField: View {
 <article class="datei" data-suche="hausaufgabenapp/views/settings/settingsview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">49</span>
+      <span class="nummer">50</span>
       <h3>SettingsView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Settings/SettingsView.swift</p>
     </div>
@@ -10422,7 +10786,7 @@ struct SettingsView: View {
 <article class="datei" data-suche="hausaufgabenapp/views/settings/timetablesettingsview.swift">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">50</span>
+      <span class="nummer">51</span>
       <h3>TimetableSettingsView.swift</h3>
       <p class="pfad">HausaufgabenApp/Views/Settings/TimetableSettingsView.swift</p>
     </div>
@@ -10692,7 +11056,7 @@ struct TimetableSettingsView: View {
 <article class="datei" data-suche="hausaufgabenapp/assets.xcassets/accentcolor.colorset/contents.json">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">51</span>
+      <span class="nummer">52</span>
       <h3>Contents.json</h3>
       <p class="pfad">HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json</p>
     </div>
@@ -10747,7 +11111,7 @@ struct TimetableSettingsView: View {
 <article class="datei" data-suche="hausaufgabenapp/assets.xcassets/appicon.appiconset/contents.json">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">52</span>
+      <span class="nummer">53</span>
       <h3>Contents.json</h3>
       <p class="pfad">HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json</p>
     </div>
@@ -10778,7 +11142,7 @@ struct TimetableSettingsView: View {
 <article class="datei" data-suche="hausaufgabenapp/assets.xcassets/contents.json">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">53</span>
+      <span class="nummer">54</span>
       <h3>Contents.json</h3>
       <p class="pfad">HausaufgabenApp/Assets.xcassets/Contents.json</p>
     </div>
@@ -10802,12 +11166,12 @@ struct TimetableSettingsView: View {
 <article class="datei" data-suche="readme.md">
   <header class="dateikopf">
     <div class="dateiname">
-      <span class="nummer">54</span>
+      <span class="nummer">55</span>
       <h3>README.md</h3>
       <p class="pfad">README.md</p>
     </div>
     <div class="dateitat">
-      <span class="marke">Markdown · 377 Zeilen</span>
+      <span class="marke">Markdown · 393 Zeilen</span>
       <button type="button" class="kopf-knopf" data-kopiere>Kopieren</button>
     </div>
   </header>
@@ -10955,7 +11319,21 @@ Zu finden **im Stundenplan oben links** oder in den Einstellungen – seit dem K
 - Beim ersten Start sind typische Schulfächer schon angelegt (Deutsch, Mathematik, Englisch …) – umbenennen oder löschen, wie du möchtest.
 - Das Kürzel ist genau das, was im Stundenplan und neben dem Hausaufgabenfeld steht.
 
-### 7. Anmeldung
+### 7. Noten
+
+Zu finden im Tab *Stundenplan &amp; Fächer* über dem Raster – dort steht auch gleich dein Schnitt.
+
+- **Note eintragen:** Fach, Datum, wofür (z. B. „Klassenarbeit 2“), **schriftlich oder mündlich** und die Note von **1+ bis 6**.
+- **Je Fach** stehen die schriftlichen und die mündlichen Noten getrennt nebeneinander, jeweils mit ihrem Schnitt, und daneben der Schnitt des Fachs.
+- **Gewichtung je Fach:** Wie viel die schriftlichen Noten zählen, stellst du ein – 70, 60, 50, 40 oder 30 Prozent. Ab Werk halb und halb. Fehlt eine Seite noch, zählt nur die andere.
+- **Gesamtschnitt** über alle Fächer mit Noten; jedes Fach zählt gleich viel.
+- **Halbjahre** ergeben sich aus dem Datum: August bis Januar ist das erste, Februar bis Juli das zweite. Mit den Pfeilen blätterst du zurück.
+- Antippen einer Note öffnet sie zum Ändern oder Löschen.
+- Gerundet wird kaufmännisch: 1,65 wird 1,7.
+
+Ehrlich dazu: Wie Lehrkräfte gewichten, ist von Schule zu Schule und Fach zu Fach verschieden, manche zählen einzelne Arbeiten doppelt oder runden anders. Homys Schnitt ist eine gute Orientierung, nicht die Zeugnisnote.
+
+### 8. Anmeldung
 
 Damit nicht jeder, der das Gerät in die Hand nimmt, in deinen Sachen liest, kann Homy beim Öffnen einen **Zahlencode** verlangen. Eingeschaltet wird das in den Einstellungen unter *Anmeldung*; ab Werk ist es aus.
 
@@ -10973,7 +11351,7 @@ Was dabei wichtig ist – ehrlich gesagt:
 - Das Ganze ist ein **Schloss vor der App**, keine Verschlüsselung der Datei. Wer den Code nicht kennt, kommt in der App nicht weiter – wer aber technisch an den Dateispeicher des Geräts kommt, ist damit nicht aufgehalten. Für ein Hausaufgabenheft ist das genau richtig, für Geheimnisse wäre es zu wenig.
 - Es ist eine Anmeldung **auf diesem Gerät**, kein Konto: Es gibt keinen Server, bei dem man sich anmelden könnte. Wer Homy auf seinem eigenen iPhone lädt, legt dort seinen eigenen Code fest.
 
-### 8. Einstellungen
+### 9. Einstellungen
 
 - **Anmeldung** – Code einrichten oder ändern, einstellen wann gefragt wird, sofort zusperren (siehe oben).
 - **Erinnerungen** – an Termine und Ferien erinnern lassen, Voreinstellung für neue Einträge.
@@ -11064,6 +11442,7 @@ HausaufgabenApp/
 │   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Merkzettel
 │   ├── CalendarEvent.swift      Ein Termin samt Erinnerungszeitpunkt
 │   ├── Holiday.swift            Ferien: Zeitraum von … bis …
+│   ├── Grade.swift              Noten, Notenskala 1+ bis 6, Halbjahre, Schnitt
 │   ├── FederalState.swift       Die 16 Bundesländer
 │   └── AppData.swift            Alles zusammen (auch das Format der Sicherung)
 ├── Store/
@@ -11087,6 +11466,7 @@ HausaufgabenApp/
 │   ├── Notes/                   Notizliste und Schreibblatt
 │   ├── Timetable/               Stundenplan-Raster, Scannen und Prüfansicht
 │   ├── Subjects/                Fächerverwaltung
+│   ├── Grades/                  Noten je Fach und Noten-Formular
 │   └── Settings/                Einstellungen, Unterrichtszeiten
 └── Assets.xcassets              App-Symbol und Akzentfarbe
 ```

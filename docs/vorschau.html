@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Homy</title>
 <style>
@@ -792,6 +793,51 @@
   .dialogknoepfe button.stark { font-weight: 600; }
   .dialogknoepfe button.rot { color: #D93025; font-weight: 600; }
 
+  /* ---- Noten ---- */
+  .hjwahl { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 2px 0 14px; }
+  .hjwahl span { font-size: 15px; font-weight: 600; min-width: 190px; text-align: center; }
+  .hjwahl button {
+    width: 34px; height: 34px; border: 0; border-radius: 17px; cursor: pointer;
+    background: var(--karte); color: var(--akzent); font-size: 20px; font-family: inherit;
+  }
+  .schnittkarte {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--karte); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px;
+  }
+  .schnittkarte .zahl {
+    font-size: 40px; font-weight: 700; letter-spacing: -.02em; line-height: 1;
+    color: var(--akzent); font-variant-numeric: tabular-nums;
+  }
+  .schnittkarte .titel { font-size: 15px; font-weight: 600; }
+  .schnittkarte .text { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .notenkarte { background: var(--karte); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
+  .nkopf { display: flex; align-items: center; gap: 10px; padding: 12px 14px 6px; }
+  .nkopf .kuerzel { margin-top: 0; }
+  .nname { flex: 1; min-width: 0; font-size: 17px; font-weight: 600; }
+  .ngesamt { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .notenzeile { display: flex; align-items: center; gap: 10px; padding: 5px 14px; }
+  .nart { flex: none; width: 82px; font-size: 13px; color: var(--text2); }
+  .nchips { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .notenchip {
+    border: 0; border-radius: 8px; min-width: 38px; padding: 5px 8px; cursor: pointer;
+    font: inherit; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums;
+    background: var(--fuellung); color: var(--text);
+  }
+  .nleer { color: var(--text3); font-size: 14px; }
+  .nschnitt { flex: none; font-size: 13px; color: var(--text2); font-variant-numeric: tabular-nums; }
+  .ngewicht {
+    display: block; width: 100%; text-align: left; cursor: pointer;
+    border: 0; border-top: .5px solid var(--trenner); background: none;
+    padding: 10px 14px; margin-top: 6px; font: inherit; font-size: 13px; color: var(--akzent);
+  }
+  .notengitter { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .notengitter button {
+    border: 0; border-radius: 10px; padding: 11px 0; cursor: pointer;
+    background: var(--karte); color: var(--text);
+    font: inherit; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums;
+  }
+  .notengitter button.an { background: var(--akzent); color: #fff; }
+
   .demohinweis {
     font-size: 13px; color: var(--text2); background: var(--karte);
     border: 1px dashed color-mix(in srgb, var(--akzent) 40%, transparent);
@@ -1181,7 +1227,9 @@ function laden() {
         einstellungen: Object.assign({}, BEISPIEL.einstellungen, g.einstellungen || {}),
         anmeldung: Object.assign({}, BEISPIEL.anmeldung, g.anmeldung || {}),
         termine: g.termine || [],
-        ferien: g.ferien || []
+        ferien: g.ferien || [],
+        noten: g.noten || [],
+        notenGewicht: g.notenGewicht || {}
       };
       return;
     }
@@ -1205,7 +1253,9 @@ function leereDaten() {
     einstellungen: Object.assign({}, BEISPIEL.einstellungen),
     anmeldung: Object.assign({}, BEISPIEL.anmeldung),
     termine: [],
-    ferien: []
+    ferien: [],
+    noten: [],
+    notenGewicht: {}
   };
 }
 
@@ -1216,6 +1266,8 @@ function beispielDatenEinsetzen() {
   daten.aufgaben = beispielAufgaben();
   daten.termine = beispielTermine();
   daten.ferien = beispielFerien();
+  daten.noten = beispielNoten();
+  daten.notenGewicht = {};
   daten.freieTage = {};
   daten.freieFaecher = {};
   sichern();
@@ -1359,7 +1411,8 @@ function sicher(s) {
 function zeichne() {
   document.querySelectorAll(".tab").forEach(b =>
     b.setAttribute("aria-selected", String(
-      b.dataset.tab === tab || (tab === "faecher" && b.dataset.tab === "stundenplan"))));
+      b.dataset.tab === tab
+      || ((tab === "faecher" || tab === "noten") && b.dataset.tab === "stundenplan"))));
 
   const istHA = tab === "hausaufgaben";
   const istNotizen = tab === "notizen";
@@ -1382,6 +1435,7 @@ function zeichne() {
   else if (tab === "notizen") zeichneNotizen();
   else if (tab === "stundenplan") zeichneStundenplan();
   else if (tab === "faecher") zeichneFaecher();
+  else if (tab === "noten") zeichneNoten();
   else zeichneEinstellungen();
 }
 
@@ -1599,6 +1653,19 @@ function zeichneStundenplan() {
       <span>
         <span class="btitel">Fächer</span>
         <div class="btext">Name, Kürzel, Farbe, Lehrkraft und Raum.</div>
+      </span>
+      <span class="pfeil">&#8250;</span>
+    </button>
+    <button class="banner" data-zunoten="1" style="margin-bottom:10px">
+      <span class="sym"><svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5V3zm2 2v14h10V7h-2V5H7zm2 4h6v2H9V9zm0 4h6v2H9v-2z"/></svg></span>
+      <span>
+        <span class="btitel">Noten</span>
+        <div class="btext">${(() => {
+          const g = gesamtSchnitt(laufendesHalbjahr());
+          return g.wert === null
+            ? "Schriftliche und mündliche Noten, Schnitt je Fach."
+            : `Schnitt ${schnittText(g.wert)} aus ${g.faecher} ${g.faecher === 1 ? "Fach" : "Fächern"}.`;
+        })()}</div>
       </span>
       <span class="pfeil">&#8250;</span>
     </button>
@@ -1867,7 +1934,7 @@ function zeichneFaecher() {
       Object.values(daten.stunden[wt]).forEach(id => { if (id === f.id) anzahl++; }));
     const teile = [f.lehrer, f.raum ? "Raum " + f.raum : "",
                    anzahl ? (anzahl === 1 ? "1 Stunde/Woche" : anzahl + " Stunden/Woche") : ""].filter(Boolean);
-    html += `<button class="eintrag" data-fach="${f.id}">
+    html += `<button class="eintrag" data-fachedit="${f.id}">
       <span class="kuerzel" style="background:${fill(f.f)};color:${tint(f.f)};margin-top:0;width:46px">${sicher(f.kuerzel)}</span>
       <span style="flex:1;min-width:0">
         <span class="haupt">${sicher(f.name)}</span>
@@ -2990,7 +3057,7 @@ function fachBearbeiten(id) {
   blatt.onclick = async ev => {
     if (ev.target.closest("[data-fachweg]")) {
       if (!(await frage("Fach „" + (f.name || "") + "“ löschen?",
-            "Die Stunden und Hausaufgaben dazu gehen mit.",
+            "Die Stunden, Hausaufgaben und Noten dazu gehen mit.",
             { ja: "Löschen", gefaehrlich: true }))) return;
       daten.faecher = daten.faecher.filter(x => x.id !== f.id);
       Object.keys(daten.stunden).forEach(wt =>
@@ -3001,6 +3068,8 @@ function fachBearbeiten(id) {
         if (k.endsWith("|" + f.id)) delete daten.aufgaben[k];
       });
       daten.termine.forEach(t => { if (t.fach === f.id) t.fach = ""; });
+      daten.noten = daten.noten.filter(n => n.fach !== f.id);
+      delete daten.notenGewicht[f.id];
       sichern(); modal.hidden = true; zeichne();
       return;
     }
@@ -3404,6 +3473,278 @@ function codeBearbeiten() {
   };
 }
 
+/* =====================================================================
+   Noten – schriftlich und mündlich, je Fach ein Schnitt
+   ===================================================================== */
+
+/* Die übliche Notenskala mit Tendenzen: 1+ ist 0,7, 1- ist 1,3 usw. */
+const NOTEN = [
+  ["1+", 0.7], ["1", 1], ["1-", 1.3], ["2+", 1.7], ["2", 2], ["2-", 2.3],
+  ["3+", 2.7], ["3", 3], ["3-", 3.3], ["4+", 3.7], ["4", 4], ["4-", 4.3],
+  ["5+", 4.7], ["5", 5], ["5-", 5.3], ["6", 6]
+];
+const notenName = w => (NOTEN.find(n => Math.abs(n[1] - w) < 0.01) || [String(w)])[0];
+/* Kaufmännisch runden: 1,65 wird 1,7. Ohne das kleine Plus landet 1,65
+   wegen der Rechengenauigkeit des Computers bei 1,6. */
+const schnittText = w => (Math.round(w * 10 + 1e-9) / 10).toFixed(1).replace(".", ",");
+const mittel = l => l.length ? l.reduce((a, b) => a + b, 0) / l.length : null;
+const GEWICHTE = [70, 60, 50, 40, 30];
+
+let notenHalbjahr = null;      // z. B. "2026-1"; null heißt: das laufende
+
+/* Halbjahre nach dem Datum: August bis Januar ist das erste,
+   Februar bis Juli das zweite. "2026-1" = 1. Halbjahr 2026/27. */
+function halbjahrVon(tagText) {
+  const [j, m] = tagText.split("-").map(Number);
+  if (m >= 8) return j + "-1";
+  if (m === 1) return (j - 1) + "-1";
+  return (j - 1) + "-2";
+}
+function halbjahrName(hj) {
+  const [j, n] = hj.split("-").map(Number);
+  return `${n}. Halbjahr ${j}/${String(j + 1).slice(2)}`;
+}
+function halbjahrSchritt(hj, richtung) {
+  let [j, n] = hj.split("-").map(Number);
+  n += richtung;
+  if (n === 3) { n = 1; j++; } else if (n === 0) { n = 2; j--; }
+  return j + "-" + n;
+}
+const laufendesHalbjahr = () => halbjahrVon(schluessel(new Date()));
+
+/* Schnitt eines Fachs: schriftlich und mündlich getrennt mitteln, dann
+   nach der Gewichtung zusammenrechnen. Fehlt eine Seite, zählt die andere. */
+function fachSchnitt(fachId, hj) {
+  const liste = daten.noten.filter(n => n.fach === fachId && halbjahrVon(n.tag) === hj);
+  const s = mittel(liste.filter(n => n.art === "s").map(n => n.wert));
+  const m = mittel(liste.filter(n => n.art === "m").map(n => n.wert));
+  const g = daten.notenGewicht[fachId];
+  const anteil = (typeof g === "number" ? g : 50) / 100;
+  const gesamt = (s !== null && m !== null) ? s * anteil + m * (1 - anteil) : (s ?? m);
+  return { liste, s, m, gesamt, anteil };
+}
+
+function gesamtSchnitt(hj) {
+  const je = daten.faecher.map(f => fachSchnitt(f.id, hj)).filter(x => x.liste.length);
+  return { wert: mittel(je.map(x => x.gesamt)), faecher: je.length };
+}
+
+function zeichneNoten() {
+  navTitel.textContent = "Noten";
+  navUnter.textContent = "";
+  const hj = notenHalbjahr || laufendesHalbjahr();
+
+  const mitNoten = daten.faecher
+    .map(f => Object.assign({ f }, fachSchnitt(f.id, hj)))
+    .filter(x => x.liste.length);
+  const gesamt = mittel(mitNoten.map(x => x.gesamt));
+
+  let html = `<button class="ergaenzen" data-zurueckplan="1"
+      style="border-top:0;padding-left:0;margin-bottom:6px">&#8249; Stundenplan</button>
+    <div class="hjwahl">
+      <button data-hj="-1" aria-label="Voriges Halbjahr">&#8249;</button>
+      <span>${halbjahrName(hj)}</span>
+      <button data-hj="1" aria-label="Nächstes Halbjahr">&#8250;</button>
+    </div>`;
+
+  if (gesamt !== null) {
+    html += `<div class="schnittkarte">
+      <div class="zahl">${schnittText(gesamt)}</div>
+      <div>
+        <div class="titel">Gesamtschnitt</div>
+        <div class="text">aus ${mitNoten.length} ${mitNoten.length === 1 ? "Fach" : "Fächern"},
+          jedes Fach zählt gleich viel</div>
+      </div>
+    </div>`;
+  }
+
+  html += `<button class="neufeld" data-neuenote="1">
+      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      Note eintragen
+    </button>`;
+
+  if (!mitNoten.length) {
+    html += `<div class="leerseite" style="padding-top:20px">
+      <div class="ltitel">Noch keine Noten in diesem Halbjahr</div>
+      <div class="ltext">Trag jede Note ein, sobald du sie bekommst – schriftliche wie
+        Klassenarbeiten und Tests, mündliche wie Mitarbeit und Referate. Homy rechnet
+        den Schnitt je Fach und insgesamt aus.</div>
+    </div>`;
+  }
+
+  mitNoten.forEach(x => {
+    const chips = art => x.liste.filter(n => n.art === art)
+      .sort((a, b) => a.tag.localeCompare(b.tag))
+      .map(n => `<button class="notenchip" data-note="${n.id}"
+          aria-label="${sicher(notenName(n.wert) + (n.titel ? ", " + n.titel : "") + " – ändern")}">${
+          notenName(n.wert)}</button>`).join("");
+    const zeile = (art, name, wert) => `
+      <div class="notenzeile">
+        <span class="nart">${name}</span>
+        <span class="nchips">${chips(art) || '<span class="nleer">–</span>'}</span>
+        <span class="nschnitt">${wert === null ? "" : "Ø " + schnittText(wert)}</span>
+      </div>`;
+    const prozent = Math.round(x.anteil * 100);
+    html += `<div class="notenkarte">
+      <div class="nkopf">
+        <span class="kuerzel" style="background:${fill(x.f.f)};color:${tint(x.f.f)}">${sicher(x.f.kuerzel)}</span>
+        <span class="nname">${sicher(x.f.name)}</span>
+        <span class="ngesamt">${schnittText(x.gesamt)}</span>
+      </div>
+      ${zeile("s", "Schriftlich", x.s)}
+      ${zeile("m", "Mündlich", x.m)}
+      <button class="ngewicht" data-gewicht="${x.f.id}">
+        Zählt ${prozent} % schriftlich, ${100 - prozent} % mündlich &#8250;</button>
+    </div>`;
+  });
+
+  html += `<div class="fuss">Noten von 1+ bis 6. Für den Schnitt eines Fachs werden die
+    schriftlichen und die mündlichen Noten getrennt gemittelt und dann nach der Gewichtung
+    zusammengerechnet; fehlt eine Seite, zählt nur die andere. Wie stark was zählt, legt
+    jede Lehrkraft selbst fest – frag am besten nach und stell es hier ein.<br><br>
+    Die Halbjahre gehen von August bis Januar und von Februar bis Juli. Homy ordnet jede
+    Note nach ihrem Datum ein.</div>`;
+
+  el.innerHTML = html;
+}
+
+let letztesNotenFach = "";
+
+function noteBearbeiten(id) {
+  const alt = id ? daten.noten.find(n => n.id === id) : null;
+  const zustand = {
+    art: alt ? alt.art : "s",
+    wert: alt ? alt.wert : null
+  };
+  const fachStart = alt ? alt.fach : (letztesNotenFach || (daten.faecher[0] || {}).id || "");
+  const tagStartText = alt ? alt.tag : schluessel(new Date());
+
+  if (!daten.faecher.length) {
+    meldung("Noch keine Fächer", "Leg zuerst unter „Fächer“ ein Fach an.");
+    return;
+  }
+
+  const h = `
+    <div class="gruppe">
+      <div class="feldzeile"><label for="nFach">Fach</label>
+        <select id="nFach">${daten.faecher.map(f =>
+          `<option value="${f.id}"${f.id === fachStart ? " selected" : ""}>${sicher(f.name)}</option>`).join("")}
+        </select></div>
+      <div class="feldzeile"><label for="nTag">Datum</label>
+        <input id="nTag" type="date" value="${tagStartText}"></div>
+      <div class="feldzeile"><label for="nTitel">Wofür</label>
+        <input id="nTitel" type="text" value="${sicher(alt ? alt.titel || "" : "")}"
+               placeholder="z. B. Klassenarbeit 2, Referat"></div>
+    </div>
+
+    <div class="gruppentitel">Art</div>
+    <div class="segmente" role="tablist">
+      <button type="button" data-nart="s" aria-selected="${zustand.art === "s"}">Schriftlich</button>
+      <button type="button" data-nart="m" aria-selected="${zustand.art === "m"}">Mündlich</button>
+    </div>
+    <div class="fuss">Schriftlich: Klassenarbeiten, Tests, Lernkontrollen.
+      Mündlich: Mitarbeit, Referate, Abfragen.</div>
+
+    <div class="gruppentitel">Note</div>
+    <div class="notengitter">${NOTEN.map(([name, w]) =>
+      `<button type="button" data-nwert="${w}" class="${zustand.wert === w ? "an" : ""}"
+         aria-pressed="${zustand.wert === w}">${name}</button>`).join("")}</div>
+    <div class="fuss" id="nProblem" style="color:#D93025;padding-top:10px"></div>
+
+    ${alt ? `<div class="gruppe" style="margin-top:16px">
+      <button class="eintrag" data-noteweg="1">
+        <span class="haupt" style="color:#D93025">Note löschen</span>
+      </button>
+    </div>` : ""}`;
+
+  blatt.innerHTML = `<div class="blattkopf"><span class="t">${alt ? "Note ändern" : "Note eintragen"}</span>
+      <button type="button" data-notesichern="1">Sichern</button></div>${h}`;
+  modal.hidden = false;
+  blatt.scrollTop = 0;
+
+  blatt.onclick = async ev => {
+    const artKnopf = ev.target.closest("[data-nart]");
+    if (artKnopf) {
+      zustand.art = artKnopf.dataset.nart;
+      blatt.querySelectorAll("[data-nart]").forEach(b =>
+        b.setAttribute("aria-selected", String(b === artKnopf)));
+      return;
+    }
+    const wertKnopf = ev.target.closest("[data-nwert]");
+    if (wertKnopf) {
+      zustand.wert = +wertKnopf.dataset.nwert;
+      blatt.querySelectorAll("[data-nwert]").forEach(b => {
+        b.classList.toggle("an", b === wertKnopf);
+        b.setAttribute("aria-pressed", String(b === wertKnopf));
+      });
+      document.getElementById("nProblem").textContent = "";
+      return;
+    }
+    if (ev.target.closest("[data-noteweg]")) {
+      if (!(await frage("Note löschen?", notenName(alt.wert) + " in " +
+            ((fachVon(alt.fach) || {}).name || "diesem Fach"),
+            { ja: "Löschen", gefaehrlich: true }))) return;
+      daten.noten = daten.noten.filter(n => n.id !== alt.id);
+      sichern(); modal.hidden = true; zeichne();
+      return;
+    }
+    if (!ev.target.closest("[data-notesichern]")) return;
+
+    const problem = document.getElementById("nProblem");
+    const fach = document.getElementById("nFach").value;
+    const tag = document.getElementById("nTag").value;
+    if (zustand.wert === null) { problem.textContent = "Tipp noch die Note an."; return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(tag)) { problem.textContent = "Bitte ein Datum wählen."; return; }
+
+    const neu = {
+      id: alt ? alt.id : "n" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      fach, art: zustand.art, wert: zustand.wert, tag,
+      titel: document.getElementById("nTitel").value.trim()
+    };
+    if (alt) daten.noten[daten.noten.findIndex(n => n.id === alt.id)] = neu;
+    else daten.noten.push(neu);
+    letztesNotenFach = fach;
+    // Das Halbjahr der Note anzeigen – sonst wäre sie scheinbar verschwunden.
+    notenHalbjahr = halbjahrVon(tag) === laufendesHalbjahr() ? null : halbjahrVon(tag);
+    sichern(); modal.hidden = true; zeichne();
+  };
+}
+
+function gewichtWaehlen(fachId) {
+  const f = fachVon(fachId);
+  const jetzt = typeof daten.notenGewicht[fachId] === "number" ? daten.notenGewicht[fachId] : 50;
+  const h = `<div class="gruppe">${GEWICHTE.map(p => `
+      <button class="eintrag" data-wahl="${p}">
+        <span class="haupt">${p} % schriftlich, ${100 - p} % mündlich</span>
+        ${p === jetzt ? '<span class="wert" style="color:var(--akzent)">&#10003;</span>' : ""}
+      </button>`).join("")}</div>
+    <div class="fuss">So viel zählen die schriftlichen Noten in ${sicher(f ? f.name : "diesem Fach")}.
+      Das legt die Lehrkraft fest – häufig ist es halb und halb.</div>`;
+  blattZeigen("Gewichtung", h, wahl => {
+    daten.notenGewicht[fachId] = +wahl;
+    sichern();
+  });
+}
+
+/* Ein paar Noten fürs Ausprobieren – im laufenden Halbjahr, nie in der Zukunft. */
+function beispielNoten() {
+  const heute = tagStart(new Date());
+  const [j, n] = laufendesHalbjahr().split("-").map(Number);
+  const anfang = n === 1 ? new Date(j, 7, 1) : new Date(j + 1, 1, 1);
+  const tag = vorWochen => {
+    const d = plusTage(heute, -7 * vorWochen);
+    return schluessel(d < anfang ? anfang : d);
+  };
+  const liste = [
+    ["m", "s", 2.3, 6, "Klassenarbeit 1"], ["m", "m", 2, 4, "Mitarbeit"], ["m", "m", 1.3, 1, "Vorrechnen"],
+    ["d", "s", 2.7, 5, "Aufsatz"], ["d", "m", 1.7, 2, "Gedichtvortrag"],
+    ["e", "s", 1.3, 3, "Vokabeltest"], ["e", "m", 2, 1, "Mitarbeit"],
+    ["bio", "m", 2, 2, "Referat Zellen"], ["ph", "s", 3, 4, "Test Optik"]
+  ];
+  return liste.map(([fach, art, wert, vor, titel], i) =>
+    ({ id: "bn" + i, fach, art, wert, tag: tag(vor), titel }));
+}
+
 /* --- Eigene Rückfragen ---------------------------------------------
    Die eingebettete Seite auf claude.ai unterdrückt alert() und confirm():
    alert() zeigt nichts, confirm() antwortet immer mit "Nein". Deshalb fragt
@@ -3702,6 +4043,20 @@ el.addEventListener("click", ev => {
   if (terminKnopf) { terminBearbeiten(terminKnopf.dataset.termin); return; }
 
   if (ev.target.closest("[data-zufaecher]")) { tab = "faecher"; zeichne(); window.scrollTo(0,0); return; }
+  if (ev.target.closest("[data-zunoten]")) { tab = "noten"; zeichne(); window.scrollTo(0,0); return; }
+
+  const hjKnopf = ev.target.closest("[data-hj]");
+  if (hjKnopf) {
+    notenHalbjahr = halbjahrSchritt(notenHalbjahr || laufendesHalbjahr(), +hjKnopf.dataset.hj);
+    if (notenHalbjahr === laufendesHalbjahr()) notenHalbjahr = null;
+    zeichne();
+    return;
+  }
+  if (ev.target.closest("[data-neuenote]")) { noteBearbeiten(null); return; }
+  const noteKnopf = ev.target.closest("[data-note]");
+  if (noteKnopf) { noteBearbeiten(noteKnopf.dataset.note); return; }
+  const gewichtKnopf = ev.target.closest("[data-gewicht]");
+  if (gewichtKnopf) { gewichtWaehlen(gewichtKnopf.dataset.gewicht); return; }
   if (ev.target.closest("[data-zurueckplan]")) { tab = "stundenplan"; zeichne(); window.scrollTo(0,0); return; }
 
   if (ev.target.closest("[data-codeaendern]")) { codeBearbeiten(); return; }
@@ -3710,8 +4065,11 @@ el.addEventListener("click", ev => {
   if (ev.target.closest("[data-planbearbeiten]")) { stundenplanBearbeiten(); return; }
   if (ev.target.closest("[data-neuesfach]")) { fachBearbeiten(null); return; }
 
-  const fachKnopf = ev.target.closest("[data-fach]");
-  if (fachKnopf) { fachBearbeiten(fachKnopf.dataset.fach); return; }
+  // Eigene Kennung für die Fächerliste: "data-fach" tragen auch alle
+  // Hausaufgaben-Zeilen, und dann öffnete jeder Tipp aufs gelbe Feld oder
+  // ins Textfeld den Fach-Editor.
+  const fachKnopf = ev.target.closest("[data-fachedit]");
+  if (fachKnopf) { fachBearbeiten(fachKnopf.dataset.fachedit); return; }
 
   if (ev.target.closest("[data-anmeldungaus]")) {
     frage("Anmeldung ausschalten?", "Danach kann jeder Homy öffnen.",

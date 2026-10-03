@@ -84,7 +84,12 @@ DIE FÜNF TABS
    Feld tippen wählt das Fach; Raum und Lehrkraft lassen sich je Stunde abweichend
    setzen. Einstellbar: 1 bis 14 Stunden pro Tag, Samstag als sechster Schultag,
    Unterrichtszeiten je Stunde. Oben links führt ein Weg zu den Fächern, oben rechts
-   das Abfotografieren.
+   das Abfotografieren. Über dem Raster ein Weg zu den NOTEN: Note eintragen mit
+   Fach, Datum, "Wofür", schriftlich oder mündlich und der Note von 1+ bis 6
+   (1+ = 0,7, 1- = 1,3 …). Je Fach schriftlich und mündlich getrennt gemittelt,
+   dann gewichtet (je Fach einstellbar, ab Werk 50/50; fehlt eine Seite, zählt die
+   andere). Gesamtschnitt: jedes Fach gleich. Halbjahre aus dem Datum (August bis
+   Januar, Februar bis Juli), mit Pfeilen blätterbar. Kaufmännisch runden.
 4. Notizen – aufgebaut wie Apples Notizen: oben ein Feld "Notiz schreiben …",
    antippen, lostippen. Kein Titelfeld, kein Sichern-Knopf; die erste beschriebene
    Zeile wird der Titel, gespeichert wird beim Schreiben. Keine Beispielnotizen.

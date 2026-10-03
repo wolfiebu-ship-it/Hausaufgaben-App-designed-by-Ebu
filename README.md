@@ -141,7 +141,21 @@ Zu finden **im Stundenplan oben links** oder in den Einstellungen – seit dem K
 - Beim ersten Start sind typische Schulfächer schon angelegt (Deutsch, Mathematik, Englisch …) – umbenennen oder löschen, wie du möchtest.
 - Das Kürzel ist genau das, was im Stundenplan und neben dem Hausaufgabenfeld steht.
 
-### 7. Anmeldung
+### 7. Noten
+
+Zu finden im Tab *Stundenplan & Fächer* über dem Raster – dort steht auch gleich dein Schnitt.
+
+- **Note eintragen:** Fach, Datum, wofür (z. B. „Klassenarbeit 2“), **schriftlich oder mündlich** und die Note von **1+ bis 6**.
+- **Je Fach** stehen die schriftlichen und die mündlichen Noten getrennt nebeneinander, jeweils mit ihrem Schnitt, und daneben der Schnitt des Fachs.
+- **Gewichtung je Fach:** Wie viel die schriftlichen Noten zählen, stellst du ein – 70, 60, 50, 40 oder 30 Prozent. Ab Werk halb und halb. Fehlt eine Seite noch, zählt nur die andere.
+- **Gesamtschnitt** über alle Fächer mit Noten; jedes Fach zählt gleich viel.
+- **Halbjahre** ergeben sich aus dem Datum: August bis Januar ist das erste, Februar bis Juli das zweite. Mit den Pfeilen blätterst du zurück.
+- Antippen einer Note öffnet sie zum Ändern oder Löschen.
+- Gerundet wird kaufmännisch: 1,65 wird 1,7.
+
+Ehrlich dazu: Wie Lehrkräfte gewichten, ist von Schule zu Schule und Fach zu Fach verschieden, manche zählen einzelne Arbeiten doppelt oder runden anders. Homys Schnitt ist eine gute Orientierung, nicht die Zeugnisnote.
+
+### 8. Anmeldung
 
 Damit nicht jeder, der das Gerät in die Hand nimmt, in deinen Sachen liest, kann Homy beim Öffnen einen **Zahlencode** verlangen. Eingeschaltet wird das in den Einstellungen unter *Anmeldung*; ab Werk ist es aus.
 
@@ -159,7 +173,7 @@ Was dabei wichtig ist – ehrlich gesagt:
 - Das Ganze ist ein **Schloss vor der App**, keine Verschlüsselung der Datei. Wer den Code nicht kennt, kommt in der App nicht weiter – wer aber technisch an den Dateispeicher des Geräts kommt, ist damit nicht aufgehalten. Für ein Hausaufgabenheft ist das genau richtig, für Geheimnisse wäre es zu wenig.
 - Es ist eine Anmeldung **auf diesem Gerät**, kein Konto: Es gibt keinen Server, bei dem man sich anmelden könnte. Wer Homy auf seinem eigenen iPhone lädt, legt dort seinen eigenen Code fest.
 
-### 8. Einstellungen
+### 9. Einstellungen
 
 - **Anmeldung** – Code einrichten oder ändern, einstellen wann gefragt wird, sofort zusperren (siehe oben).
 - **Erinnerungen** – an Termine und Ferien erinnern lassen, Voreinstellung für neue Einträge.
@@ -250,6 +264,7 @@ HausaufgabenApp/
 │   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Merkzettel
 │   ├── CalendarEvent.swift      Ein Termin samt Erinnerungszeitpunkt
 │   ├── Holiday.swift            Ferien: Zeitraum von … bis …
+│   ├── Grade.swift              Noten, Notenskala 1+ bis 6, Halbjahre, Schnitt
 │   ├── FederalState.swift       Die 16 Bundesländer
 │   └── AppData.swift            Alles zusammen (auch das Format der Sicherung)
 ├── Store/
@@ -273,6 +288,7 @@ HausaufgabenApp/
 │   ├── Notes/                   Notizliste und Schreibblatt
 │   ├── Timetable/               Stundenplan-Raster, Scannen und Prüfansicht
 │   ├── Subjects/                Fächerverwaltung
+│   ├── Grades/                  Noten je Fach und Noten-Formular
 │   └── Settings/                Einstellungen, Unterrichtszeiten
 └── Assets.xcassets              App-Symbol und Akzentfarbe
 ```

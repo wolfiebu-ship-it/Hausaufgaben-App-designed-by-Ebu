@@ -166,8 +166,9 @@ struct SubjectsView: View {
     private func deleteMessage(for subject: Subject) -> String {
         let lessons = store.lessonCount(forSubject: subject.id)
         let homework = store.homeworkCount(forSubject: subject.id)
+        let grades = store.grades.filter { $0.subjectID == subject.id }.count
 
-        if lessons == 0 && homework == 0 {
+        if lessons == 0 && homework == 0 && grades == 0 {
             return "Das Fach wird entfernt."
         }
 
@@ -178,7 +179,16 @@ struct SubjectsView: View {
         if homework > 0 {
             parts.append(homework == 1 ? "1 Hausaufgabe" : "\(homework) Hausaufgaben")
         }
-        return "Dabei werden auch \(parts.joined(separator: " und ")) gelöscht. Das lässt sich nicht rückgängig machen."
+        if grades > 0 {
+            parts.append(grades == 1 ? "1 Note" : "\(grades) Noten")
+        }
+        let liste: String
+        if parts.count > 1 {
+            liste = parts.dropLast().joined(separator: ", ") + " und " + parts[parts.count - 1]
+        } else {
+            liste = parts[0]
+        }
+        return "Dabei werden auch \(liste) gelöscht. Das lässt sich nicht rückgängig machen."
     }
 }
 

@@ -84,6 +84,51 @@ struct TimetableView: View {
         }
     }
 
+    /// Der Weg zu den Noten – mit dem Schnitt des laufenden Halbjahrs.
+    private var gradesBanner: some View {
+        NavigationLink {
+            GradesView()
+                .environmentObject(store)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "list.number")
+                    .font(.title2)
+                    .foregroundStyle(.tint)
+                    .frame(width: 32)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Noten")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text(gradesSubtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var gradesSubtitle: String {
+        guard let gesamt = store.overallAverage(in: .current) else {
+            return "Schriftliche und mündliche Noten, Schnitt je Fach."
+        }
+        let faecher = gesamt.subjectCount == 1 ? "Fach" : "Fächern"
+        return "Schnitt \(GradeScale.averageText(gesamt.value)) aus \(gesamt.subjectCount) \(faecher)."
+    }
+
     /// Hinweis über dem Raster: den eigenen Plan abfotografieren statt tippen.
     private var scanBanner: some View {
         Button {
@@ -136,9 +181,13 @@ struct TimetableView: View {
 
     private var grid: some View {
         VStack(spacing: 0) {
-            scanBanner
+            gradesBanner
                 .padding(.horizontal, Self.outerPadding)
                 .padding(.top, Self.outerPadding)
+
+            scanBanner
+                .padding(.horizontal, Self.outerPadding)
+                .padding(.top, 8)
 
             GeometryReader { geometry in
                 ScrollView([.horizontal, .vertical]) {

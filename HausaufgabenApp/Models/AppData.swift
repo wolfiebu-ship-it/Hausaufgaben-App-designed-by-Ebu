@@ -18,6 +18,11 @@ struct AppData: Codable {
     var events: [CalendarEvent]
     /// Ferien mit Anfang und Ende.
     var holidays: [Holiday]
+    /// Noten, schriftlich und mündlich.
+    var grades: [Grade]
+    /// Wie viel Prozent die schriftlichen Noten je Fach zählen.
+    /// Schlüssel: Kennung des Fachs. Fehlt ein Fach, gilt halb und halb.
+    var gradeWeights: [String: Int]
     /// Die eigenen Angaben (Name, Klasse, Telefon …).
     var profile: Profile
     var settings: AppSettings
@@ -35,6 +40,8 @@ struct AppData: Codable {
          notes: [Note] = [],
          events: [CalendarEvent] = [],
          holidays: [Holiday] = [],
+         grades: [Grade] = [],
+         gradeWeights: [String: Int] = [:],
          profile: Profile = Profile(),
          settings: AppSettings = AppSettings(),
          lock: LockSettings = LockSettings()) {
@@ -47,6 +54,8 @@ struct AppData: Codable {
         self.notes = notes
         self.events = events
         self.holidays = holidays
+        self.grades = grades
+        self.gradeWeights = gradeWeights
         self.profile = profile
         self.settings = settings
         self.lock = lock
@@ -63,6 +72,9 @@ struct AppData: Codable {
         notes = try container.decodeIfPresent([Note].self, forKey: .notes) ?? []
         events = try container.decodeIfPresent([CalendarEvent].self, forKey: .events) ?? []
         holidays = try container.decodeIfPresent([Holiday].self, forKey: .holidays) ?? []
+        // Noten gibt es erst seit dieser Fassung – ältere Sicherungen haben keine.
+        grades = try container.decodeIfPresent([Grade].self, forKey: .grades) ?? []
+        gradeWeights = try container.decodeIfPresent([String: Int].self, forKey: .gradeWeights) ?? [:]
         profile = try container.decodeIfPresent(Profile.self, forKey: .profile) ?? Profile()
         settings = try container.decodeIfPresent(AppSettings.self, forKey: .settings) ?? AppSettings()
         lock = try container.decodeIfPresent(LockSettings.self, forKey: .lock) ?? LockSettings()
@@ -115,6 +127,17 @@ struct AppData: Codable {
                 event.startMinutes = nil
             }
             return event
+        }
+
+        // Noten nur zu vorhandenen Fächern, mit gültigem Wert und Datum.
+        grades = grades.filter { grade in
+            validIDs.contains(grade.subjectID)
+                && GradeScale.validValues.contains(grade.value)
+                && SchoolCalendar.date(fromDayKey: grade.dayKey) != nil
+        }
+        let gueltigeKennungen = Set(validIDs.map(\.uuidString))
+        gradeWeights = gradeWeights.filter { kennung, prozent in
+            gueltigeKennungen.contains(kennung) && (0...100).contains(prozent)
         }
 
         // Ferien ohne gültigen Zeitraum wären nur verwirrend.

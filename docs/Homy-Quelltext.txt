@@ -23,52 +23,55 @@ INHALT
    7. HausaufgabenApp/Models/AppSettings.swift
    8. HausaufgabenApp/Models/CalendarEvent.swift
    9. HausaufgabenApp/Models/FederalState.swift
-  10. HausaufgabenApp/Models/Holiday.swift
-  11. HausaufgabenApp/Models/HomeworkEntry.swift
-  12. HausaufgabenApp/Models/Lesson.swift
-  13. HausaufgabenApp/Models/LockSettings.swift
-  14. HausaufgabenApp/Models/Note.swift
-  15. HausaufgabenApp/Models/Profile.swift
-  16. HausaufgabenApp/Models/Subject.swift
-  17. HausaufgabenApp/Store/AppStore.swift
-  18. HausaufgabenApp/Store/LockController.swift
-  19. HausaufgabenApp/Support/AppTheme.swift
-  20. HausaufgabenApp/Support/BackupDocument.swift
-  21. HausaufgabenApp/Support/DoodleBackground.swift
-  22. HausaufgabenApp/Support/Haptics.swift
-  23. HausaufgabenApp/Support/HomyLogo.swift
-  24. HausaufgabenApp/Support/PublicHolidays.swift
-  25. HausaufgabenApp/Support/Reminders.swift
-  26. HausaufgabenApp/Support/SchoolCalendar.swift
-  27. HausaufgabenApp/Support/SubjectNames.swift
-  28. HausaufgabenApp/Support/TimetableRecognizer.swift
-  29. HausaufgabenApp/Views/Calendar/CalendarView.swift
-  30. HausaufgabenApp/Views/Calendar/EventEditorView.swift
-  31. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
-  32. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
-  33. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
-  34. HausaufgabenApp/Views/Homework/HomeworkRow.swift
-  35. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
-  36. HausaufgabenApp/Views/Homework/SearchView.swift
-  37. HausaufgabenApp/Views/Lock/AppGateView.swift
-  38. HausaufgabenApp/Views/Lock/LockSetupView.swift
-  39. HausaufgabenApp/Views/Lock/LockView.swift
-  40. HausaufgabenApp/Views/Notes/NoteDetailView.swift
-  41. HausaufgabenApp/Views/Notes/NotesView.swift
-  42. HausaufgabenApp/Views/RootView.swift
-  43. HausaufgabenApp/Views/Settings/ProfileView.swift
-  44. HausaufgabenApp/Views/Settings/SettingsView.swift
-  45. HausaufgabenApp/Views/Settings/TimetableSettingsView.swift
-  46. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
-  47. HausaufgabenApp/Views/Subjects/SubjectsView.swift
-  48. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
-  49. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
-  50. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
-  51. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
-  52. HausaufgabenApp/Views/Timetable/TimetableView.swift
-  53. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
-  54. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
-  55. HausaufgabenApp/Assets.xcassets/Contents.json
+  10. HausaufgabenApp/Models/Grade.swift
+  11. HausaufgabenApp/Models/Holiday.swift
+  12. HausaufgabenApp/Models/HomeworkEntry.swift
+  13. HausaufgabenApp/Models/Lesson.swift
+  14. HausaufgabenApp/Models/LockSettings.swift
+  15. HausaufgabenApp/Models/Note.swift
+  16. HausaufgabenApp/Models/Profile.swift
+  17. HausaufgabenApp/Models/Subject.swift
+  18. HausaufgabenApp/Store/AppStore.swift
+  19. HausaufgabenApp/Store/LockController.swift
+  20. HausaufgabenApp/Support/AppTheme.swift
+  21. HausaufgabenApp/Support/BackupDocument.swift
+  22. HausaufgabenApp/Support/DoodleBackground.swift
+  23. HausaufgabenApp/Support/Haptics.swift
+  24. HausaufgabenApp/Support/HomyLogo.swift
+  25. HausaufgabenApp/Support/PublicHolidays.swift
+  26. HausaufgabenApp/Support/Reminders.swift
+  27. HausaufgabenApp/Support/SchoolCalendar.swift
+  28. HausaufgabenApp/Support/SubjectNames.swift
+  29. HausaufgabenApp/Support/TimetableRecognizer.swift
+  30. HausaufgabenApp/Views/Calendar/CalendarView.swift
+  31. HausaufgabenApp/Views/Calendar/EventEditorView.swift
+  32. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
+  33. HausaufgabenApp/Views/Grades/GradeEditorView.swift
+  34. HausaufgabenApp/Views/Grades/GradesView.swift
+  35. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
+  36. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
+  37. HausaufgabenApp/Views/Homework/HomeworkRow.swift
+  38. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
+  39. HausaufgabenApp/Views/Homework/SearchView.swift
+  40. HausaufgabenApp/Views/Lock/AppGateView.swift
+  41. HausaufgabenApp/Views/Lock/LockSetupView.swift
+  42. HausaufgabenApp/Views/Lock/LockView.swift
+  43. HausaufgabenApp/Views/Notes/NoteDetailView.swift
+  44. HausaufgabenApp/Views/Notes/NotesView.swift
+  45. HausaufgabenApp/Views/RootView.swift
+  46. HausaufgabenApp/Views/Settings/ProfileView.swift
+  47. HausaufgabenApp/Views/Settings/SettingsView.swift
+  48. HausaufgabenApp/Views/Settings/TimetableSettingsView.swift
+  49. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
+  50. HausaufgabenApp/Views/Subjects/SubjectsView.swift
+  51. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
+  52. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
+  53. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
+  54. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
+  55. HausaufgabenApp/Views/Timetable/TimetableView.swift
+  56. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
+  57. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
+  58. HausaufgabenApp/Assets.xcassets/Contents.json
 
 
 ================================================================================
@@ -218,7 +221,21 @@ Zu finden **im Stundenplan oben links** oder in den Einstellungen – seit dem K
 - Beim ersten Start sind typische Schulfächer schon angelegt (Deutsch, Mathematik, Englisch …) – umbenennen oder löschen, wie du möchtest.
 - Das Kürzel ist genau das, was im Stundenplan und neben dem Hausaufgabenfeld steht.
 
-### 7. Anmeldung
+### 7. Noten
+
+Zu finden im Tab *Stundenplan & Fächer* über dem Raster – dort steht auch gleich dein Schnitt.
+
+- **Note eintragen:** Fach, Datum, wofür (z. B. „Klassenarbeit 2“), **schriftlich oder mündlich** und die Note von **1+ bis 6**.
+- **Je Fach** stehen die schriftlichen und die mündlichen Noten getrennt nebeneinander, jeweils mit ihrem Schnitt, und daneben der Schnitt des Fachs.
+- **Gewichtung je Fach:** Wie viel die schriftlichen Noten zählen, stellst du ein – 70, 60, 50, 40 oder 30 Prozent. Ab Werk halb und halb. Fehlt eine Seite noch, zählt nur die andere.
+- **Gesamtschnitt** über alle Fächer mit Noten; jedes Fach zählt gleich viel.
+- **Halbjahre** ergeben sich aus dem Datum: August bis Januar ist das erste, Februar bis Juli das zweite. Mit den Pfeilen blätterst du zurück.
+- Antippen einer Note öffnet sie zum Ändern oder Löschen.
+- Gerundet wird kaufmännisch: 1,65 wird 1,7.
+
+Ehrlich dazu: Wie Lehrkräfte gewichten, ist von Schule zu Schule und Fach zu Fach verschieden, manche zählen einzelne Arbeiten doppelt oder runden anders. Homys Schnitt ist eine gute Orientierung, nicht die Zeugnisnote.
+
+### 8. Anmeldung
 
 Damit nicht jeder, der das Gerät in die Hand nimmt, in deinen Sachen liest, kann Homy beim Öffnen einen **Zahlencode** verlangen. Eingeschaltet wird das in den Einstellungen unter *Anmeldung*; ab Werk ist es aus.
 
@@ -236,7 +253,7 @@ Was dabei wichtig ist – ehrlich gesagt:
 - Das Ganze ist ein **Schloss vor der App**, keine Verschlüsselung der Datei. Wer den Code nicht kennt, kommt in der App nicht weiter – wer aber technisch an den Dateispeicher des Geräts kommt, ist damit nicht aufgehalten. Für ein Hausaufgabenheft ist das genau richtig, für Geheimnisse wäre es zu wenig.
 - Es ist eine Anmeldung **auf diesem Gerät**, kein Konto: Es gibt keinen Server, bei dem man sich anmelden könnte. Wer Homy auf seinem eigenen iPhone lädt, legt dort seinen eigenen Code fest.
 
-### 8. Einstellungen
+### 9. Einstellungen
 
 - **Anmeldung** – Code einrichten oder ändern, einstellen wann gefragt wird, sofort zusperren (siehe oben).
 - **Erinnerungen** – an Termine und Ferien erinnern lassen, Voreinstellung für neue Einträge.
@@ -327,6 +344,7 @@ HausaufgabenApp/
 │   ├── LockSettings.swift       Anmeldung: Prüfwert des Codes, Merkzettel
 │   ├── CalendarEvent.swift      Ein Termin samt Erinnerungszeitpunkt
 │   ├── Holiday.swift            Ferien: Zeitraum von … bis …
+│   ├── Grade.swift              Noten, Notenskala 1+ bis 6, Halbjahre, Schnitt
 │   ├── FederalState.swift       Die 16 Bundesländer
 │   └── AppData.swift            Alles zusammen (auch das Format der Sicherung)
 ├── Store/
@@ -350,6 +368,7 @@ HausaufgabenApp/
 │   ├── Notes/                   Notizliste und Schreibblatt
 │   ├── Timetable/               Stundenplan-Raster, Scannen und Prüfansicht
 │   ├── Subjects/                Fächerverwaltung
+│   ├── Grades/                  Noten je Fach und Noten-Formular
 │   └── Settings/                Einstellungen, Unterrichtszeiten
 └── Assets.xcassets              App-Symbol und Akzentfarbe
 ```
@@ -849,6 +868,11 @@ struct AppData: Codable {
     var events: [CalendarEvent]
     /// Ferien mit Anfang und Ende.
     var holidays: [Holiday]
+    /// Noten, schriftlich und mündlich.
+    var grades: [Grade]
+    /// Wie viel Prozent die schriftlichen Noten je Fach zählen.
+    /// Schlüssel: Kennung des Fachs. Fehlt ein Fach, gilt halb und halb.
+    var gradeWeights: [String: Int]
     /// Die eigenen Angaben (Name, Klasse, Telefon …).
     var profile: Profile
     var settings: AppSettings
@@ -866,6 +890,8 @@ struct AppData: Codable {
          notes: [Note] = [],
          events: [CalendarEvent] = [],
          holidays: [Holiday] = [],
+         grades: [Grade] = [],
+         gradeWeights: [String: Int] = [:],
          profile: Profile = Profile(),
          settings: AppSettings = AppSettings(),
          lock: LockSettings = LockSettings()) {
@@ -878,6 +904,8 @@ struct AppData: Codable {
         self.notes = notes
         self.events = events
         self.holidays = holidays
+        self.grades = grades
+        self.gradeWeights = gradeWeights
         self.profile = profile
         self.settings = settings
         self.lock = lock
@@ -894,6 +922,9 @@ struct AppData: Codable {
         notes = try container.decodeIfPresent([Note].self, forKey: .notes) ?? []
         events = try container.decodeIfPresent([CalendarEvent].self, forKey: .events) ?? []
         holidays = try container.decodeIfPresent([Holiday].self, forKey: .holidays) ?? []
+        // Noten gibt es erst seit dieser Fassung – ältere Sicherungen haben keine.
+        grades = try container.decodeIfPresent([Grade].self, forKey: .grades) ?? []
+        gradeWeights = try container.decodeIfPresent([String: Int].self, forKey: .gradeWeights) ?? [:]
         profile = try container.decodeIfPresent(Profile.self, forKey: .profile) ?? Profile()
         settings = try container.decodeIfPresent(AppSettings.self, forKey: .settings) ?? AppSettings()
         lock = try container.decodeIfPresent(LockSettings.self, forKey: .lock) ?? LockSettings()
@@ -946,6 +977,17 @@ struct AppData: Codable {
                 event.startMinutes = nil
             }
             return event
+        }
+
+        // Noten nur zu vorhandenen Fächern, mit gültigem Wert und Datum.
+        grades = grades.filter { grade in
+            validIDs.contains(grade.subjectID)
+                && GradeScale.validValues.contains(grade.value)
+                && SchoolCalendar.date(fromDayKey: grade.dayKey) != nil
+        }
+        let gueltigeKennungen = Set(validIDs.map(\.uuidString))
+        gradeWeights = gradeWeights.filter { kennung, prozent in
+            gueltigeKennungen.contains(kennung) && (0...100).contains(prozent)
         }
 
         // Ferien ohne gültigen Zeitraum wären nur verwirrend.
@@ -1438,7 +1480,203 @@ enum FederalState: String, Codable, Hashable, CaseIterable, Identifiable {
 
 
 ================================================================================
-  10. HausaufgabenApp/Models/Holiday.swift
+  10. HausaufgabenApp/Models/Grade.swift
+================================================================================
+
+import Foundation
+
+/// Schriftlich oder mündlich.
+enum GradeKind: String, Codable, Hashable, CaseIterable, Identifiable {
+    case written
+    case oral
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .written: return "Schriftlich"
+        case .oral:    return "Mündlich"
+        }
+    }
+
+    var examples: String {
+        switch self {
+        case .written: return "Klassenarbeiten, Tests, Lernkontrollen"
+        case .oral:    return "Mitarbeit, Referate, Abfragen"
+        }
+    }
+}
+
+/// Eine Note in einem Fach.
+struct Grade: Codable, Hashable, Identifiable {
+    var id: UUID
+    var subjectID: UUID
+    var kind: GradeKind
+    /// Der Notenwert: 1+ ist 0,7, 1 ist 1,0, 1- ist 1,3 … 6 ist 6,0.
+    var value: Double
+    /// Der Tag ("yyyy-MM-dd"). Danach richtet sich auch das Halbjahr.
+    var dayKey: String
+    /// Wofür es die Note gab, z. B. „Klassenarbeit 2“. Freiwillig.
+    var title: String
+
+    init(id: UUID = UUID(),
+         subjectID: UUID,
+         kind: GradeKind,
+         value: Double,
+         dayKey: String,
+         title: String = "") {
+        self.id = id
+        self.subjectID = subjectID
+        self.kind = kind
+        self.value = value
+        self.dayKey = dayKey
+        self.title = title
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        subjectID = try container.decode(UUID.self, forKey: .subjectID)
+        kind = try container.decodeIfPresent(GradeKind.self, forKey: .kind) ?? .written
+        value = try container.decodeIfPresent(Double.self, forKey: .value) ?? 3
+        dayKey = try container.decodeIfPresent(String.self, forKey: .dayKey) ?? ""
+        title = try container.decodeIfPresent(String.self, forKey: .title) ?? ""
+    }
+
+    var halfYear: SchoolHalfYear? { SchoolHalfYear(dayKey: dayKey) }
+
+    var trimmedTitle: String { title.trimmingCharacters(in: .whitespacesAndNewlines) }
+}
+
+/// Eine Stufe der Notenskala, z. B. „2-“ mit dem Wert 2,3.
+struct GradeStep: Hashable, Identifiable {
+    let name: String
+    let value: Double
+    var id: String { name }
+}
+
+/// Die übliche Notenskala von 1+ bis 6.
+enum GradeScale {
+    static let steps: [GradeStep] = [
+        GradeStep(name: "1+", value: 0.7), GradeStep(name: "1", value: 1.0), GradeStep(name: "1-", value: 1.3),
+        GradeStep(name: "2+", value: 1.7), GradeStep(name: "2", value: 2.0), GradeStep(name: "2-", value: 2.3),
+        GradeStep(name: "3+", value: 2.7), GradeStep(name: "3", value: 3.0), GradeStep(name: "3-", value: 3.3),
+        GradeStep(name: "4+", value: 3.7), GradeStep(name: "4", value: 4.0), GradeStep(name: "4-", value: 4.3),
+        GradeStep(name: "5+", value: 4.7), GradeStep(name: "5", value: 5.0), GradeStep(name: "5-", value: 5.3),
+        GradeStep(name: "6", value: 6.0)
+    ]
+
+    static let validValues: ClosedRange<Double> = 0.7...6.0
+
+    /// „2-“ für 2,3 usw.
+    static func name(for value: Double) -> String {
+        steps.first { abs($0.value - value) < 0.01 }?.name ?? averageText(value)
+    }
+
+    /// Ein Schnitt mit einer Nachkommastelle, kaufmännisch gerundet: 1,65 wird 1,7.
+    /// Ohne das kleine Plus landet 1,65 wegen der Rechengenauigkeit bei 1,6.
+    static func averageText(_ value: Double) -> String {
+        let gerundet = (value * 10 + 1e-9).rounded() / 10
+        return String(format: "%.1f", gerundet).replacingOccurrences(of: ".", with: ",")
+    }
+
+    /// Wie viel Prozent die schriftlichen Noten zählen – zur Auswahl.
+    static let writtenShares: [Int] = [70, 60, 50, 40, 30]
+    static let defaultWrittenShare = 50
+}
+
+/// Ein Schulhalbjahr: August bis Januar ist das erste, Februar bis Juli das zweite.
+///
+/// `year` ist das Jahr, in dem das Schuljahr beginnt – 2026 steht für 2026/27.
+struct SchoolHalfYear: Hashable, Comparable {
+    var year: Int
+    var half: Int
+
+    init(year: Int, half: Int) {
+        self.year = year
+        self.half = half
+    }
+
+    init?(dayKey: String) {
+        let teile = dayKey.split(separator: "-").compactMap { Int($0) }
+        guard teile.count == 3 else { return nil }
+        self.init(year: teile[0], month: teile[1])
+    }
+
+    init(date: Date) {
+        let komponenten = Calendar(identifier: .gregorian).dateComponents([.year, .month], from: date)
+        self.init(year: komponenten.year ?? 2000, month: komponenten.month ?? 1)
+    }
+
+    private init(year: Int, month: Int) {
+        if month >= 8 {
+            self.year = year; half = 1
+        } else if month == 1 {
+            self.year = year - 1; half = 1
+        } else {
+            self.year = year - 1; half = 2
+        }
+    }
+
+    static var current: SchoolHalfYear { SchoolHalfYear(date: Date()) }
+
+    /// „1. Halbjahr 2026/27“
+    var title: String {
+        let folgejahr = String(year + 1).suffix(2)
+        return "\(half). Halbjahr \(year)/\(folgejahr)"
+    }
+
+    var next: SchoolHalfYear {
+        half == 1 ? SchoolHalfYear(year: year, half: 2) : SchoolHalfYear(year: year + 1, half: 1)
+    }
+
+    var previous: SchoolHalfYear {
+        half == 2 ? SchoolHalfYear(year: year, half: 1) : SchoolHalfYear(year: year - 1, half: 2)
+    }
+
+    static func < (lhs: SchoolHalfYear, rhs: SchoolHalfYear) -> Bool {
+        (lhs.year, lhs.half) < (rhs.year, rhs.half)
+    }
+}
+
+/// Der Stand eines Fachs in einem Halbjahr.
+struct SubjectGradeSummary {
+    var grades: [Grade]
+    var writtenAverage: Double?
+    var oralAverage: Double?
+    /// Anteil der schriftlichen Noten am Schnitt, 0…1.
+    var writtenShare: Double
+
+    /// Schriftlich und mündlich getrennt gemittelt, dann gewichtet.
+    /// Fehlt eine Seite, zählt nur die andere.
+    var total: Double? {
+        switch (writtenAverage, oralAverage) {
+        case let (s?, m?): return s * writtenShare + m * (1 - writtenShare)
+        case let (s?, nil): return s
+        case let (nil, m?): return m
+        default: return nil
+        }
+    }
+
+    func grades(of kind: GradeKind) -> [Grade] {
+        grades.filter { $0.kind == kind }.sorted { $0.dayKey < $1.dayKey }
+    }
+
+    static func average(_ values: [Double]) -> Double? {
+        values.isEmpty ? nil : values.reduce(0, +) / Double(values.count)
+    }
+}
+
+/// Ein Fach mit seinen Noten in einem Halbjahr – für Listen in der Oberfläche.
+struct SubjectGrades: Identifiable {
+    let subject: Subject
+    let summary: SubjectGradeSummary
+    var id: UUID { subject.id }
+}
+
+
+================================================================================
+  11. HausaufgabenApp/Models/Holiday.swift
 ================================================================================
 
 import SwiftUI
@@ -1608,7 +1846,7 @@ struct Holiday: Identifiable, Codable, Hashable {
 
 
 ================================================================================
-  11. HausaufgabenApp/Models/HomeworkEntry.swift
+  12. HausaufgabenApp/Models/HomeworkEntry.swift
 ================================================================================
 
 import Foundation
@@ -1650,7 +1888,7 @@ struct HomeworkEntry: Identifiable, Codable, Hashable {
 
 
 ================================================================================
-  12. HausaufgabenApp/Models/Lesson.swift
+  13. HausaufgabenApp/Models/Lesson.swift
 ================================================================================
 
 import Foundation
@@ -1692,7 +1930,7 @@ struct Lesson: Identifiable, Codable, Hashable {
 
 
 ================================================================================
-  13. HausaufgabenApp/Models/LockSettings.swift
+  14. HausaufgabenApp/Models/LockSettings.swift
 ================================================================================
 
 import Foundation
@@ -1847,7 +2085,7 @@ struct LockSettings: Codable, Hashable {
 
 
 ================================================================================
-  14. HausaufgabenApp/Models/Note.swift
+  15. HausaufgabenApp/Models/Note.swift
 ================================================================================
 
 import Foundation
@@ -1920,7 +2158,7 @@ struct Note: Identifiable, Codable, Hashable {
 
 
 ================================================================================
-  15. HausaufgabenApp/Models/Profile.swift
+  16. HausaufgabenApp/Models/Profile.swift
 ================================================================================
 
 import Foundation
@@ -1998,7 +2236,7 @@ struct Profile: Codable, Hashable {
 
 
 ================================================================================
-  16. HausaufgabenApp/Models/Subject.swift
+  17. HausaufgabenApp/Models/Subject.swift
 ================================================================================
 
 import SwiftUI
@@ -2072,7 +2310,7 @@ extension Subject {
 
 
 ================================================================================
-  17. HausaufgabenApp/Store/AppStore.swift
+  18. HausaufgabenApp/Store/AppStore.swift
 ================================================================================
 
 import Foundation
@@ -2094,6 +2332,10 @@ final class AppStore: ObservableObject {
     @Published private(set) var events: [CalendarEvent]
     /// Ferien mit Anfang und Ende.
     @Published private(set) var holidays: [Holiday]
+    /// Noten, schriftlich und mündlich.
+    @Published private(set) var grades: [Grade]
+    /// Prozent, die die schriftlichen Noten je Fach zählen (Schlüssel: Fach-Kennung).
+    @Published private(set) var gradeWeights: [String: Int]
     /// Die eigenen Angaben – frei änderbar, deshalb ohne private(set).
     @Published var profile: Profile {
         didSet {
@@ -2146,6 +2388,8 @@ final class AppStore: ObservableObject {
         self.notes = data.notes
         self.events = data.events
         self.holidays = data.holidays
+        self.grades = data.grades
+        self.gradeWeights = data.gradeWeights
         self.profile = data.profile
         self.settings = data.settings
         self.lock = data.lock
@@ -2193,6 +2437,8 @@ final class AppStore: ObservableObject {
         subjects.removeAll { $0.id == id }
         lessons.removeAll { $0.subjectID == id }
         homework.removeAll { $0.subjectID == id }
+        grades.removeAll { $0.subjectID == id }
+        gradeWeights.removeValue(forKey: id.uuidString)
         scheduleSave()
     }
 
@@ -2854,6 +3100,64 @@ final class AppStore: ObservableObject {
         }
     }
 
+    // MARK: - Noten
+
+    /// Legt eine Note an oder ersetzt sie, wenn es sie schon gibt.
+    func saveGrade(_ grade: Grade) {
+        guard subjects.contains(where: { $0.id == grade.subjectID }),
+              GradeScale.validValues.contains(grade.value),
+              SchoolCalendar.date(fromDayKey: grade.dayKey) != nil else { return }
+        var grade = grade
+        grade.title = grade.trimmedTitle
+        if let index = grades.firstIndex(where: { $0.id == grade.id }) {
+            grades[index] = grade
+        } else {
+            grades.append(grade)
+        }
+        scheduleSave()
+    }
+
+    func deleteGrade(id: UUID) {
+        grades.removeAll { $0.id == id }
+        scheduleSave()
+    }
+
+    /// Wie viel Prozent die schriftlichen Noten in einem Fach zählen.
+    func writtenShare(forSubject id: UUID) -> Int {
+        gradeWeights[id.uuidString] ?? GradeScale.defaultWrittenShare
+    }
+
+    func setWrittenShare(_ percent: Int, forSubject id: UUID) {
+        guard (0...100).contains(percent) else { return }
+        gradeWeights[id.uuidString] = percent
+        scheduleSave()
+    }
+
+    /// Schnitt eines Fachs in einem Halbjahr.
+    func gradeSummary(forSubject id: UUID, in halfYear: SchoolHalfYear) -> SubjectGradeSummary {
+        let liste = grades.filter { $0.subjectID == id && $0.halfYear == halfYear }
+        return SubjectGradeSummary(
+            grades: liste,
+            writtenAverage: SubjectGradeSummary.average(liste.filter { $0.kind == .written }.map(\.value)),
+            oralAverage: SubjectGradeSummary.average(liste.filter { $0.kind == .oral }.map(\.value)),
+            writtenShare: Double(writtenShare(forSubject: id)) / 100)
+    }
+
+    /// Fächer mit mindestens einer Note im Halbjahr, in der Reihenfolge der Fächerliste.
+    func subjectsWithGrades(in halfYear: SchoolHalfYear) -> [SubjectGrades] {
+        sortedSubjects.compactMap { subject in
+            let summary = gradeSummary(forSubject: subject.id, in: halfYear)
+            return summary.grades.isEmpty ? nil : SubjectGrades(subject: subject, summary: summary)
+        }
+    }
+
+    /// Gesamtschnitt: jedes Fach mit Noten zählt gleich viel.
+    func overallAverage(in halfYear: SchoolHalfYear) -> (value: Double, subjectCount: Int)? {
+        let schnitte = subjectsWithGrades(in: halfYear).compactMap { $0.summary.total }
+        guard let wert = SubjectGradeSummary.average(schnitte) else { return nil }
+        return (wert, schnitte.count)
+    }
+
     // MARK: - Daten ersetzen
 
     func replaceAll(with data: AppData) {
@@ -2867,6 +3171,8 @@ final class AppStore: ObservableObject {
         notes = data.notes
         events = data.events
         holidays = data.holidays
+        grades = data.grades
+        gradeWeights = data.gradeWeights
         profile = data.profile
         settings = data.settings
         // Die Anmeldung bleibt, wie sie auf diesem Gerät eingestellt ist:
@@ -2898,6 +3204,8 @@ final class AppStore: ObservableObject {
                 notes: notes,
                 events: events,
                 holidays: holidays,
+                grades: grades,
+                gradeWeights: gradeWeights,
                 profile: profile,
                 settings: settings,
                 lock: lock)
@@ -2976,7 +3284,7 @@ final class AppStore: ObservableObject {
 
 
 ================================================================================
-  18. HausaufgabenApp/Store/LockController.swift
+  19. HausaufgabenApp/Store/LockController.swift
 ================================================================================
 
 import Foundation
@@ -3104,7 +3412,7 @@ final class LockController: ObservableObject {
 
 
 ================================================================================
-  19. HausaufgabenApp/Support/AppTheme.swift
+  20. HausaufgabenApp/Support/AppTheme.swift
 ================================================================================
 
 import SwiftUI
@@ -3220,7 +3528,7 @@ func hideKeyboard() {
 
 
 ================================================================================
-  20. HausaufgabenApp/Support/BackupDocument.swift
+  21. HausaufgabenApp/Support/BackupDocument.swift
 ================================================================================
 
 import SwiftUI
@@ -3251,7 +3559,7 @@ struct BackupDocument: FileDocument {
 
 
 ================================================================================
-  21. HausaufgabenApp/Support/DoodleBackground.swift
+  22. HausaufgabenApp/Support/DoodleBackground.swift
 ================================================================================
 
 import SwiftUI
@@ -3328,7 +3636,7 @@ struct DoodleCanvas: View {
 
 
 ================================================================================
-  22. HausaufgabenApp/Support/Haptics.swift
+  23. HausaufgabenApp/Support/Haptics.swift
 ================================================================================
 
 import UIKit
@@ -3360,7 +3668,7 @@ enum Haptics {
 
 
 ================================================================================
-  23. HausaufgabenApp/Support/HomyLogo.swift
+  24. HausaufgabenApp/Support/HomyLogo.swift
 ================================================================================
 
 import SwiftUI
@@ -3493,7 +3801,7 @@ struct HomyWordmark: View {
 
 
 ================================================================================
-  24. HausaufgabenApp/Support/PublicHolidays.swift
+  25. HausaufgabenApp/Support/PublicHolidays.swift
 ================================================================================
 
 import Foundation
@@ -3688,7 +3996,7 @@ enum PublicHolidays {
 
 
 ================================================================================
-  25. HausaufgabenApp/Support/Reminders.swift
+  26. HausaufgabenApp/Support/Reminders.swift
 ================================================================================
 
 import Foundation
@@ -3866,7 +4174,7 @@ extension Holiday {
 
 
 ================================================================================
-  26. HausaufgabenApp/Support/SchoolCalendar.swift
+  27. HausaufgabenApp/Support/SchoolCalendar.swift
 ================================================================================
 
 import Foundation
@@ -4053,7 +4361,7 @@ enum SchoolCalendar {
 
 
 ================================================================================
-  27. HausaufgabenApp/Support/SubjectNames.swift
+  28. HausaufgabenApp/Support/SubjectNames.swift
 ================================================================================
 
 import Foundation
@@ -4143,7 +4451,7 @@ enum SubjectNames {
 
 
 ================================================================================
-  28. HausaufgabenApp/Support/TimetableRecognizer.swift
+  29. HausaufgabenApp/Support/TimetableRecognizer.swift
 ================================================================================
 
 import Foundation
@@ -4554,7 +4862,7 @@ extension UIImage {
 
 
 ================================================================================
-  29. HausaufgabenApp/Views/Calendar/CalendarView.swift
+  30. HausaufgabenApp/Views/Calendar/CalendarView.swift
 ================================================================================
 
 import SwiftUI
@@ -5410,7 +5718,7 @@ struct HolidayRow: View {
 
 
 ================================================================================
-  30. HausaufgabenApp/Views/Calendar/EventEditorView.swift
+  31. HausaufgabenApp/Views/Calendar/EventEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -5641,7 +5949,7 @@ struct EventEditorView: View {
 
 
 ================================================================================
-  31. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
+  32. HausaufgabenApp/Views/Calendar/HolidayEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -5880,7 +6188,477 @@ struct HolidayEditorView: View {
 
 
 ================================================================================
-  32. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
+  33. HausaufgabenApp/Views/Grades/GradeEditorView.swift
+================================================================================
+
+import SwiftUI
+
+/// Eine Note eintragen oder ändern.
+struct GradeEditorView: View {
+    /// Die Note, die geändert wird – `nil` für eine neue.
+    let existing: Grade?
+    /// Welches Fach bei einer neuen Note vorausgewählt ist.
+    var defaultSubjectID: UUID?
+    /// Wird nach dem Sichern aufgerufen.
+    var onSaved: (Grade) -> Void = { _ in }
+
+    @EnvironmentObject private var store: AppStore
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var subjectID: UUID?
+    @State private var kind: GradeKind = .written
+    @State private var value: Double?
+    @State private var date = Date()
+    @State private var title = ""
+    @State private var problem: String?
+    @State private var confirmDelete = false
+    @State private var didLoad = false
+
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 3)
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Picker("Fach", selection: $subjectID) {
+                        ForEach(store.sortedSubjects) { fach in
+                            Text(fach.displayName).tag(Optional(fach.id))
+                        }
+                    }
+                    DatePicker("Datum", selection: $date, displayedComponents: .date)
+                    TextField("Wofür, z. B. Klassenarbeit 2", text: $title)
+                }
+
+                Section {
+                    Picker("Art", selection: $kind) {
+                        ForEach(GradeKind.allCases) { art in
+                            Text(art.title).tag(art)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                } header: {
+                    Text("Art")
+                } footer: {
+                    Text("\(kind.title): \(kind.examples).")
+                }
+
+                Section {
+                    LazyVGrid(columns: columns, spacing: 8) {
+                        ForEach(GradeScale.steps) { stufe in
+                            gradeButton(stufe)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                } header: {
+                    Text("Note")
+                }
+
+                if let problem {
+                    Section {
+                        Label(problem, systemImage: "exclamationmark.triangle.fill")
+                            .font(.footnote)
+                            .foregroundStyle(.red)
+                    }
+                }
+
+                if existing != nil {
+                    Section {
+                        Button("Note löschen", role: .destructive) {
+                            confirmDelete = true
+                        }
+                    }
+                }
+            }
+            .environment(\.locale, Locale(identifier: "de_DE"))
+            .navigationTitle(existing == nil ? "Note eintragen" : "Note ändern")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Abbrechen") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Sichern") { save() }
+                        .font(.body.weight(.semibold))
+                }
+            }
+            .confirmationDialog("Note löschen?",
+                                isPresented: $confirmDelete,
+                                titleVisibility: .visible) {
+                Button("Löschen", role: .destructive) {
+                    if let existing {
+                        store.deleteGrade(id: existing.id)
+                    }
+                    dismiss()
+                }
+            }
+            .onAppear(perform: load)
+        }
+    }
+
+    private func gradeButton(_ stufe: GradeStep) -> some View {
+        let gewaehlt = value == stufe.value
+        return Button {
+            value = stufe.value
+            problem = nil
+            Haptics.tap()
+        } label: {
+            Text(stufe.name)
+                .font(.title3.weight(.semibold))
+                .monospacedDigit()
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .foregroundStyle(gewaehlt ? Color.white : Color.primary)
+                .background(gewaehlt ? Color.accentColor : Color(.tertiarySystemFill),
+                            in: RoundedRectangle(cornerRadius: 10))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Note \(stufe.name)")
+        .accessibilityAddTraits(gewaehlt ? .isSelected : [])
+    }
+
+    // MARK: - Laden und Sichern
+
+    private func load() {
+        guard !didLoad else { return }
+        didLoad = true
+
+        if let existing {
+            subjectID = existing.subjectID
+            kind = existing.kind
+            value = existing.value
+            date = SchoolCalendar.date(fromDayKey: existing.dayKey) ?? Date()
+            title = existing.title
+        } else {
+            let gibtEs = defaultSubjectID.flatMap { id in store.subjects.contains { $0.id == id } ? id : nil }
+            subjectID = gibtEs ?? store.sortedSubjects.first?.id
+        }
+    }
+
+    private func save() {
+        guard let subjectID else {
+            problem = "Wähl ein Fach aus. Fächer legst du unter „Fächer“ an."
+            return
+        }
+        guard let value else {
+            problem = "Tipp noch die Note an."
+            return
+        }
+
+        let note = Grade(id: existing?.id ?? UUID(),
+                         subjectID: subjectID,
+                         kind: kind,
+                         value: value,
+                         dayKey: SchoolCalendar.dayKey(date),
+                         title: title)
+        store.saveGrade(note)
+        Haptics.success()
+        onSaved(note)
+        dismiss()
+    }
+}
+
+
+================================================================================
+  34. HausaufgabenApp/Views/Grades/GradesView.swift
+================================================================================
+
+import SwiftUI
+
+/// Die Noten: je Fach schriftlich und mündlich, mit Schnitt – Halbjahr für Halbjahr.
+struct GradesView: View {
+    @EnvironmentObject private var store: AppStore
+
+    @State private var halfYear = SchoolHalfYear.current
+    @State private var editing: GradeEditorTarget?
+    /// Das zuletzt benutzte Fach – die nächste Note ist oft im selben.
+    @State private var lastSubjectID: UUID?
+
+    var body: some View {
+        let faecher = store.subjectsWithGrades(in: halfYear)
+
+        ScrollView {
+            VStack(spacing: 12) {
+                halfYearSwitcher
+
+                if let gesamt = store.overallAverage(in: halfYear) {
+                    overallCard(value: gesamt.value, subjectCount: gesamt.subjectCount)
+                }
+
+                addButton
+
+                if faecher.isEmpty {
+                    emptyHint
+                }
+
+                ForEach(faecher) { eintrag in
+                    subjectCard(eintrag)
+                }
+
+                Text("Noten von 1+ bis 6. Für den Schnitt eines Fachs werden die schriftlichen und die mündlichen Noten getrennt gemittelt und dann nach der Gewichtung zusammengerechnet; fehlt eine Seite, zählt nur die andere. Wie stark was zählt, legt jede Lehrkraft selbst fest – frag am besten nach und stell es hier ein.\n\nDie Halbjahre gehen von August bis Januar und von Februar bis Juli. Homy ordnet jede Note nach ihrem Datum ein.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 4)
+                    .padding(.top, 4)
+            }
+            .padding(16)
+            .frame(maxWidth: 700)
+            .frame(maxWidth: .infinity)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Noten")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    editing = .new
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .accessibilityLabel("Note eintragen")
+            }
+        }
+        .sheet(item: $editing) { target in
+            GradeEditorView(existing: target.grade,
+                            defaultSubjectID: lastSubjectID) { gespeichert in
+                lastSubjectID = gespeichert.subjectID
+                // Das Halbjahr der Note zeigen – sonst wäre sie scheinbar verschwunden.
+                if let hj = gespeichert.halfYear { halfYear = hj }
+            }
+            .environmentObject(store)
+        }
+    }
+
+    // MARK: - Teile
+
+    private var halfYearSwitcher: some View {
+        HStack(spacing: 12) {
+            Button {
+                halfYear = halfYear.previous
+            } label: {
+                Image(systemName: "chevron.left")
+                    .frame(width: 34, height: 34)
+                    .background(Color(.secondarySystemGroupedBackground), in: Circle())
+            }
+            .accessibilityLabel("Voriges Halbjahr")
+
+            Text(halfYear.title)
+                .font(.subheadline.weight(.semibold))
+                .monospacedDigit()
+                .frame(minWidth: 190)
+
+            Button {
+                halfYear = halfYear.next
+            } label: {
+                Image(systemName: "chevron.right")
+                    .frame(width: 34, height: 34)
+                    .background(Color(.secondarySystemGroupedBackground), in: Circle())
+            }
+            .accessibilityLabel("Nächstes Halbjahr")
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.tint)
+        .padding(.bottom, 2)
+    }
+
+    private func overallCard(value: Double, subjectCount: Int) -> some View {
+        HStack(spacing: 16) {
+            Text(GradeScale.averageText(value))
+                .font(.system(size: 40, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.tint)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Gesamtschnitt")
+                    .font(.subheadline.weight(.semibold))
+                Text("aus \(subjectCount) \(subjectCount == 1 ? "Fach" : "Fächern"), jedes Fach zählt gleich viel")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(16)
+        .background(Color(.secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+        .accessibilityElement(children: .combine)
+    }
+
+    private var addButton: some View {
+        Button {
+            editing = .new
+        } label: {
+            Label("Note eintragen", systemImage: "plus")
+                .font(.body)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 15)
+                .background(
+                    RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
+                        .strokeBorder(Color.accentColor.opacity(0.35),
+                                      style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
+                        .background(Color(.secondarySystemGroupedBackground),
+                                    in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+                )
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.secondary)
+    }
+
+    private var emptyHint: some View {
+        VStack(spacing: 8) {
+            Text("Noch keine Noten in diesem Halbjahr")
+                .font(.headline)
+            Text("Trag jede Note ein, sobald du sie bekommst – schriftliche wie Klassenarbeiten und Tests, mündliche wie Mitarbeit und Referate. Homy rechnet den Schnitt je Fach und insgesamt aus.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 20)
+        .padding(.horizontal, 12)
+    }
+
+    private func subjectCard(_ eintrag: SubjectGrades) -> some View {
+        let fach = eintrag.subject
+        let stand = eintrag.summary
+        let prozent = store.writtenShare(forSubject: fach.id)
+
+        return VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 10) {
+                SubjectBadge(subject: fach, width: 40)
+                Text(fach.displayName)
+                    .font(.headline)
+                    .lineLimit(1)
+                Spacer(minLength: 8)
+                if let gesamt = stand.total {
+                    Text(GradeScale.averageText(gesamt))
+                        .font(.title2.weight(.bold))
+                        .monospacedDigit()
+                        .accessibilityLabel("Schnitt \(GradeScale.averageText(gesamt))")
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.top, 12)
+            .padding(.bottom, 6)
+
+            ForEach(GradeKind.allCases) { art in
+                kindRow(art, summary: stand)
+            }
+
+            Divider()
+                .padding(.top, 6)
+
+            Menu {
+                ForEach(GradeScale.writtenShares, id: \.self) { anteil in
+                    Button {
+                        store.setWrittenShare(anteil, forSubject: fach.id)
+                    } label: {
+                        if anteil == prozent {
+                            Label("\(anteil) % schriftlich, \(100 - anteil) % mündlich", systemImage: "checkmark")
+                        } else {
+                            Text("\(anteil) % schriftlich, \(100 - anteil) % mündlich")
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Text("Zählt \(prozent) % schriftlich, \(100 - prozent) % mündlich")
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption2)
+                }
+                .font(.footnote)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .background(Color(.secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+    }
+
+    private func kindRow(_ art: GradeKind, summary: SubjectGradeSummary) -> some View {
+        let liste = summary.grades(of: art)
+        let schnitt = art == .written ? summary.writtenAverage : summary.oralAverage
+
+        return HStack(spacing: 10) {
+            Text(art.title)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .frame(width: 82, alignment: .leading)
+
+            if liste.isEmpty {
+                Text("–")
+                    .foregroundStyle(.tertiary)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(liste) { note in
+                            gradeChip(note)
+                        }
+                    }
+                }
+            }
+
+            Spacer(minLength: 0)
+
+            if let schnitt {
+                Text("Ø \(GradeScale.averageText(schnitt))")
+                    .font(.footnote)
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 5)
+    }
+
+    private func gradeChip(_ note: Grade) -> some View {
+        Button {
+            editing = .edit(note)
+        } label: {
+            Text(GradeScale.name(for: note.value))
+                .font(.subheadline.weight(.semibold))
+                .monospacedDigit()
+                .frame(minWidth: 38)
+                .padding(.vertical, 5)
+                .padding(.horizontal, 6)
+                .background(Color(.tertiarySystemFill), in: RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(chipLabel(note))
+        .accessibilityHint("Zum Ändern antippen")
+    }
+
+    private func chipLabel(_ note: Grade) -> String {
+        let titel = note.trimmedTitle
+        return titel.isEmpty
+            ? "Note \(GradeScale.name(for: note.value))"
+            : "Note \(GradeScale.name(for: note.value)), \(titel)"
+    }
+}
+
+/// Was der Noten-Editor öffnen soll: eine neue Note oder eine vorhandene.
+enum GradeEditorTarget: Identifiable {
+    case new
+    case edit(Grade)
+
+    var id: String {
+        switch self {
+        case .new: return "neu"
+        case .edit(let note): return note.id.uuidString
+        }
+    }
+
+    var grade: Grade? {
+        if case .edit(let note) = self { return note }
+        return nil
+    }
+}
+
+
+================================================================================
+  35. HausaufgabenApp/Views/Homework/HomeworkDayCard.swift
 ================================================================================
 
 import SwiftUI
@@ -6220,7 +6998,7 @@ struct HomeworkDayCard: View {
 
 
 ================================================================================
-  33. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
+  36. HausaufgabenApp/Views/Homework/HomeworkPagerView.swift
 ================================================================================
 
 import SwiftUI
@@ -6401,7 +7179,7 @@ struct HomeworkPagerView: View {
 
 
 ================================================================================
-  34. HausaufgabenApp/Views/Homework/HomeworkRow.swift
+  37. HausaufgabenApp/Views/Homework/HomeworkRow.swift
 ================================================================================
 
 import SwiftUI
@@ -6597,7 +7375,7 @@ struct SubjectBadge: View {
 
 
 ================================================================================
-  35. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
+  38. HausaufgabenApp/Views/Homework/HomeworkWeekView.swift
 ================================================================================
 
 import SwiftUI
@@ -6753,7 +7531,7 @@ struct HintBox: View {
 
 
 ================================================================================
-  36. HausaufgabenApp/Views/Homework/SearchView.swift
+  39. HausaufgabenApp/Views/Homework/SearchView.swift
 ================================================================================
 
 import SwiftUI
@@ -6903,7 +7681,7 @@ struct SearchResultRow: View {
 
 
 ================================================================================
-  37. HausaufgabenApp/Views/Lock/AppGateView.swift
+  40. HausaufgabenApp/Views/Lock/AppGateView.swift
 ================================================================================
 
 import SwiftUI
@@ -6946,7 +7724,7 @@ struct AppGateView: View {
 
 
 ================================================================================
-  38. HausaufgabenApp/Views/Lock/LockSetupView.swift
+  41. HausaufgabenApp/Views/Lock/LockSetupView.swift
 ================================================================================
 
 import SwiftUI
@@ -7058,7 +7836,7 @@ struct LockSetupView: View {
 
 
 ================================================================================
-  39. HausaufgabenApp/Views/Lock/LockView.swift
+  42. HausaufgabenApp/Views/Lock/LockView.swift
 ================================================================================
 
 import SwiftUI
@@ -7283,7 +8061,7 @@ struct LockView: View {
 
 
 ================================================================================
-  40. HausaufgabenApp/Views/Notes/NoteDetailView.swift
+  43. HausaufgabenApp/Views/Notes/NoteDetailView.swift
 ================================================================================
 
 import SwiftUI
@@ -7366,7 +8144,7 @@ struct NoteDetailView: View {
 
 
 ================================================================================
-  41. HausaufgabenApp/Views/Notes/NotesView.swift
+  44. HausaufgabenApp/Views/Notes/NotesView.swift
 ================================================================================
 
 import SwiftUI
@@ -7506,7 +8284,7 @@ struct NoteRow: View {
 
 
 ================================================================================
-  42. HausaufgabenApp/Views/RootView.swift
+  45. HausaufgabenApp/Views/RootView.swift
 ================================================================================
 
 import SwiftUI
@@ -7562,7 +8340,7 @@ struct RootView: View {
 
 
 ================================================================================
-  43. HausaufgabenApp/Views/Settings/ProfileView.swift
+  46. HausaufgabenApp/Views/Settings/ProfileView.swift
 ================================================================================
 
 import SwiftUI
@@ -7695,7 +8473,7 @@ struct LabeledField: View {
 
 
 ================================================================================
-  44. HausaufgabenApp/Views/Settings/SettingsView.swift
+  47. HausaufgabenApp/Views/Settings/SettingsView.swift
 ================================================================================
 
 import SwiftUI
@@ -8354,7 +9132,7 @@ struct SettingsView: View {
 
 
 ================================================================================
-  45. HausaufgabenApp/Views/Settings/TimetableSettingsView.swift
+  48. HausaufgabenApp/Views/Settings/TimetableSettingsView.swift
 ================================================================================
 
 import SwiftUI
@@ -8612,7 +9390,7 @@ struct TimetableSettingsView: View {
 
 
 ================================================================================
-  46. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
+  49. HausaufgabenApp/Views/Subjects/SubjectEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -8801,7 +9579,7 @@ struct SubjectEditorView: View {
 
 
 ================================================================================
-  47. HausaufgabenApp/Views/Subjects/SubjectsView.swift
+  50. HausaufgabenApp/Views/Subjects/SubjectsView.swift
 ================================================================================
 
 import SwiftUI
@@ -8972,8 +9750,9 @@ struct SubjectsView: View {
     private func deleteMessage(for subject: Subject) -> String {
         let lessons = store.lessonCount(forSubject: subject.id)
         let homework = store.homeworkCount(forSubject: subject.id)
+        let grades = store.grades.filter { $0.subjectID == subject.id }.count
 
-        if lessons == 0 && homework == 0 {
+        if lessons == 0 && homework == 0 && grades == 0 {
             return "Das Fach wird entfernt."
         }
 
@@ -8984,7 +9763,16 @@ struct SubjectsView: View {
         if homework > 0 {
             parts.append(homework == 1 ? "1 Hausaufgabe" : "\(homework) Hausaufgaben")
         }
-        return "Dabei werden auch \(parts.joined(separator: " und ")) gelöscht. Das lässt sich nicht rückgängig machen."
+        if grades > 0 {
+            parts.append(grades == 1 ? "1 Note" : "\(grades) Noten")
+        }
+        let liste: String
+        if parts.count > 1 {
+            liste = parts.dropLast().joined(separator: ", ") + " und " + parts[parts.count - 1]
+        } else {
+            liste = parts[0]
+        }
+        return "Dabei werden auch \(liste) gelöscht. Das lässt sich nicht rückgängig machen."
     }
 }
 
@@ -9075,7 +9863,7 @@ struct SubjectRow: View {
 
 
 ================================================================================
-  48. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
+  51. HausaufgabenApp/Views/Timetable/DocumentScannerView.swift
 ================================================================================
 
 import SwiftUI
@@ -9130,7 +9918,7 @@ struct DocumentScannerView: UIViewControllerRepresentable {
 
 
 ================================================================================
-  49. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
+  52. HausaufgabenApp/Views/Timetable/LessonEditorView.swift
 ================================================================================
 
 import SwiftUI
@@ -9266,7 +10054,7 @@ struct LessonEditorView: View {
 
 
 ================================================================================
-  50. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
+  53. HausaufgabenApp/Views/Timetable/ScanReviewView.swift
 ================================================================================
 
 import SwiftUI
@@ -9681,7 +10469,7 @@ struct ScanCellEditor: View {
 
 
 ================================================================================
-  51. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
+  54. HausaufgabenApp/Views/Timetable/TimetableScanFlow.swift
 ================================================================================
 
 import SwiftUI
@@ -9899,7 +10687,7 @@ private struct Tipp: View {
 
 
 ================================================================================
-  52. HausaufgabenApp/Views/Timetable/TimetableView.swift
+  55. HausaufgabenApp/Views/Timetable/TimetableView.swift
 ================================================================================
 
 import SwiftUI
@@ -9988,6 +10776,51 @@ struct TimetableView: View {
         }
     }
 
+    /// Der Weg zu den Noten – mit dem Schnitt des laufenden Halbjahrs.
+    private var gradesBanner: some View {
+        NavigationLink {
+            GradesView()
+                .environmentObject(store)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "list.number")
+                    .font(.title2)
+                    .foregroundStyle(.tint)
+                    .frame(width: 32)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Noten")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text(gradesSubtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var gradesSubtitle: String {
+        guard let gesamt = store.overallAverage(in: .current) else {
+            return "Schriftliche und mündliche Noten, Schnitt je Fach."
+        }
+        let faecher = gesamt.subjectCount == 1 ? "Fach" : "Fächern"
+        return "Schnitt \(GradeScale.averageText(gesamt.value)) aus \(gesamt.subjectCount) \(faecher)."
+    }
+
     /// Hinweis über dem Raster: den eigenen Plan abfotografieren statt tippen.
     private var scanBanner: some View {
         Button {
@@ -10040,9 +10873,13 @@ struct TimetableView: View {
 
     private var grid: some View {
         VStack(spacing: 0) {
-            scanBanner
+            gradesBanner
                 .padding(.horizontal, Self.outerPadding)
                 .padding(.top, Self.outerPadding)
+
+            scanBanner
+                .padding(.horizontal, Self.outerPadding)
+                .padding(.top, 8)
 
             GeometryReader { geometry in
                 ScrollView([.horizontal, .vertical]) {
@@ -10217,7 +11054,7 @@ struct TimetableCell: View {
 
 
 ================================================================================
-  53. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
+  56. HausaufgabenApp/Assets.xcassets/AccentColor.colorset/Contents.json
 ================================================================================
 
 {
@@ -10261,7 +11098,7 @@ struct TimetableCell: View {
 
 
 ================================================================================
-  54. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
+  57. HausaufgabenApp/Assets.xcassets/AppIcon.appiconset/Contents.json
 ================================================================================
 
 {
@@ -10281,7 +11118,7 @@ struct TimetableCell: View {
 
 
 ================================================================================
-  55. HausaufgabenApp/Assets.xcassets/Contents.json
+  58. HausaufgabenApp/Assets.xcassets/Contents.json
 ================================================================================
 
 {

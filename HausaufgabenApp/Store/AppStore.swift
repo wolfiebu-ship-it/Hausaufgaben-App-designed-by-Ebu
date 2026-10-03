@@ -17,6 +17,10 @@ final class AppStore: ObservableObject {
     @Published private(set) var events: [CalendarEvent]
     /// Ferien mit Anfang und Ende.
     @Published private(set) var holidays: [Holiday]
+    /// Noten, schriftlich und mündlich.
+    @Published private(set) var grades: [Grade]
+    /// Prozent, die die schriftlichen Noten je Fach zählen (Schlüssel: Fach-Kennung).
+    @Published private(set) var gradeWeights: [String: Int]
     /// Die eigenen Angaben – frei änderbar, deshalb ohne private(set).
     @Published var profile: Profile {
         didSet {
@@ -69,6 +73,8 @@ final class AppStore: ObservableObject {
         self.notes = data.notes
         self.events = data.events
         self.holidays = data.holidays
+        self.grades = data.grades
+        self.gradeWeights = data.gradeWeights
         self.profile = data.profile
         self.settings = data.settings
         self.lock = data.lock
@@ -116,6 +122,8 @@ final class AppStore: ObservableObject {
         subjects.removeAll { $0.id == id }
         lessons.removeAll { $0.subjectID == id }
         homework.removeAll { $0.subjectID == id }
+        grades.removeAll { $0.subjectID == id }
+        gradeWeights.removeValue(forKey: id.uuidString)
         scheduleSave()
     }
 
@@ -777,6 +785,64 @@ final class AppStore: ObservableObject {
         }
     }
 
+    // MARK: - Noten
+
+    /// Legt eine Note an oder ersetzt sie, wenn es sie schon gibt.
+    func saveGrade(_ grade: Grade) {
+        guard subjects.contains(where: { $0.id == grade.subjectID }),
+              GradeScale.validValues.contains(grade.value),
+              SchoolCalendar.date(fromDayKey: grade.dayKey) != nil else { return }
+        var grade = grade
+        grade.title = grade.trimmedTitle
+        if let index = grades.firstIndex(where: { $0.id == grade.id }) {
+            grades[index] = grade
+        } else {
+            grades.append(grade)
+        }
+        scheduleSave()
+    }
+
+    func deleteGrade(id: UUID) {
+        grades.removeAll { $0.id == id }
+        scheduleSave()
+    }
+
+    /// Wie viel Prozent die schriftlichen Noten in einem Fach zählen.
+    func writtenShare(forSubject id: UUID) -> Int {
+        gradeWeights[id.uuidString] ?? GradeScale.defaultWrittenShare
+    }
+
+    func setWrittenShare(_ percent: Int, forSubject id: UUID) {
+        guard (0...100).contains(percent) else { return }
+        gradeWeights[id.uuidString] = percent
+        scheduleSave()
+    }
+
+    /// Schnitt eines Fachs in einem Halbjahr.
+    func gradeSummary(forSubject id: UUID, in halfYear: SchoolHalfYear) -> SubjectGradeSummary {
+        let liste = grades.filter { $0.subjectID == id && $0.halfYear == halfYear }
+        return SubjectGradeSummary(
+            grades: liste,
+            writtenAverage: SubjectGradeSummary.average(liste.filter { $0.kind == .written }.map(\.value)),
+            oralAverage: SubjectGradeSummary.average(liste.filter { $0.kind == .oral }.map(\.value)),
+            writtenShare: Double(writtenShare(forSubject: id)) / 100)
+    }
+
+    /// Fächer mit mindestens einer Note im Halbjahr, in der Reihenfolge der Fächerliste.
+    func subjectsWithGrades(in halfYear: SchoolHalfYear) -> [SubjectGrades] {
+        sortedSubjects.compactMap { subject in
+            let summary = gradeSummary(forSubject: subject.id, in: halfYear)
+            return summary.grades.isEmpty ? nil : SubjectGrades(subject: subject, summary: summary)
+        }
+    }
+
+    /// Gesamtschnitt: jedes Fach mit Noten zählt gleich viel.
+    func overallAverage(in halfYear: SchoolHalfYear) -> (value: Double, subjectCount: Int)? {
+        let schnitte = subjectsWithGrades(in: halfYear).compactMap { $0.summary.total }
+        guard let wert = SubjectGradeSummary.average(schnitte) else { return nil }
+        return (wert, schnitte.count)
+    }
+
     // MARK: - Daten ersetzen
 
     func replaceAll(with data: AppData) {
@@ -790,6 +856,8 @@ final class AppStore: ObservableObject {
         notes = data.notes
         events = data.events
         holidays = data.holidays
+        grades = data.grades
+        gradeWeights = data.gradeWeights
         profile = data.profile
         settings = data.settings
         // Die Anmeldung bleibt, wie sie auf diesem Gerät eingestellt ist:
@@ -821,6 +889,8 @@ final class AppStore: ObservableObject {
                 notes: notes,
                 events: events,
                 holidays: holidays,
+                grades: grades,
+                gradeWeights: gradeWeights,
                 profile: profile,
                 settings: settings,
                 lock: lock)
